@@ -77,75 +77,19 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: appbar,
       body: ListView.builder(
-        itemBuilder: (_, index) { return FigmaEventBox(fem, ffem,width,height, appbar, bottomNavigationBar,context);/*OldEventBox(height, width, context, appbar, bottomNavigationBar);*/},),
+        itemBuilder: (_, index) { return
+
+          EventBox(fem, ffem,width,height, appbar, bottomNavigationBar,context);},),
+
+
+
+
         bottomNavigationBar: bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
   }
 
-  Container OldEventBox(double height, double width, BuildContext context, AppBar appbar, BottomAppBar bottomNavigationBar) {
-        return Container(
-          height: height / 3,
-          width: width,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-          ),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) =>
-                    EventPage(picture: 'images/Widewallsten.jpg',
-                        appbar: appbar,
-                        bottomNavigationBar: bottomNavigationBar)),
-              );
-            },
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(10.0),
-                child: SizedBox(
-                  height: height / 4, // adjust as needed
-                  width: width / 1.2, // adjust as needed
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black, width: 1),
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                            ),
-                            child: Image.network(
-                              'https://picsum.photos/300/150',
-                              // replace with your image URL
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Event Name',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-  }
-
-    Container FigmaEventBox(double fem, double ffem,double width,double height,appbar,bottomNavigationBar,context) {
+    Container EventBox(double fem, double ffem,double width,double height,appbar,bottomNavigationBar,context) {
       String eventImage = 'images/Widewallsten.jpg';
       String eventTime = '2023-03-23  kl:14:00';
       String eventName = 'Möte med Wallsten';
