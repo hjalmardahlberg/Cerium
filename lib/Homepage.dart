@@ -24,8 +24,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
      final bottomNavigationBar = finalBottomAppBar(context);
 
-     eventList.add(EventBox('images/Widewallsten.jpg','2023-03-23  kl:14:00', 'Möte med Wallsten',fem, ffem,width,height, appbar, bottomNavigationBar,context));
-     eventList.add(EventBox('images/home.png','2023-03-23  kl:17:00', 'Möte med Frugan',fem, ffem,width,height, appbar, bottomNavigationBar,context));
+     eventList.add(EventBox('images/wallsten.jpg','2023-03-23  kl:14:00', 'Möte med Wallsten',fem, ffem,width,height, appbar, bottomNavigationBar,context));
+     eventList.add(EventBox('images/edvard_inception.png','2023-03-23  kl:17:00', 'Möte med Frugan',fem, ffem,width,height, appbar, bottomNavigationBar,context));
 
     return Scaffold(
       appBar: appbar,
@@ -209,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         child: Image.asset(
                           eventImage,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fill,
                         ),
                       ),
                     ),
