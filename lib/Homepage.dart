@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'Event.dart';
+import 'addEvent.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -22,7 +23,7 @@ class _MyHomePageState extends State<MyHomePage> {
     double height = MediaQuery.of(context).size.height;
      final appbar = finalAppBar();
 
-     final bottomNavigationBar = finalBottomAppBar(context);
+     final bottomNavigationBar = finalBottomAppBar(context,'MyHomePage');
 
      eventList.add(EventBox('images/wallsten.jpg','2023-03-23  kl:14:00', 'Möte med Wallsten',fem, ffem,width,height, appbar, bottomNavigationBar,context));
      eventList.add(EventBox('images/edvard_inception.png','2023-03-23  kl:17:00', 'Möte med Frugan',fem, ffem,width,height, appbar, bottomNavigationBar,context));
@@ -35,33 +36,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
         bottomNavigationBar: bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
-  }
-
-  BottomAppBar finalBottomAppBar(BuildContext context) {
-    return BottomAppBar(
-     child: Row(
-       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-       children: <Widget>[
-         IconButton(
-           icon: Icon(Icons.event),
-           onPressed: () {},
-         ),
-         IconButton(
-           icon: Icon(Icons.add),
-           onPressed: () {
-             Navigator.push(
-               context,
-               MaterialPageRoute(builder: (_) => NextPage()),
-             );
-           },
-         ),
-         IconButton(
-           icon: Icon(Icons.navigate_next),
-           onPressed: () {},
-         ),
-       ],
-     ),
-   );
   }
 
   AppBar finalAppBar() {
@@ -90,6 +64,37 @@ class _MyHomePageState extends State<MyHomePage> {
               iconSize: 50,
               onPressed: () {},
             ),
+          ),
+        ],
+      ),
+    );
+  }
+  BottomAppBar finalBottomAppBar(BuildContext context, String pageName) {
+    return BottomAppBar(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.event),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              if(pageName != 'AddEventPage') {
+                Navigator.push(
+
+                  context,
+                  MaterialPageRoute(builder: (_) =>
+                      AddEventPage(appbar: finalAppBar(),
+                        bottomNavigationBar: finalBottomAppBar(context,'AddEventPage'))),
+                );
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.navigate_next),
+            onPressed: () {},
           ),
         ],
       ),
