@@ -23,7 +23,7 @@ class _EventPageState extends State<EventPage> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     String eventName = 'Möte med Wallsten';
-    String date ='2023-03-23';
+    String date = '2023-03-23';
     String time = '20:00-21:00';
     String eventInfo = 'Möte med Wallsten';
 
@@ -34,9 +34,9 @@ class _EventPageState extends State<EventPage> {
           children: [
             EventImage(height, width),
             EventName(eventName),
-            DateAndTime(date,time),
-            Expanded(child:EventInformation(eventInfo,height, width)),
-            Expanded(child:EventParticipants()),
+            DateAndTime(date, time),
+            Expanded(child: EventInformation(eventInfo, height, width)),
+            Expanded(child: EventParticipants()),
           ],
         ),
       ),
@@ -46,82 +46,89 @@ class _EventPageState extends State<EventPage> {
 
   Row EventParticipants() {
     return Row(
-
-            children: [
-              Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Icon(Icons.group, size: 24),
-              ),
-              Text('deltagare', style: TextStyle(fontSize: 24)),
-            ],
-          );
+      children: [
+        Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Icon(Icons.group, size: 24),
+        ),
+        Text('deltagare', style: TextStyle(fontSize: 24)),
+      ],
+    );
   }
 
-  SizedBox EventInformation(String eventInfo,double height, double width) {
+  SizedBox EventInformation(String eventInfo, double height, double width) {
     return SizedBox(
-            height: height/5,
-            width: width/1.1,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.white,
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 2,
-                  ),
-                ),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(eventInfo,
-                        style: TextStyle(fontSize: 20)),
-                  ),
-                ),
-              ),
+      height: height / 5,
+      width: width / 1.1,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: Colors.white,
+            border: Border.all(
+              color: Colors.black,
+              width: 2,
             ),
-          );
+          ),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(eventInfo, style: TextStyle(fontSize: 20)),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  Row DateAndTime(String date,String time) {
+  Row DateAndTime(String date, String time) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-                Padding(
-                padding: EdgeInsets.all(20),
-                child: Icon(Icons.calendar_month, size: 24),
-              ),
-              Text(date, style: TextStyle(fontSize: 24)),
-              Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Icon(
-                  Icons.access_time,
-                  size: 24,
-                ),
-              ),
-              Text(time, style: TextStyle(fontSize: 24))
-            ],
-          );
+      children: [
+        Padding(
+          padding: EdgeInsets.all(20),
+          child: Icon(Icons.calendar_month, size: 24),
+        ),
+        Text(date, style: TextStyle(fontSize: 24)),
+        Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Icon(
+            Icons.access_time,
+            size: 24,
+          ),
+        ),
+        Text(time, style: TextStyle(fontSize: 24))
+      ],
+    );
   }
 
   Padding EventName(String eventName) {
     return Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: Text(eventName,
-                style: TextStyle(fontSize: 24)),
-          );
+      padding: EdgeInsets.only(top: 10.0),
+      child: Text(eventName, style: TextStyle(fontSize: 24)),
+    );
   }
 
   SizedBox EventImage(double height, double width) {
     return SizedBox(
-            height: height/4,
-              child: FittedBox(
-                fit:BoxFit.cover,
-                child: Image(image: AssetImage(widget.picture),fit:BoxFit.cover,),
-              ),
-          );
+      height: height / 4,
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: Color(0xff000000))),
+          color: Color(0xffffffff),
+        ),
+        child: FittedBox(
+          fit: BoxFit.fitHeight,
+          child: Image(
+            image: AssetImage(widget.picture),
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
   }
 }
