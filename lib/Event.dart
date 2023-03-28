@@ -22,15 +22,20 @@ class _EventPageState extends State<EventPage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    String eventName = 'Möte med Wallsten';
+    String date ='2023-03-23';
+    String time = '20:00-21:00';
+    String eventInfo = 'Möte med Wallsten';
+
     return Scaffold(
       appBar: widget.appbar,
       body: Center(
         child: Column(
           children: [
             EventImage(height, width),
-            EventName(),
-            DateAndTime(),
-            Expanded(child:EventInformation(height, width)),
+            EventName(eventName),
+            DateAndTime(date,time),
+            Expanded(child:EventInformation(eventInfo,height, width)),
             Expanded(child:EventParticipants()),
           ],
         ),
@@ -41,6 +46,7 @@ class _EventPageState extends State<EventPage> {
 
   Row EventParticipants() {
     return Row(
+
             children: [
               Padding(
                 padding: EdgeInsets.all(20.0),
@@ -51,7 +57,7 @@ class _EventPageState extends State<EventPage> {
           );
   }
 
-  SizedBox EventInformation(double height, double width) {
+  SizedBox EventInformation(String eventInfo,double height, double width) {
     return SizedBox(
             height: height/5,
             width: width/1.1,
@@ -71,7 +77,7 @@ class _EventPageState extends State<EventPage> {
                   alignment: Alignment.topLeft,
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Text("Möte med Wallsten",
+                    child: Text(eventInfo,
                         style: TextStyle(fontSize: 20)),
                   ),
                 ),
@@ -80,14 +86,15 @@ class _EventPageState extends State<EventPage> {
           );
   }
 
-  Row DateAndTime() {
+  Row DateAndTime(String date,String time) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
+                Padding(
                 padding: EdgeInsets.all(20),
                 child: Icon(Icons.calendar_month, size: 24),
               ),
-              Text('2023-03-23', style: TextStyle(fontSize: 24)),
+              Text(date, style: TextStyle(fontSize: 24)),
               Padding(
                 padding: EdgeInsets.all(10.0),
                 child: Icon(
@@ -95,15 +102,15 @@ class _EventPageState extends State<EventPage> {
                   size: 24,
                 ),
               ),
-              Text('20:00-21:00', style: TextStyle(fontSize: 24))
+              Text(time, style: TextStyle(fontSize: 24))
             ],
           );
   }
 
-  Padding EventName() {
+  Padding EventName(String eventName) {
     return Padding(
             padding: EdgeInsets.only(top: 10.0),
-            child: const Text('Möte med Wallsten',
+            child: Text(eventName,
                 style: TextStyle(fontSize: 24)),
           );
   }
