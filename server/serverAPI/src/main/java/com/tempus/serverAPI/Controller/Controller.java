@@ -31,10 +31,8 @@ public class Controller {
     @PutMapping(value = "/update/{id}")
     public String updateUser(@PathVariable long id, @RequestBody Users user) {
         Users updatedUser = userRepo.findById(id).get();
-        updatedUser.setFirstname(user.getFirstname());
-        updatedUser.setLastname(user.getLastname());
-        updatedUser.setAge(user.getAge());
-        updatedUser.setOccupation(user.getOccupation());
+        updatedUser.setName(user.getName());
+        updatedUser.setEmail(user.getEmail());
         userRepo.save(updatedUser);
         return "Updated user info";
     }

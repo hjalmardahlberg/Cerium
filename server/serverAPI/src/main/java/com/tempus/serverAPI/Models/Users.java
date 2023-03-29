@@ -2,6 +2,8 @@ package com.tempus.serverAPI.Models;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 
 @Entity
 public class Users {
@@ -9,15 +11,16 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column
-    private String firstname;
-    @Column
-    private String lastname;
-    @Column
-    private int age;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "email")
+    private String email;
 
-    @Column
-    private String Occupation;
+    @ElementCollection //FIXME: Ska inte vara element collection (tror jag)
+    private Set<Long> user_id;
+
+    @ElementCollection //FIXME: Ska inte vara element collection (tror jag)
+    private Set<Long> group_id;
 
     public long getId() {
         return id;
@@ -27,35 +30,21 @@ public class Users {
         this.id = id;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getEmail() {
+        return email;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public int getAge() {
-        return age;
-    }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getOccupation() {
-        return Occupation;
-    }
-
-    public void setOccupation(String occupation) {
-        this.Occupation = occupation;
-    }
 }
