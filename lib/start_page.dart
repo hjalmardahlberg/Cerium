@@ -1,5 +1,4 @@
-import 'package:cerium/googleSignIn.dart';
-import 'package:cerium/logged_in_widget.dart';
+import 'googleSignIn.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,7 @@ class StartPage extends StatelessWidget{
         if (snapshot.connectionState == ConnectionState.waiting){
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData){
-          return HomePage();
+          return MyHomePage(title: "Tempus");
         } else if (snapshot.hasError){
           return Center(child: Text('Something Went Wrong!'));
         } else{

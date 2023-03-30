@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'Event.dart';
 import 'addEvent.dart';
 import 'MyGroups.dart';
+import 'profile_widget.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});

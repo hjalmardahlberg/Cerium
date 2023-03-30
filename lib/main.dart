@@ -1,10 +1,10 @@
-import 'package:cerium/googleSignIn.dart';
-import 'package:cerium/home_page.dart';
-import 'package:cerium/provider.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
+import 'googleSignIn.dart';
+import 'provider.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'start_page.dart';
 
 
 Future main() async {
