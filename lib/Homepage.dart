@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'Event.dart';
+import 'addEvent.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -14,85 +15,94 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    List<Widget> eventList = <Widget>[];
     double baseWidth = 390;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-     final appbar = AppBar(
-        backgroundColor: Colors.red.shade800,
-        titleSpacing: 0,
-        title: Row(
-          children: <Widget>[
-            Expanded(
-              child: IconButton(
-                padding: EdgeInsets.all(5),
-                icon: Icon(Icons.group),
-                iconSize: 50,
-                onPressed: () {},
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Center(
-                child: Text(widget.title, style: const TextStyle(fontSize: 28)),
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                icon: Icon(Icons.person),
-                iconSize: 50,
-                onPressed: () {},
-              ),
-            ),
-          ],
-        ),
-      );
+     final appbar = finalAppBar();
 
-     final bottomNavigationBar = BottomAppBar(
-       child: Row(
-         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-         children: <Widget>[
-           IconButton(
-             icon: Icon(Icons.event),
-             onPressed: () {},
-           ),
-           IconButton(
-             icon: Icon(Icons.add),
-             onPressed: () {
-               Navigator.push(
-                 context,
-                 MaterialPageRoute(builder: (_) => NextPage()),
-               );
-             },
-           ),
-           IconButton(
-             icon: Icon(Icons.navigate_next),
-             onPressed: () {},
-           ),
-         ],
-       ),
-     );
+     final bottomNavigationBar = finalBottomAppBar(context,'MyHomePage');
+
+     eventList.add(EventBox('images/wallsten.jpg','2023-03-23  kl:14:00', 'Möte med Wallsten',fem, ffem,width,height, appbar, bottomNavigationBar,context));
+     eventList.add(EventBox('images/edvard_inception.png','2023-03-23  kl:17:00', 'Möte med Frugan',fem, ffem,width,height, appbar, bottomNavigationBar,context));
 
     return Scaffold(
       appBar: appbar,
-      body: ListView.builder(
-        itemBuilder: (_, index) { return
-
-          EventBox(fem, ffem,width,height, appbar, bottomNavigationBar,context);},),
-
-
-
+      body: ListView(
+        children: eventList,
+      ),
 
         bottomNavigationBar: bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
+
+  AppBar finalAppBar() {
+    return AppBar(
+      backgroundColor: Colors.red.shade800,
+      titleSpacing: 0,
+      title: Row(
+        children: <Widget>[
+          Expanded(
+            child: IconButton(
+              padding: EdgeInsets.all(5),
+              icon: Icon(Icons.group),
+              iconSize: 50,
+              onPressed: () {},
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Text(widget.title, style: const TextStyle(fontSize: 28)),
+            ),
+          ),
+          Expanded(
+            child: IconButton(
+              icon: Icon(Icons.person),
+              iconSize: 50,
+              onPressed: () {},
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  BottomAppBar finalBottomAppBar(BuildContext context, String pageName) {
+    return BottomAppBar(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.event),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              if(pageName != 'AddEventPage') {
+                Navigator.push(
+
+                  context,
+                  MaterialPageRoute(builder: (_) =>
+                      AddEventPage(appbar: finalAppBar(),
+                        bottomNavigationBar: finalBottomAppBar(context,'AddEventPage'))),
+                );
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.navigate_next),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+  }
   }
 
-    Container EventBox(double fem, double ffem,double width,double height,appbar,bottomNavigationBar,context) {
-      String eventImage = 'images/Widewallsten.jpg';
-      String eventTime = '2023-03-23  kl:14:00';
-      String eventName = 'Möte med Wallsten';
+    Container EventBox(String eventImage,String eventTime,String eventName,double fem, double ffem,double width,double height,appbar,bottomNavigationBar,context) {
       return Container(
         // event3JfJ (23:33)
         margin: EdgeInsets.fromLTRB(width/12, 10*fem, 0*fem, 10*fem),
@@ -204,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         child: Image.asset(
                           eventImage,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fill,
                         ),
                       ),
                     ),
