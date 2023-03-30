@@ -13,9 +13,6 @@ public class Groups {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @ElementCollection
-  private Set<Long> user_ids;
-
 
 
 }

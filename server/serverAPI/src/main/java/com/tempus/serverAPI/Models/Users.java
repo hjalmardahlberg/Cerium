@@ -2,6 +2,8 @@ package com.tempus.serverAPI.Models;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 
@@ -16,11 +18,10 @@ public class Users {
     @Column(name = "email")
     private String email;
 
-    @ElementCollection //FIXME: Ska inte vara element collection (tror jag)
-    private Set<Long> user_id;
 
-    @ElementCollection //FIXME: Ska inte vara element collection (tror jag)
-    private Set<Long> group_id;
+    @OneToMany(targetEntity = Groups.class,cascade = CascadeType.ALL)
+    @JoinColumn(name = "gid_fk", referencedColumnName = "id")
+    private List<Groups> g_id = new ArrayList<Groups>();
 
     public long getId() {
         return id;
@@ -46,5 +47,12 @@ public class Users {
         this.email = email;
     }
 
+    public List<Groups> getGroups(){
+        return g_id;
+    }
+
+    public void setGroups(List<Groups> groups) {
+        this.g_id = groups;
+    }
 
 }

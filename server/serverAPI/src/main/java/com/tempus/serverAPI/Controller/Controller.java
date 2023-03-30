@@ -1,6 +1,8 @@
 package com.tempus.serverAPI.Controller;
 
 import com.tempus.serverAPI.Models.Users;
+import com.tempus.serverAPI.Models.Groups;
+import com.tempus.serverAPI.Repo.GroupRepo;
 import com.tempus.serverAPI.Repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,9 @@ public class Controller {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private GroupRepo groupRepo;
     @GetMapping(value = "/")
     public String getPage(){
         return "test";
@@ -43,4 +48,6 @@ public class Controller {
         userRepo.delete(delUser);
         return "Deletion complete, r for retard the way im getting this dumb money";
     }
+
+
 }
