@@ -44,7 +44,7 @@ class SignUpWidget extends StatelessWidget {
 
           },
           icon: FaIcon(FontAwesomeIcons.google, color: Colors.deepOrange),
-          label: Text('Sign up with Google'),
+          label: Text('Sign in with Google'),
         ),
         SizedBox(height: 40),
         RichText(
