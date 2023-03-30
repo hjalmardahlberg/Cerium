@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "509388546066",
+    "project_id": "tempussignin",
+    "storage_bucket": "tempussignin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509388546066:android:f27aedcb7d177f993538cb",
+        "android_client_info": {
+          "package_name": "com.example.cerium"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "509388546066-m0g2dldbve6ai5a1vluu3o3i4b1cst0g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPacQLqSSKe1ihmBHO19_VnxYSDDUpjQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "509388546066-m0g2dldbve6ai5a1vluu3o3i4b1cst0g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

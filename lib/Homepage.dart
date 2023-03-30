@@ -87,7 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
             child: IconButton(
               icon: Icon(Icons.person),
               iconSize: 50,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                builder: (_) => ProfileWidget()));
+              },
             ),
           ),
         ],
