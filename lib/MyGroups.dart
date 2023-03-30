@@ -77,7 +77,7 @@ class _MyGroups extends State<MyGroups> {
         ],
       ),
     );
-    String groupImage = 'images/Widewallsten.jpg';
+    String groupImage = 'images/wallsten.jpg';
     String groupName = 'Grupp med Wallsten';
     list.add(GroupBox(fem, ffem, width, height, appbar, bottomNavigationBar, context, groupImage, groupName));
     return Scaffold(

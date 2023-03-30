@@ -22,7 +22,7 @@ class _AddEventPageState extends State<AddEventPage> {
 
     return Scaffold(
     appBar: widget.appbar,
-    body:Text(widget.pageName),
+    body:Text("hej"),
     bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
