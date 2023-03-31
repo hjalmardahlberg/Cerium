@@ -1,12 +1,18 @@
 package com.tempus.serverAPI.Models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Entity
 public class Users {
 
@@ -20,8 +26,9 @@ public class Users {
 
 
     @OneToMany(targetEntity = Groups.class,cascade = CascadeType.ALL)
-    @JoinColumn(name = "gid_fk", referencedColumnName = "id")
+    @JoinColumn(name = "uid_fk", referencedColumnName = "id") // här refererar vi till grupp-tabellen. Vi kommer få en till kolonn i Group-tabellen som heter uid_fk som pekar på användarens id. Vi slipper då att använda en till tabell.
     private List<Groups> g_id = new ArrayList<Groups>();
+
 
     public long getId() {
         return id;

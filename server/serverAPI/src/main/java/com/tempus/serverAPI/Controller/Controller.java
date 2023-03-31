@@ -27,10 +27,49 @@ public class Controller {
         return userRepo.findAll();
     }
 
+
+    @GetMapping(value = "/users/groups")
+    public List<Groups> getUserGroups(long u_id) {
+        List<Long> id = new ArrayList<Long>();
+        id.add(u_id);
+        List<Groups> groups = groupRepo.findAllById(id);
+        return groups;
+    }
+
+
     @PostMapping(value = "/save")
     public String saveUser(@RequestBody Users user) {
         userRepo.save(user);
         return "Saved user";
+    }
+
+
+    @PutMapping(value = "/group/create/{id}")
+    public String createGroup(@PathVariable long id, @RequestBody Users user) {
+        Users updatedUser = userRepo.findById(id).get();
+        Groups gCreate = createGroupAux();
+        user.getGroups().add(gCreate);
+        userRepo.save(updatedUser);
+        return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
+    }
+
+    public Groups createGroupAux() {
+        Groups toReturn = new Groups();
+        groupRepo.save(toReturn);
+        return toReturn;
+    }
+
+
+    @PutMapping(value = "/user/group/join/{id}")
+    public String joinGroup(@PathVariable long id, @RequestBody Users user) {
+
+        Groups groupToJoin = groupRepo.findById(id).get();
+        if(groupToJoin != null) {
+            user.getGroups().add(groupToJoin);
+            userRepo.save(user);
+        }
+
+        return "uuuh idk man";
     }
 
     @PutMapping(value = "/update/{id}")
