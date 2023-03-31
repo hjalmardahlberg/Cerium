@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'provider.dart';
+import 'googleSignIn.dart';
 
 class ProfileWidget extends StatelessWidget{
   //final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
