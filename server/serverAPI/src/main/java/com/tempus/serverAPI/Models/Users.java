@@ -1,5 +1,6 @@
 package com.tempus.serverAPI.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "u_id")
     private long id;
     @Column(name = "name")
     private String name;
@@ -25,8 +27,9 @@ public class Users {
     private String email;
 
 
-    @OneToMany(targetEntity = Groups.class,cascade = CascadeType.ALL)
-    @JoinColumn(name = "uid_fk", referencedColumnName = "id") // här refererar vi till grupp-tabellen. Vi kommer få en till kolonn i Group-tabellen som heter uid_fk som pekar på användarens id. Vi slipper då att använda en till tabell.
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    //@JoinColumn(name = "uid_fk", referencedColumnName = "id") // här refererar vi till grupp-tabellen. Vi kommer få en till kolonn i Group-tabellen som heter uid_fk som pekar på användarens id. Vi slipper då att använda en till tabell.
     private List<Groups> g_id = new ArrayList<Groups>();
 
 

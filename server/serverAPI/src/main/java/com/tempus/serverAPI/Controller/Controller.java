@@ -24,16 +24,15 @@ public class Controller {
 
     @GetMapping(value = "/users")
     public List<Users> getUsers() {
+
         return userRepo.findAll();
     }
 
 
-    @GetMapping(value = "/users/groups")
-    public List<Groups> getUserGroups(long u_id) {
-        List<Long> id = new ArrayList<Long>();
-        id.add(u_id);
-        List<Groups> groups = groupRepo.findAllById(id);
-        return groups;
+    @GetMapping(value = "/user/{id}/groups")
+    public List<Groups> getUserGroups(@PathVariable long id) {
+        Users user = userRepo.findById(id).get();
+        return user.getGroups();
     }
 
 
@@ -43,33 +42,36 @@ public class Controller {
         return "Saved user";
     }
 
+    @PutMapping(value = "/group/create/{g_name}/{id}")
+    public String createGroup(@PathVariable String g_name, @PathVariable long id, @RequestBody Users user) {
 
-    @PutMapping(value = "/group/create/{id}")
-    public String createGroup(@PathVariable long id, @RequestBody Users user) {
         Users updatedUser = userRepo.findById(id).get();
-        Groups gCreate = createGroupAux();
+        Groups gCreate = new Groups();
+        gCreate.setName(g_name);
+        gCreate.setUser(updatedUser);
         user.getGroups().add(gCreate);
+        groupRepo.save(gCreate);
         userRepo.save(updatedUser);
         return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
     }
 
-    public Groups createGroupAux() {
-        Groups toReturn = new Groups();
-        groupRepo.save(toReturn);
-        return toReturn;
-    }
 
 
-    @PutMapping(value = "/user/group/join/{id}")
-    public String joinGroup(@PathVariable long id, @RequestBody Users user) {
 
-        Groups groupToJoin = groupRepo.findById(id).get();
+    @PutMapping(value = "/user/{u_id}/group/join/{g_name}")
+    public String joinGroup(@PathVariable long u_id,@PathVariable String g_name, @RequestBody Users user) {
+
+        Users userJoin = userRepo.findById(u_id).get();
+        Groups groupToJoin = new Groups();
         if(groupToJoin != null) {
+            groupToJoin.setUser(userJoin);
+            groupToJoin.setName(g_name);
             user.getGroups().add(groupToJoin);
-            userRepo.save(user);
+            groupRepo.save(groupToJoin);
+            userRepo.save(userJoin);
         }
 
-        return "uuuh idk man";
+        return "Sucessfully joined the group: " + groupToJoin.getName();
     }
 
     @PutMapping(value = "/update/{id}")
