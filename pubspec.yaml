@@ -31,17 +31,20 @@ dependencies:
   flutter:
     sdk: flutter
 
-
-
   # Google Sign In
   firebase_auth: ^4.3.0
   google_sign_in: ^6.0.2
+
+  #Date and time
+  image_picker: ^0.8.4+3
+  intl: ^0.17.0
 
 
   firebase_core: ^2.8.0
 
   # Google Icon
-  font_awesome_flutter: ^10.4.0
+  #font_awesome_flutter: ^10.4.0
+  flutter_signin_button: ^2.0.0
 
   #State Management
   provider: ^6.0.5

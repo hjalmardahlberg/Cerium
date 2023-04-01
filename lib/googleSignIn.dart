@@ -1,4 +1,5 @@
 import 'package:provider/provider.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -33,10 +34,8 @@ class SignUpWidget extends StatelessWidget {
           ),
         ),
         Spacer(),
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-              primary: Colors.grey
-          ),
+      SignInButton(
+        Buttons.Google,
           onPressed: () {
             //TODO: Implement log in functionality
             final provider =
@@ -44,8 +43,8 @@ class SignUpWidget extends StatelessWidget {
             provider.googleLogin();
 
           },
-          icon: FaIcon(FontAwesomeIcons.google, color: Colors.deepOrange),
-          label: Text('Sign in with Google'),
+
+          text: 'Sign in with Google',
         ),
         SizedBox(height: 40),
         RichText(
