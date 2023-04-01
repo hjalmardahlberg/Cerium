@@ -5,6 +5,9 @@ import 'Event.dart';
 import 'addEvent.dart';
 import 'MyGroups.dart';
 import 'profile_widget.dart';
+import 'provider.dart';
+import 'package:provider/provider.dart';
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -108,7 +111,19 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           IconButton(
             icon: Icon(Icons.event),
-            onPressed: () {},
+            onPressed: () async {
+              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+              final events = await provider.getPrimaryCalendarEvents();
+              print(events);
+              //String? events;
+              //final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+              //try {
+              //  events = await provider.getCalendarEvents();
+              //}catch(e){
+              //  print(e.toString());
+              //}
+              //print(events);
+            },
           ),
           IconButton(
             icon: Icon(Icons.add),
@@ -127,7 +142,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           IconButton(
             icon: Icon(Icons.navigate_next),
-            onPressed: () {},
+            onPressed: () { //TEMP LOGIN BUTTON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              final provider =
+              Provider.of<GoogleSignInProvider>(context, listen: false);
+              provider.googleLogin();
+            },
           ),
         ],
       ),
