@@ -53,7 +53,8 @@ public class Controller {
             user.getGroups().add(gCreate);
             groupRepo.save(gCreate);
             userRepo.save(updatedUser);
-            return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
+            return "success";
+            //return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
         }
         else {
             throw new RuntimeException("Group-name already exists!");
