@@ -7,7 +7,9 @@ import 'MyGroups.dart';
 import 'profile_widget.dart';
 import 'provider.dart';
 import 'package:provider/provider.dart';
+import 'package:googleapis/calendar/v3.dart' show Event;
 
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -114,15 +116,26 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () async {
               final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
               final events = await provider.getPrimaryCalendarEvents();
+
+              for (Event event in events) {
+                print('Event ID: ${event.id}');
+                print('Event summary: ${event.summary}');
+                print('Event start time: ${event.start?.dateTime}');
+                print('Event end time: ${event.end?.dateTime}');
+                print('Event location: ${event.location}');
+                print('Event description: ${event.description}');
+              }
+
+              /*
+              String? events;
+              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+              try {
+                events = await provider.getCalendarEvents();
+              }catch(e){
+                print(e.toString());
+              }
               print(events);
-              //String? events;
-              //final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
-              //try {
-              //  events = await provider.getCalendarEvents();
-              //}catch(e){
-              //  print(e.toString());
-              //}
-              //print(events);
+              */
             },
           ),
           IconButton(

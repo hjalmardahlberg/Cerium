@@ -2,19 +2,28 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+
+import 'package:googleapis/calendar/v3.dart' as calendar;
+import 'package:googleapis_auth/googleapis_auth.dart';
+
 import 'package:http/http.dart' as http;
+
 import 'dart:convert';
 import 'package:googleapis/calendar/v3.dart';
 
-//import 'package:googleapis/calendar/v3.dart';
+import 'secrets.dart';
+
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 
 class GoogleSignInProvider extends ChangeNotifier{
   final googleSignIn = GoogleSignIn(
-    scopes: ["https://www.googleapis.com/auth/calendar",
-      'https://www.googleapis.com/auth/calendar.events.readonly',
+    scopes: <String>[
+      calendar.CalendarApi.calendarScope,
+
     ],
   );
+
 
   GoogleSignInAccount? _user;
 
@@ -60,9 +69,9 @@ class GoogleSignInProvider extends ChangeNotifier{
     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
     print("ACCESS TOKEN: " + googleAuth.accessToken.toString());
-
     return googleAuth.accessToken;
   }
+
 
   Future<List<Event>> getPrimaryCalendarEvents() async {
     final String? accessToken = await getAccessToken();
@@ -86,6 +95,7 @@ class GoogleSignInProvider extends ChangeNotifier{
   }
 
 
+
   Future<String?> getCalendarEvents() async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return null;
@@ -98,10 +108,7 @@ class GoogleSignInProvider extends ChangeNotifier{
     try {
       var response = await http.get(
         Uri.parse('https://www.googleapis.com/calendar/v3/calendars/primary/events'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -114,6 +121,7 @@ class GoogleSignInProvider extends ChangeNotifier{
       rethrow;
     }
   }
+
 
 
 }
