@@ -43,8 +43,8 @@ public class ServerApiApplicationTests {
 	@Test
 	public void test_create() {
 		List<Groups> hmm = new ArrayList<Groups>();
-		when(userRepo.findAll()).thenReturn(Stream.of(new Users(1L, "test", "test@test.com", false, hmm)).collect(Collectors.toList()));
-		assertEquals(1, userRepo.findAll().size());
+		when(userRepo.findAll()).thenReturn(Stream.of(new Users(1L, "Eddy", "recce@snerk.com", false, hmm), new Users(2L, "Kangussy", "kan@ga.com", false, hmm)).collect(Collectors.toList()));
+		assertEquals(2, userRepo.findAll().size());
 	}
 
 
