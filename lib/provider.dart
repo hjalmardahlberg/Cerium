@@ -94,7 +94,27 @@ class GoogleSignInProvider extends ChangeNotifier{
     }
   }
 
+  Future<List<Event>> getCalendarEventsInterval(DateTime start, DateTime end) async {
+    final String? accessToken = await getAccessToken();
+    if (accessToken == null) return [];
 
+    print("GOT ACCESS TOKEN!");
+    final headers = {'Authorization': 'Bearer $accessToken'};
+    final Uri uri = Uri.https('www.googleapis.com', '/calendar/v3/calendars/primary/events', {
+      'timeMin': start.toIso8601String() + 'Z',
+      'timeMax': end.toIso8601String() + 'Z',
+    });
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final eventsJson = json['items'] as List<dynamic>;
+      final events = eventsJson.map((e) => Event.fromJson(e)).toList();
+      return events;
+    } else {
+      throw Exception('Failed to load calendar events: ${response.statusCode}');
+    }
+  }
 
   Future<String?> getCalendarEvents() async {
     final String? accessToken = await getAccessToken();
@@ -122,6 +142,18 @@ class GoogleSignInProvider extends ChangeNotifier{
     }
   }
 
+/*
+Combine the events from both users into a single list.
 
+Sort the list of events by their start time.
+
+Iterate through the list of events and identify overlapping events.
+
+Identify the gaps between overlapping events as potential free time.
+
+Determine the common free time between both users based on their availability.
+
+Display the common free time to the users.
+*/
 
 }

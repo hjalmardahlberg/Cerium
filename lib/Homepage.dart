@@ -118,12 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
               final events = await provider.getPrimaryCalendarEvents();
 
               for (Event event in events) {
-                print('Event ID: ${event.id}');
+                //print('Event ID: ${event.id}');
                 print('Event summary: ${event.summary}');
                 print('Event start time: ${event.start?.dateTime}');
                 print('Event end time: ${event.end?.dateTime}');
-                print('Event location: ${event.location}');
-                print('Event description: ${event.description}');
+                //print('Event location: ${event.location}');
+                //print('Event description: ${event.description}');
               }
 
               /*
@@ -136,6 +136,28 @@ class _MyHomePageState extends State<MyHomePage> {
               }
               print(events);
               */
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.hail_rounded),
+            onPressed: () async{
+              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+
+              if (pageName != 'AddEventPage') {
+                // kommer fetcha första veckan i april (TEMP)
+                final start = DateTime(2023, 4, 1);
+                final end = DateTime(2023, 4, 7);
+                final events = await provider.getCalendarEventsInterval(start, end);
+                for (Event event in events) {
+                  //print('Event ID: ${event.id}');
+                  print('Event summary: ${event.summary}');
+                  print('Event start time: ${event.start?.dateTime}');
+                  print('Event end time: ${event.end?.dateTime}');
+                  //print('Event location: ${event.location}');
+                  //print('Event description: ${event.description}');
+                  print("");
+                }
+              }
             },
           ),
           IconButton(
