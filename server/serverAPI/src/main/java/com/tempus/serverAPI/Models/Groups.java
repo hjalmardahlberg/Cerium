@@ -22,7 +22,7 @@ public class Groups {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "g_id")
-  private long id;
+  private long g_id;
 
   @Column(name = "name")
   private String name;
@@ -32,13 +32,14 @@ public class Groups {
   @JsonIgnore
   private Users user;
 
+
   public long getId() {
 
-    return id;
+    return g_id;
   }
   public void setId(long id) {
 
-    this.id = id;
+    this.g_id = id;
   }
 
   public String getName() {

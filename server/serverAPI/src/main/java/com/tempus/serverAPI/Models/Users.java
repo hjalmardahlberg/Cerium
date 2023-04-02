@@ -26,6 +26,8 @@ public class Users {
     @Column(name = "email")
     private String email;
 
+    @Transient
+    private Boolean joinFlag = false;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -59,6 +61,26 @@ public class Users {
 
     public List<Groups> getGroups(){
         return g_id;
+    }
+
+    public Groups getGroup(String groupName) {
+        for (int i = 0; i < this.g_id.size(); i++ ) {
+            Groups currGroup = this.g_id.get(i);
+            if(currGroup.getName().equals(groupName)){
+                return currGroup;
+            }
+        }
+        throw new RuntimeException("Unable to find group with given name!");
+    }
+
+    public Boolean alreadyInGroup(String groupName) {
+        for (int i = 0; i < this.g_id.size(); i++ ) {
+            Groups currGroup = this.g_id.get(i);
+            if(currGroup.getName().equals(groupName)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setGroups(List<Groups> groups) {
