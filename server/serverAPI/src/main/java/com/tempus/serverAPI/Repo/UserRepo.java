@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 //@EnableJpaRepositories
 public interface UserRepo extends JpaRepository<Users, Long>{
+
+    Users findByName(String name);
 }
 
