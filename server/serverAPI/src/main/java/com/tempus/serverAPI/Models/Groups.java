@@ -1,6 +1,7 @@
 package com.tempus.serverAPI.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tempus.serverAPI.Models.Users;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class Groups {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "u_id")
   @JsonIgnore
+
   private Users user;
 
 

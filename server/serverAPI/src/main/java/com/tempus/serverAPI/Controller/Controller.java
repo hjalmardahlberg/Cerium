@@ -29,10 +29,23 @@ public class Controller {
     }
 
 
-    @GetMapping(value = "/user/{id}/groups")
-    public List<Groups> getUserGroups(@PathVariable long id) {
-        Users user = userRepo.findById(id).get();
+
+    @GetMapping(value = "/user/{u_id}/groups")
+    public List<Groups> getUserGroups(@PathVariable long u_id) {
+        Users user = userRepo.findById(u_id).get();
         return user.getGroups();
+    }
+
+    @GetMapping(value = "/groups/{g_name}/users")
+    public List<Users> getUsersFromGroup(@PathVariable String g_name) {
+        List<Groups> QueryResult = groupRepo.findByName(g_name);
+        System.out.println("Group size: " + QueryResult.size());
+        List<Users> toReturn = new ArrayList<>();
+        for(int i = 0; i < QueryResult.size(); i++) {
+            Users currUser = (QueryResult.get(i).getUser());
+            toReturn.add(currUser);
+        }
+        return toReturn;
     }
 
 
@@ -66,27 +79,22 @@ public class Controller {
 
         Users userJoin = userRepo.findById(u_id).get();
         List<Groups> Queries = groupRepo.findByName(g_name);
-        for (int i = 0; i < Queries.size(); i++) {
-            Groups currGroup = Queries.get(i);
-            if(currGroup.getUser().getId() == userJoin.getId()){
-                throw new RuntimeException("Cannot join a group that user is already a member of!");
-            }
 
-        }
+        if (!groupRepo.findByName(g_name).isEmpty() && user.getJoinFlag()) {
+            for (int i = 0; i < Queries.size(); i++) {
+                Groups currGroup = Queries.get(i);
+                if(currGroup.getUser().getId() == userJoin.getId()){
+                    throw new RuntimeException("Cannot join a group that user is already a member of!");
+                }
+            }
+            Groups groupToJoin = new Groups();
+            groupToJoin.setUser(userJoin);
+            groupToJoin.setName(g_name);
+            user.getGroups().add(groupToJoin);
+            groupRepo.save(groupToJoin);
+            userRepo.save(userJoin);
+            return "Successfully joined the group: " + groupToJoin.getName();
 
-        if (groupRepo.findByName(g_name) != null && user.getJoinFlag()) {
-            if(userJoin.alreadyInGroup(g_name)) {
-                throw new RuntimeException("Cannot join a group that user is already a member of!");
-            }
-            else{
-                Groups groupToJoin = new Groups();
-                groupToJoin.setUser(userJoin);
-                groupToJoin.setName(g_name);
-                user.getGroups().add(groupToJoin);
-                groupRepo.save(groupToJoin);
-                userRepo.save(userJoin);
-                return "Successfully joined the group: " + groupToJoin.getName();
-            }
         }
         else {
             throw new RuntimeException("Cannot join a group that doesn't exist!");
@@ -94,11 +102,16 @@ public class Controller {
 
     }
 
+    /*
+          if(userJoin.alreadyInGroup(g_name)) {
+                throw new RuntimeException("Cannot join a group that user is already a member of!");
+            }
+     */
+
     @PutMapping(value = "/group/leave/{g_name}/{u_id}")
     public String leaveGroup(@PathVariable long u_id, @PathVariable String g_name, @RequestBody Users user) {
         Users updateUser = userRepo.findById(u_id).get();
         Groups groupToDelete = updateUser.getGroup(g_name);
-        
         updateUser.getGroups().remove(updateUser.getGroups().indexOf(groupToDelete)); //bruuuuh
         groupRepo.delete(groupToDelete);
         return "User successfully left the group: " + groupToDelete.getName();
@@ -112,6 +125,8 @@ public class Controller {
         userRepo.save(updatedUser);
         return "Updated user info";
     }
+
+
 
     @DeleteMapping(value = "/delete/{id}")
     public String delUser(@PathVariable long id) {
