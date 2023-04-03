@@ -5,8 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 //import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 //@EnableJpaRepositories
-public interface UserRepo extends JpaRepository<Users, Long>{
+public interface UserRepo extends JpaRepository<Users, String>{
 
     Users findByName(String name);
+    Users findByEmail(String email);
 }
 

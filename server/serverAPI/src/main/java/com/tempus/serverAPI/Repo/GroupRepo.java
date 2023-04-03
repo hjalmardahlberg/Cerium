@@ -1,7 +1,6 @@
 package com.tempus.serverAPI.Repo;
 
 import com.tempus.serverAPI.Models.Groups;
-import com.tempus.serverAPI.Models.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -26,6 +26,11 @@ public class Events {
     @Column(name = "date")
     private String date;
 
+    @Column(name = "start")
+    private String start_time;
+
+    @Column(name = "end")
+    private String end_time;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "g_name")

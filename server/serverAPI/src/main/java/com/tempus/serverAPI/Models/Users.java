@@ -9,7 +9,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,14 +18,12 @@ import java.util.Set;
 public class Users {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "u_id")
-    private long id;
+    private String id;
     @Column(name = "name")
     private String name;
     @Column(name = "email")
     private String email;
-
     @Transient
     private Boolean joinFlag = false;
 
@@ -35,11 +33,11 @@ public class Users {
     private List<Groups> g_id = new ArrayList<Groups>();
 
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

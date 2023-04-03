@@ -31,7 +31,7 @@ public class Controller {
 
 
     @GetMapping(value = "/user/{u_id}/groups")
-    public List<Groups> getUserGroups(@PathVariable long u_id) {
+    public List<Groups> getUserGroups(@PathVariable String u_id) {
         Users user = userRepo.findById(u_id).get();
         return user.getGroups();
     }
@@ -51,33 +51,39 @@ public class Controller {
 
     @PostMapping(value = "/save")
     public String saveUser(@RequestBody Users user) {
-        userRepo.save(user);
-        return "Saved user";
+        if(userRepo.findByEmail(user.getEmail()) != null){
+            throw new RuntimeException("Email already exists");
+        }
+        else{
+            userRepo.save(user);
+            return "Saved user";
+        }
     }
 
-    @PutMapping(value = "/group/create/{g_name}/{u_id}")
-    public String createGroup(@PathVariable String g_name, @PathVariable long u_id, @RequestBody Users user) {
+    @PutMapping(value = "/group/create/{g_name}")
+    public String createGroup(@PathVariable String g_name, @RequestBody Users user) {
 
         if (groupRepo.findByName(g_name).isEmpty() || user.getJoinFlag()) {
-            Users updatedUser = userRepo.findById(u_id).get();
-            Groups gCreate = new Groups();
-            gCreate.setName(g_name);
-            gCreate.setUser(updatedUser);
-            user.getGroups().add(gCreate);
-            groupRepo.save(gCreate);
-            userRepo.save(updatedUser);
-            return "success";
-            //return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
+        Users updatedUser = userRepo.findById(user.getId()).get();
+        Groups gCreate = new Groups();
+        gCreate.setName(g_name);
+        gCreate.setUser(updatedUser);
+        gCreate.setAdmin(updatedUser.getName());
+        user.getGroups().add(gCreate);
+        groupRepo.save(gCreate);
+        userRepo.save(updatedUser);
+        return "success";
+        //return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
         }
         else {
             throw new RuntimeException("Group-name already exists!");
         }
     }
 
-    @PutMapping(value = "/group/join/{g_name}/{u_id}")
-    public String joinGroup(@PathVariable long u_id,@PathVariable String g_name, @RequestBody Users user) {
+    @PutMapping(value = "/group/join/{g_name}")
+    public String joinGroup(@PathVariable String g_name, @RequestBody Users user) {
 
-        Users userJoin = userRepo.findById(u_id).get();
+        Users userJoin = userRepo.findById(user.getId()).get();
         List<Groups> Queries = groupRepo.findByName(g_name);
 
         if (!groupRepo.findByName(g_name).isEmpty() && user.getJoinFlag()) {
@@ -90,6 +96,7 @@ public class Controller {
             Groups groupToJoin = new Groups();
             groupToJoin.setUser(userJoin);
             groupToJoin.setName(g_name);
+            groupToJoin.setAdmin(Queries.get(0).getAdmin());
             user.getGroups().add(groupToJoin);
             groupRepo.save(groupToJoin);
             userRepo.save(userJoin);
@@ -109,7 +116,7 @@ public class Controller {
      */
 
     @PutMapping(value = "/group/leave/{g_name}/{u_id}")
-    public String leaveGroup(@PathVariable long u_id, @PathVariable String g_name, @RequestBody Users user) {
+    public String leaveGroup(@PathVariable String u_id, @PathVariable String g_name, @RequestBody Users user) {
         Users updateUser = userRepo.findById(u_id).get();
         Groups groupToDelete = updateUser.getGroup(g_name);
         updateUser.getGroups().remove(updateUser.getGroups().indexOf(groupToDelete)); //bruuuuh
@@ -118,7 +125,7 @@ public class Controller {
     }
 
     @PutMapping(value = "/update/{id}")
-    public String updateUser(@PathVariable long id, @RequestBody Users user) {
+    public String updateUser(@PathVariable String id, @RequestBody Users user) {
         Users updatedUser = userRepo.findById(id).get();
         updatedUser.setName(user.getName());
         updatedUser.setEmail(user.getEmail());
@@ -127,10 +134,29 @@ public class Controller {
     }
 
 
+    @DeleteMapping(value = "/group/delete/{g_name}")
+    public String delGroup(@PathVariable String g_name, @RequestBody Users user) {
+        Users selectedUser = userRepo.findById(user.getId()).get();
+        List<Groups> selectedGroup = groupRepo.findByName(g_name);
+        if(selectedGroup.isEmpty()) {
+            throw new RuntimeException("Cannot delete a group that does not exist");
+        }
+        Groups hmm = selectedGroup.get(0);
+        if(hmm.getAdmin().equals(selectedUser.getName())){
+            for(int i = 0; i < selectedGroup.size(); i++) {
+                groupRepo.delete(selectedGroup.get(i));
+            }
+            return "Successfully deleted " + hmm.getName();
+        }
+        else {
+            throw new RuntimeException("User is not owner of the group");
+        }
+
+    }
 
     @DeleteMapping(value = "/delete/{id}")
-    public String delUser(@PathVariable long id) {
-        Users delUser = userRepo.findById(id).get();
+    public String delUser(@PathVariable String u_id) {
+        Users delUser = userRepo.findById(u_id).get();
         userRepo.delete(delUser);
         return "Deleted user";
     }

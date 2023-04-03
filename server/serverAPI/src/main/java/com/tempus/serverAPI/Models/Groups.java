@@ -1,17 +1,12 @@
 package com.tempus.serverAPI.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.tempus.serverAPI.Models.Users;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -31,8 +26,10 @@ public class Groups {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "u_id")
   @JsonIgnore
-
   private Users user;
+
+  @Column(name = "owner")
+  private String admin;
 
 
   public long getId() {
