@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EventRepo extends JpaRepository<Events, Long> {
 
-
+    Events findByName(String name);
 }
