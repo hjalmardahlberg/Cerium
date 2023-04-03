@@ -29,7 +29,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
         children: [
           Spacer(),
           Image.asset(
-            'images/tempus_logo_tansp.png',
+            'images/scuffed_logo_for_anim.png',
             width: 300,
             height: 300,
           ),
