@@ -82,6 +82,8 @@ flutter:
   assets:
     - images/
     - images/wallsten.jpg
+    - images/tempus_logo_tansp.png
+    - images/tempus_logo_tansp_horizontal.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

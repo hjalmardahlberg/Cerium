@@ -86,7 +86,11 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             flex: 2,
             child: Center(
-              child: Text(widget.title, style: const TextStyle(fontSize: 28)),
+              child: Image.asset("images/tempus_logo_tansp_horizontal.png",
+              height: 160,
+              width: 160,
+              ),
+              //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
             ),
           ),
           Expanded(
@@ -148,6 +152,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 final start = DateTime(2023, 4, 1);
                 final end = DateTime(2023, 4, 7);
                 final events = await provider.getCalendarEventsInterval(start, end);
+
+                print("BODY:");
+                print(events);
+                print("");
                 for (Event event in events) {
                   //print('Event ID: ${event.id}');
                   print('Event summary: ${event.summary}');

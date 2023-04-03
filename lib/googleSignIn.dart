@@ -12,7 +12,11 @@ class SignUpWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Spacer(),
-        FlutterLogo(size: 120),
+        Image.asset(
+          'images/tempus_logo_tansp.png',
+          width: 300,
+          height: 300,
+        ),
         Spacer(),
         Align(
           alignment: Alignment.centerLeft,
