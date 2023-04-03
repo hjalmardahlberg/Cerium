@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 //import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +10,10 @@ import 'profile_widget.dart';
 import 'provider.dart';
 import 'package:provider/provider.dart';
 import 'package:googleapis/calendar/v3.dart' show Event;
+
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:http/http.dart' as http;
 
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -111,6 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   BottomAppBar finalBottomAppBar(BuildContext context, String pageName) {
+    final user = FirebaseAuth.instance.currentUser!;
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -165,6 +172,29 @@ class _MyHomePageState extends State<MyHomePage> {
                   //print('Event description: ${event.description}');
                   print("");
                 }
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_upward),
+            onPressed: () async{
+
+              final userData = {
+                'id': user.uid,
+                'name' :user.displayName,
+                'email' : user.email,
+              };
+
+              final url = 'http://192.121.208.57:8080/save';
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response = await http.post(Uri.parse(url),headers: headers, body: body);
+
+              if (response.statusCode == 200){
+                print('User data sent successfully!');
+              }else{
+                print('Error sending user data: ${response.statusCode}');
               }
             },
           ),

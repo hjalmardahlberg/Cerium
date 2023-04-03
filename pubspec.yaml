@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  animated_background: ^2.0.0
 
   googleapis: ^10.1.0
 
