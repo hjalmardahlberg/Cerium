@@ -1,14 +1,21 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
-//import 'package:google_fonts/google_fonts.dart';
-import 'Event.dart';
+
 
 class Group extends StatefulWidget {
-  const Group({super.key, required  this.groupName});
+  const Group(
+      {Key? key,
+        required this.groupName,
+        required this.picture,
+        required this.appbar,
+        required this.bottomNavigationBar})
+      : super(key: key);
 
   final String groupName;
+  final String picture;
+  final AppBar appbar;
+  final BottomAppBar bottomNavigationBar;
 
   @override
   State<Group> createState() => _Group();
@@ -16,7 +23,14 @@ class Group extends StatefulWidget {
 
 class _Group extends State<Group> {
   final chatList = List.empty(growable: true);
+  final myController = TextEditingController();
 
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     double baseWidth = 390;
@@ -53,7 +67,39 @@ class _Group extends State<Group> {
         ],
       ),
     );
-
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemBuilder: (_, index) {
+              if(index<chatList.length) {
+                return chatList[index];
+              }
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: TextFormField(
+            controller: myController,
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.go,
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Send a message',
+            ),
+            onFieldSubmitted: (_) async {
+              chatInput(myController.text);
+              myController.clear();
+    },
+          ),
+        ),
+      ],
+    );
     final bottomNavigationBar = BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -78,19 +124,23 @@ class _Group extends State<Group> {
         ],
       ),
     );
-    //TODO: Create function populateChatList which fills the chatList with old messages stored locally
-    chatList.add("Hej");
+    populateChatList();
     return Scaffold(
       appBar: appbar,
-      body: ListView.builder(
-        itemBuilder: (_, index) {
-          if(index<chatList.length) {
-            return chatList[index];
-          }
-        },
-      ),
+      body: body,
       bottomNavigationBar: bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
+  }
+
+  void populateChatList() {
+    //TODO: Servercall
+  }
+
+  chatInput(String input) {
+    setState(() {
+      chatList.add(Text(input));
+    });
+    //TODO: Sent message to others in group
   }
 }
 
