@@ -65,6 +65,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  date_range_picker:
+    dependency: "direct main"
+    description:
+      name: date_range_picker
+      sha256: f5bf1cf3e7f93855ca5955281fc0eb8c72866331f586d0cb1de595f389b17e20
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.7"
   fake_async:
     dependency: transitive
     description:

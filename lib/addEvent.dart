@@ -60,8 +60,6 @@ class _AddEventPageState extends State<AddEventPage> {
               SizedBox(height: 16),
               AddEventTextForm('Enter your events name'),
               SizedBox(height: 16),
-              Row(mainAxisAlignment: MainAxisAlignment.start,children:[SizedBox(width: 16),Text('Start:',style: TextStyle(fontSize: 24),),  SizedBox(width: width/2.8-16),Text('Stop:',style: TextStyle(fontSize: 24),)],),
-              SizedBox(height: 16),
               DatePickerRow(context, width),
               SizedBox(height: 16),
               TimePickerRow(context, width),
@@ -75,18 +73,21 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  IconButton DatePicker(BuildContext context, DateTime? date, Function(DateTime)? onDateSelected) {
+  IconButton DatePicker(BuildContext context, DateTimeRange? dateRange,
+      Function(DateTimeRange)? onDatesSelected) {
     return IconButton(
       icon: Icon(Icons.calendar_today),
       onPressed: () async {
-        final DateTime? pickedDate = await showDatePicker(
+        final DateTimeRange? pickedDateRange = await showDateRangePicker(
           context: context,
-          initialDate: date ?? DateTime.now(),
           firstDate: DateTime.now(),
-          lastDate: DateTime(DateTime.now().year + 10),
+          lastDate: DateTime.now().add(Duration(days: 365)),
+          initialDateRange: dateRange ??
+              DateTimeRange(start: DateTime.now(), end: DateTime.now()),
         );
-        if (pickedDate != null) {
-          onDateSelected?.call(pickedDate);
+
+        if (pickedDateRange != null) {
+          onDatesSelected?.call(pickedDateRange);
         }
       },
     );
@@ -97,40 +98,37 @@ class _AddEventPageState extends State<AddEventPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          DatePicker(context, _startSelectedDate, (date) {
+          DatePicker(
+              context,
+              DateTimeRange(
+                  start: _startSelectedDate ?? DateTime.now(),
+                  end: _stopSelectedDate ?? DateTime.now()), (dateRange) {
             setState(() {
-              _startSelectedDate = date;
+              _startSelectedDate = dateRange.start;
+              _stopSelectedDate = dateRange.end;
             });
           }),
           SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              _startSelectedDate != null
-                  ? DateFormat('EEE, MMM d, y').format(_startSelectedDate!)
-                  : 'Select date',
-            ),
+          Text(
+            _startSelectedDate != null
+                ? DateFormat('EEE, M/d/y').format(_startSelectedDate!)
+                : 'Select start date',
           ),
-
-          DatePicker(context, _stopSelectedDate, (date) {
-            setState(() {
-              _stopSelectedDate = date;
-            });
-          }),
+          Text(' to '),
+          Text(
+            _startSelectedDate != null
+                ? DateFormat('EEE, M/d/y').format(_stopSelectedDate!)
+                : 'Select stop date',
+          ),
           SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              _stopSelectedDate != null
-                  ? DateFormat('EEE, MMM d, y').format(_stopSelectedDate!)
-                  : 'Select date',
-            ),
-          ),
         ],
       ),
     );
   }
 
-  IconButton TimePicker(BuildContext context,TimeOfDay time) {
-    return  IconButton(
+  IconButton TimePicker(BuildContext context, TimeOfDay time,
+      Function(TimeOfDay)? onTimeSelected) {
+    return IconButton(
       icon: Icon(Icons.access_time),
       onPressed: () async {
         final TimeOfDay? pickedTime = await showTimePicker(
@@ -138,13 +136,12 @@ class _AddEventPageState extends State<AddEventPage> {
           initialTime: time ?? TimeOfDay.now(),
         );
         if (pickedTime != null) {
-          setState(() {
-            time = pickedTime;
-          });
+          onTimeSelected?.call(pickedTime);
         }
       },
     );
   }
+
   Center TimePickerRow(BuildContext context, double width) {
     return Center(
       child: Row(
@@ -153,47 +150,63 @@ class _AddEventPageState extends State<AddEventPage> {
           IconButton(
             icon: Icon(Icons.access_time),
             onPressed: () async {
-              final TimeOfDay? pickedTime = await showTimePicker(
+              final TimeOfDay? startSelectedTime = await showTimePicker(
                 context: context,
                 initialTime: _startSelectedTime ?? TimeOfDay.now(),
               );
-              if (pickedTime != null) {
-                setState(() {
-                  _startSelectedTime = pickedTime;
-                });
+              if (startSelectedTime != null) {
+                final TimeOfDay? stopSelectedTime = await showTimePicker(
+                  context: context,
+                  initialTime: _stopSelectedTime ?? startSelectedTime,
+                );
+                if (stopSelectedTime != null) {
+                  setState(() {
+                    _startSelectedTime = startSelectedTime;
+                    _stopSelectedTime = stopSelectedTime;
+                  });
+                }
               }
             },
           ),
           SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              _startSelectedTime != null
-                  ? _startSelectedTime!.format(context)
-                  : 'Select time',
-            ),
+          Text(
+            _startSelectedTime != null
+                ? _startSelectedTime!.format(context)
+                : 'Select start time',
           ),
-          IconButton(
-            icon: Icon(Icons.access_time),
-            onPressed: () async {
-              final TimeOfDay? pickedTime = await showTimePicker(
-                context: context,
-                initialTime: _stopSelectedTime ?? TimeOfDay.now(),
-              );
-              if (pickedTime != null) {
-                setState(() {
-                  _stopSelectedTime = pickedTime;
-                });
-              }
-            },
+          Text(' - '),
+          Text(
+            _stopSelectedTime != null
+                ? _stopSelectedTime!.format(context)
+                : 'Select stop time',
           ),
           SizedBox(width: 16),
           Expanded(
             child: Text(
-              _stopSelectedTime != null
-                  ? _stopSelectedTime!.format(context)
-                  : 'Select time',
+              _startSelectedTime != null &&
+                      _stopSelectedTime != null &&
+                      DateTime(
+                        1,
+                        1,
+                        1,
+                        _startSelectedTime!.hour,
+                        _startSelectedTime!.minute,
+                      ).isAfter(
+                        DateTime(
+                          1,
+                          1,
+                          1,
+                          _stopSelectedTime!.hour,
+                          _stopSelectedTime!.minute,
+                        ),
+                      )
+                  ? 'Stop time cannot be earlier than start time'
+                  : '',
+              style: TextStyle(
+                color: Colors.red,
+              ),
             ),
-          ),
+          )
         ],
       ),
     );
