@@ -31,10 +31,18 @@ dependencies:
   flutter:
     sdk: flutter
 
+
+  animated_background: ^2.0.0
+  flutter_signin_button: ^2.0.0
+
+  googleapis: ^10.1.0
+
   # Google Sign In
   firebase_auth: ^4.3.0
   google_sign_in: ^6.0.2
 
+
+  googleapis_auth: ^1.4.0
   #Date and time
   #date_range_picker: ^1.0.1
   image_picker: ^0.8.4+3
@@ -45,10 +53,15 @@ dependencies:
 
   # Google Icon
   #font_awesome_flutter: ^10.4.0
+
   flutter_signin_button: ^2.0.0
+
 
   #State Management
   provider: ^6.0.5
+
+  http: ^0.13.5
+  convert: ^3.1.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -57,6 +70,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.12.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -65,8 +79,15 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/logo_white.png"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -79,6 +100,11 @@ flutter:
   assets:
     - images/
     - images/wallsten.jpg
+    - images/tempus_logo_tansp.png
+    - images/tempus_logo_tansp_horizontal.png
+    - images/tempus_logo_for_animation.png
+    - images/scuffed_logo_for_anim.png
+    - images/logo_white.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

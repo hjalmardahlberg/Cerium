@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'HomePage.dart';
 
+
 class StartPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) => Scaffold(
