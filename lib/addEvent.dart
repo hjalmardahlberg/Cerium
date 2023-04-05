@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+//ÄNDRAS TILL ADD GROUP
 class AddEventPage extends StatefulWidget {
   const AddEventPage(
       {Key? key, required this.appbar, required this.bottomNavigationBar})
@@ -58,13 +59,13 @@ class _AddEventPageState extends State<AddEventPage> {
               if (_imageFile == null) EventPickImage(height, width, _imageFile),
               if (_imageFile != null) EventImage(height, width, _imageFile),
               SizedBox(height: 16),
-              AddEventTextForm('Enter your events name'),
+              AddEventTextForm('Enter your event name'),
               SizedBox(height: 16),
               DatePickerRow(context, width),
               SizedBox(height: 16),
               TimePickerRow(context, width),
               SizedBox(height: 16),
-              AddEventTextForm('Enter your events info'),
+              AddEventTextForm('Enter your event info'),
             ],
           ),
         ),

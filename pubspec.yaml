@@ -41,6 +41,7 @@ dependencies:
   firebase_auth: ^4.3.0
   google_sign_in: ^6.0.2
 
+  jwt_decoder: ^2.0.1
 
   googleapis_auth: ^1.4.0
   #Date and time
@@ -53,8 +54,6 @@ dependencies:
 
   # Google Icon
   #font_awesome_flutter: ^10.4.0
-
-  flutter_signin_button: ^2.0.0
 
 
   #State Management

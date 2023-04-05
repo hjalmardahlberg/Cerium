@@ -176,29 +176,6 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.arrow_upward),
-            onPressed: () async{
-
-              final userData = {
-                'id': user.uid,
-                'name' :user.displayName,
-                'email' : user.email,
-              };
-
-              final url = 'http://192.121.208.57:8080/save';
-              final headers = {'Content-Type': 'application/json'};
-              final body = jsonEncode(userData);
-              //print(body.toString());
-              final response = await http.post(Uri.parse(url),headers: headers, body: body);
-
-              if (response.statusCode == 200){
-                print('User data sent successfully!');
-              }else{
-                print('Error sending user data: ${response.statusCode}');
-              }
-            },
-          ),
-          IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
               if (pageName != 'AddEventPage') {
@@ -210,6 +187,83 @@ class _MyHomePageState extends State<MyHomePage> {
                           bottomNavigationBar:
                               finalBottomAppBar(context, 'AddEventPage'))),
                 );
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.cabin_rounded),
+            onPressed: () async{ // create group
+
+              String? groupName = "Best Group2";
+
+              final userData = {
+                'id': user.uid,
+                'name' :user.displayName,
+                'email' : user.email,
+              };
+
+              final url = 'http://192.121.208.57:8080/group/create/'+ groupName;
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response = await http.put(Uri.parse(url),headers: headers, body: body);
+
+              if (response.statusCode == 200){
+                print('Group data sent successfully!');
+              }else{
+                print('Error sending user data: ${response.statusCode}');
+              }
+
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.run_circle_rounded), // JOIN GROUP
+            onPressed: () async{
+
+              String? groupName = "Best Group2";
+
+              final userData = {
+                'id': user.uid,
+                'name' :user.displayName,
+                'email' : user.email,
+                'joinFlag': true,
+              };
+
+              final url = 'http://192.121.208.57:8080/group/join/'+ groupName;
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response = await http.put(Uri.parse(url),headers: headers, body: body);
+
+              if (response.statusCode == 200){
+                print('Joined group successfully!');
+              }else{
+                print('Error sending user data: ${response.statusCode}');
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app), // Leave GROUP
+            onPressed: () async{
+
+              String? groupName = "Best Group2";
+
+              final userData = {
+                'id': user.uid,
+                'name' :user.displayName,
+                'email' : user.email,
+              };
+
+              final url = 'http://192.121.208.57:8080/group/leave/'+ groupName;
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response = await http.put(Uri.parse(url),headers: headers, body: body);
+
+              if (response.statusCode == 200){
+                print('Left group successfully!');
+              }else{
+                print('Error sending user data: ${response.statusCode}');
               }
             },
           ),

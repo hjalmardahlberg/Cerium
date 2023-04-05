@@ -57,7 +57,7 @@ class ProfileWidget extends StatelessWidget{
             ),
             SizedBox(height: 50),
             Text(
-              'USER ID: ' + user.uid!,
+              '', //+ user.uid!,
               style: TextStyle(color: Colors.white, fontSize: 19),
             ),
             SizedBox(height: 10),
