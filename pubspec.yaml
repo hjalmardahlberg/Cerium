@@ -36,7 +36,7 @@ dependencies:
   google_sign_in: ^6.0.2
 
   #Date and time
-  date_range_picker: ^1.0.1
+  #date_range_picker: ^1.0.1
   image_picker: ^0.8.4+3
   intl: ^0.17.0
 
