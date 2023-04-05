@@ -38,35 +38,7 @@ class _Group extends State<Group> {
     double ffem = fem * 0.97;
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    final appbar = AppBar(
-      backgroundColor: Colors.red.shade800,
-      titleSpacing: 0,
-      title: Row(
-        children: <Widget>[
-          Expanded(
-            child: IconButton(
-              padding: EdgeInsets.all(5),
-              icon: Icon(Icons.group),
-              iconSize: 50,
-              onPressed: () {},
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Center(
-              child: Text(widget.groupName, style: const TextStyle(fontSize: 28)),
-            ),
-          ),
-          Expanded(
-            child: IconButton(
-              icon: Icon(Icons.person),
-              iconSize: 50,
-              onPressed: () {},
-            ),
-          ),
-        ],
-      ),
-    );
+
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -100,35 +72,12 @@ class _Group extends State<Group> {
         ),
       ],
     );
-    final bottomNavigationBar = BottomAppBar(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.event),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => NextPage()),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.navigate_next),
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
+
     populateChatList();
     return Scaffold(
-      appBar: appbar,
+      appBar: widget.appbar,
       body: body,
-      bottomNavigationBar: bottomNavigationBar,
+      bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 

@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   AppBar finalAppBar() {
     return AppBar(
-      backgroundColor: Colors.red.shade800,
+      backgroundColor: Color.fromARGB(255, 153, 255, 255),
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
@@ -85,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => MyGroups(title: 'Groups')));
+                        builder: (_) => MyGroups(title: 'Groups',appbar: finalAppBar(),bottomNavigationBar: finalBottomAppBar(context, 'MyGroups'),)));
               },
             ),
           ),

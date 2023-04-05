@@ -2,13 +2,21 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+
 //import 'package:google_fonts/google_fonts.dart';
 import 'Group.dart';
 
 class MyGroups extends StatefulWidget {
-  const MyGroups({super.key, required this.title});
+  const MyGroups(
+      {super.key,
+      required this.title,
+      required this.appbar,
+      required this.bottomNavigationBar});
 
   final String title;
+  final AppBar appbar;
+  final BottomAppBar bottomNavigationBar;
+
   @override
   State<MyGroups> createState() => _MyGroups();
 }
@@ -23,73 +31,21 @@ class _MyGroups extends State<MyGroups> {
     double ffem = fem * 0.97;
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    final appbar = AppBar(
-      backgroundColor: Colors.red.shade800,
-      titleSpacing: 0,
-      title: Row(
-        children: <Widget>[
-          Expanded(
-            child: IconButton(
-              padding: EdgeInsets.all(5),
-              icon: Icon(Icons.group),
-              iconSize: 50,
-              onPressed: () {},
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Center(
-              child: Text(widget.title, style: const TextStyle(fontSize: 28)),
-            ),
-          ),
-          Expanded(
-            child: IconButton(
-              icon: Icon(Icons.person),
-              iconSize: 50,
-              onPressed: () {},
-            ),
-          ),
-        ],
-      ),
-    );
 
-    final bottomNavigationBar = BottomAppBar(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.event),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => NextPage()),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.navigate_next),
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
     String groupImage = 'images/wallsten.jpg';
     String groupName = 'Grupp med Wallsten';
-    list.add(GroupBox(fem, ffem, width, height, appbar, bottomNavigationBar, context, groupImage, groupName));
+    list.add(GroupBox(fem, ffem, width, height, widget.appbar, widget.bottomNavigationBar,
+        context, groupImage, groupName));
     return Scaffold(
-      appBar: appbar,
+      appBar: widget.appbar,
       body: ListView.builder(
         itemBuilder: (_, index) {
-          if(index<list.length) {
+          if (index < list.length) {
             return list[index];
           }
         },
       ),
-      bottomNavigationBar: bottomNavigationBar,
+      bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 }
@@ -103,7 +59,8 @@ Container GroupBox(double fem, double ffem, double width, double height, appbar,
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(//TODO:Fix
+          MaterialPageRoute(
+              //TODO:Fix
               builder: (_) => Group(
                   groupName: groupName,
                   picture: groupImage,
@@ -191,7 +148,7 @@ class NextPage extends StatelessWidget {
         title: const Text('Create'),
       ),
       body:
-      const Center(child: Image(image: AssetImage('images/wallsten.jpg'))),
+          const Center(child: Image(image: AssetImage('images/wallsten.jpg'))),
     );
   }
 }
