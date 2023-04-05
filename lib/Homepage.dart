@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 //import 'package:google_fonts/google_fonts.dart';
@@ -5,6 +7,15 @@ import 'Event.dart';
 import 'addEvent.dart';
 import 'MyGroups.dart';
 import 'profile_widget.dart';
+import 'provider.dart';
+import 'package:provider/provider.dart';
+import 'package:googleapis/calendar/v3.dart' show Event;
+
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:http/http.dart' as http;
+
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -81,7 +92,11 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             flex: 2,
             child: Center(
-              child: Text(widget.title, style: const TextStyle(fontSize: 28)),
+              child: Image.asset("images/tempus_logo_tansp_horizontal.png",
+              height: 160,
+              width: 160,
+              ),
+              //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
             ),
           ),
           Expanded(
@@ -102,13 +117,86 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   BottomAppBar finalBottomAppBar(BuildContext context, String pageName) {
+    final user = FirebaseAuth.instance.currentUser!;
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           IconButton(
             icon: Icon(Icons.event),
-            onPressed: () {},
+            onPressed: () async {
+              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+              final events = await provider.getPrimaryCalendarEvents();
+
+              for (Event event in events) {
+                //print('Event ID: ${event.id}');
+                print('Event summary: ${event.summary}');
+                print('Event start time: ${event.start?.dateTime}');
+                print('Event end time: ${event.end?.dateTime}');
+                //print('Event location: ${event.location}');
+                //print('Event description: ${event.description}');
+              }
+
+              /*
+              String? events;
+              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+              try {
+                events = await provider.getCalendarEvents();
+              }catch(e){
+                print(e.toString());
+              }
+              print(events);
+              */
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.hail_rounded),
+            onPressed: () async{
+              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+
+              if (pageName != 'AddEventPage') {
+                // kommer fetcha första veckan i april (TEMP)
+                final start = DateTime(2023, 4, 1);
+                final end = DateTime(2023, 4, 7);
+                final events = await provider.getCalendarEventsInterval(start, end);
+
+                print("BODY:");
+                print(events);
+                print("");
+                for (Event event in events) {
+                  //print('Event ID: ${event.id}');
+                  print('Event summary: ${event.summary}');
+                  print('Event start time: ${event.start?.dateTime}');
+                  print('Event end time: ${event.end?.dateTime}');
+                  //print('Event location: ${event.location}');
+                  //print('Event description: ${event.description}');
+                  print("");
+                }
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_upward),
+            onPressed: () async{
+
+              final userData = {
+                'id': user.uid,
+                'name' :user.displayName,
+                'email' : user.email,
+              };
+
+              final url = 'http://192.121.208.57:8080/save';
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response = await http.post(Uri.parse(url),headers: headers, body: body);
+
+              if (response.statusCode == 200){
+                print('User data sent successfully!');
+              }else{
+                print('Error sending user data: ${response.statusCode}');
+              }
+            },
           ),
           IconButton(
             icon: Icon(Icons.add),
@@ -127,7 +215,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           IconButton(
             icon: Icon(Icons.navigate_next),
-            onPressed: () {},
+            onPressed: () { //TEMP LOGIN BUTTON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              final provider =
+              Provider.of<GoogleSignInProvider>(context, listen: false);
+              provider.googleLogin();
+            },
           ),
         ],
       ),
