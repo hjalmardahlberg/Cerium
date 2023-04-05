@@ -45,7 +45,7 @@ public class Controller {
 
     @GetMapping(value = "/groups/{g_name}/users")
     public List<Users> getUsersFromGroup(@PathVariable String g_name) {
-        List<Groups> QueryResult = groupRepo.findByName(g_name);
+        List<Groups> QueryResult = groupRepo.findByName(g_name);//TODO: Förbättra detta med Lista av user ids i Groups.
         System.out.println("Group size: " + QueryResult.size());
         List<Users> toReturn = new ArrayList<>();
         for(int i = 0; i < QueryResult.size(); i++) {
@@ -116,11 +116,7 @@ public class Controller {
 
     }
 
-    /*
-          if(userJoin.alreadyInGroup(g_name)) {
-                throw new RuntimeException("Cannot join a group that user is already a member of!");
-            }
-     */
+
 
     @PutMapping(value = "/group/leave/{g_name}/{u_id}")
     public String leaveGroup(@PathVariable String u_id, @PathVariable String g_name, @RequestBody Users user) {
@@ -131,14 +127,37 @@ public class Controller {
         return "User successfully left the group: " + groupToDelete.getName();
     }
 
-    @PutMapping(value = "/event/create/{event}")
-    public String createEvent(@RequestBody Groups group, @RequestBody Events event) {
+    @PutMapping(value = "/event/create/{e_name}")
+    public String createEvent(@RequestBody Groups group, @PathVariable String e_name) {
         Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
+        List<Events> gEvents = eventRepo.findByName(e_name);
 
-        eventRepo.save(event);
+        for(int i = 0; i < gEvents.size(); i++) {
+            Events selEvent = gEvents.get(i);
+            if(selEvent.getGroup().getName().equals(group.getName())) {
+                throw new RuntimeException("Event with given name already exists within that group");
+
+            }
+        }
+
+        Events createdEvent = new Events();
+        createdEvent.setName(e_name);
+        createdEvent.setGroup(selectedGroup);
+        gEvents.add(createdEvent);
+        eventRepo.save(createdEvent);
+        groupRepo.save(selectedGroup);
         return "Successfully created a event within the group: " + group.getName();
+
+
+
     }
 
+
+    @DeleteMapping(value = "/event/delete/{e_name}")
+    public String delEvent(@PathVariable String e_name, @RequestBody Groups group) {
+        Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
+        Events selectedEvent = eventRepo.
+    }
 
     @PutMapping(value = "/update/{id}")
     public String updateUser(@PathVariable String id, @RequestBody Users user) {

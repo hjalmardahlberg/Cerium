@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Data
 @AllArgsConstructor
@@ -30,6 +33,14 @@ public class Groups {
 
   @Column(name = "owner")
   private String admin;
+
+  /*
+  @Transient
+  private List<String> userID = new ArrayList<>(); */
+
+  @OneToMany(mappedBy = "name",cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
+  private List<Events> events = new ArrayList<Events>();
 
 
   public long getId() {

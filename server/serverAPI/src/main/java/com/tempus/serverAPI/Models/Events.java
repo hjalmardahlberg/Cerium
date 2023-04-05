@@ -32,10 +32,13 @@ public class Events {
     @Column(name = "end")
     private String end_time;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "g_name")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "g_id")
     @JsonIgnore
     private Groups group;
+
+
 
     //TODO: Lägg till mer fält
 }
