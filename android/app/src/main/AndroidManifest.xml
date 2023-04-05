@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.cerium">
-   <application
-        android:label="cerium"
+    package="com.example.projecttest">
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <application
+        android:label="projecttest"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

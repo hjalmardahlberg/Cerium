@@ -1,0 +1,28 @@
+changes
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch Front-end-dev
+# Your branch is up to date with 'origin/Front-end-dev'.
+#
+# Changes to be committed:
+#	modified:   README.md
+#	modified:   android/app/build.gradle
+#	modified:   android/app/src/debug/AndroidManifest.xml
+#	modified:   android/app/src/main/AndroidManifest.xml
+#	deleted:    android/app/src/main/kotlin/com/example/cerium/MainActivity.kt
+#	modified:   android/app/src/profile/AndroidManifest.xml
+#	modified:   ios/Runner.xcodeproj/project.pbxproj
+#	modified:   ios/Runner/Info.plist
+#	modified:   lib/main.dart
+#	modified:   pubspec.yaml
+#	deleted:    server/Server.txt
+#
+# Untracked files:
+#	android/app/src/main/kotlin/
+#	images/
+#	lib/Event.dart
+#	lib/EventFeed.dart
+#	lib/Homepage.dart
+#	test/
+#

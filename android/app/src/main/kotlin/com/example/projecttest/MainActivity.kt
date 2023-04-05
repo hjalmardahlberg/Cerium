@@ -1,4 +1,4 @@
-package com.example.cerium
+package com.example.projecttest
 
 import io.flutter.embedding.android.FlutterActivity
 

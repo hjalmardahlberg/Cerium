@@ -1,5 +1,5 @@
-name: cerium
-description: Tempus
+name: projecttest
+description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -31,6 +31,24 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Google Sign In
+  firebase_auth: ^4.3.0
+  google_sign_in: ^6.0.2
+
+  #Date and time
+  date_range_picker: ^1.0.1
+  image_picker: ^0.8.4+3
+  intl: ^0.17.0
+
+
+  firebase_core: ^2.8.0
+
+  # Google Icon
+  #font_awesome_flutter: ^10.4.0
+  flutter_signin_button: ^2.0.0
+
+  #State Management
+  provider: ^6.0.5
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -52,16 +70,15 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - images/
+    - images/wallsten.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
