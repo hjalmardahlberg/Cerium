@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Date;
+
 //
 @Data
 @AllArgsConstructor
@@ -26,7 +28,7 @@ public class Events {
     private String name;
 
     @Column(name = "date")
-    private String date;
+    private Date date;
 
     @Column(name = "start")
     private String start_time;

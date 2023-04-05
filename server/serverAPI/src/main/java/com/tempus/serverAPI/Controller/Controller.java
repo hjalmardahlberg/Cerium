@@ -117,10 +117,9 @@ public class Controller {
     }
 
 
-
-    @PutMapping(value = "/group/leave/{g_name}/{u_id}")
-    public String leaveGroup(@PathVariable String u_id, @PathVariable String g_name, @RequestBody Users user) {
-        Users updateUser = userRepo.findById(u_id).get(); //FIXME: Detta ska vara id genom request body och inte via ett givet u_id
+    @PutMapping(value = "/group/leave/{g_name}")
+    public String leaveGroup(@PathVariable String g_name, @RequestBody Users user) {
+        Users updateUser = userRepo.findById(user.getId()).get();
         Groups groupToDelete = updateUser.getGroup(g_name);
         updateUser.getGroups().remove(updateUser.getGroups().indexOf(groupToDelete)); //bruuuuh
         groupRepo.delete(groupToDelete);
@@ -131,7 +130,6 @@ public class Controller {
     public String createEvent(@RequestBody Groups group, @PathVariable String e_name) {
         Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
         List<Events> gEvents = eventRepo.findByName(e_name);
-
         for(int i = 0; i < gEvents.size(); i++) {
             Events selEvent = gEvents.get(i);
             if(selEvent.getGroup().getName().equals(group.getName())) {
@@ -139,7 +137,6 @@ public class Controller {
 
             }
         }
-
         Events createdEvent = new Events();
         createdEvent.setName(e_name);
         createdEvent.setGroup(selectedGroup);
@@ -148,9 +145,8 @@ public class Controller {
         groupRepo.save(selectedGroup);
         return "Successfully created a event within the group: " + group.getName();
 
-
-
     }
+
 
 
     @DeleteMapping(value = "/event/delete/{e_name}")
