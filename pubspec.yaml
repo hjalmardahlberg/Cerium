@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
 
   animated_background: ^2.0.0
+  flutter_signin_button: ^2.0.0
 
   googleapis: ^10.1.0
 
@@ -46,7 +47,7 @@ dependencies:
   firebase_core: ^2.8.0
 
   # Google Icon
-  font_awesome_flutter: ^10.4.0
+  #font_awesome_flutter: ^10.4.0
 
   #State Management
   provider: ^6.0.5
@@ -61,6 +62,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.12.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -69,8 +71,15 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/logo_white.png"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -87,6 +96,7 @@ flutter:
     - images/tempus_logo_tansp_horizontal.png
     - images/tempus_logo_for_animation.png
     - images/scuffed_logo_for_anim.png
+    - images/logo_white.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

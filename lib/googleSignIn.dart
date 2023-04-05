@@ -1,8 +1,9 @@
 import 'package:provider/provider.dart';
 import 'provider.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+//import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:animated_background/animated_background.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 class SignUpWidget extends StatefulWidget {
   @override
@@ -53,32 +54,23 @@ class _SignUpWidgetState extends State<SignUpWidget>
             ),
           ),
           Spacer(),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(primary: Colors.grey),
-            onPressed: () {
-              //TODO: Implement log in functionality
-              final provider =
-              Provider.of<GoogleSignInProvider>(context, listen: false);
-              provider.googleLogin();
-            },
-            icon:
-            FaIcon(FontAwesomeIcons.google, color: Colors.deepOrange),
-            label: Text('Sign in with Google'),
-          ),
-          SizedBox(height: 40),
-          RichText(
-            text: TextSpan(
-              text: 'Already have an account? ',
-              children: [
-                TextSpan(
-                  text: 'Log in',
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ],
+          SizedBox(
+            width: 180, // Set the desired width
+            height: 40,
+            // Set the desired height
+            child: SignInButton(
+
+              Buttons.GoogleDark,
+              onPressed: () async {
+                //TODO: Implement log in functionality
+                final provider =
+                Provider.of<GoogleSignInProvider>(context,
+                    listen: false);
+                provider.googleLogin();
+              },
             ),
           ),
+          SizedBox(height: 40),
         ],
       ),
     ),
