@@ -156,7 +156,8 @@ public class Controller {
     @DeleteMapping(value = "/event/delete/{e_name}")
     public String delEvent(@PathVariable String e_name, @RequestBody Groups group) {
         Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
-        Events selectedEvent = eventRepo.
+        //Events selectedEvent = eventRepo.
+        return "Success";
     }
 
     @PutMapping(value = "/update/{id}")

@@ -2,6 +2,7 @@ package com.tempus.serverAPI.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class Events {
     private long id;
 
     @Column(name = "event_name")
+    @NotNull
     private String name;
 
     @Column(name = "date")
