@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 //import 'package:google_fonts/google_fonts.dart';
-import 'Event.dart';
+import 'Group.dart';
 
 class MyGroups extends StatefulWidget {
   const MyGroups({super.key, required this.title});
@@ -104,7 +104,8 @@ Container GroupBox(double fem, double ffem, double width, double height, appbar,
         Navigator.push(
           context,
           MaterialPageRoute(//TODO:Fix
-              builder: (_) => EventPage(
+              builder: (_) => Group(
+                  groupName: groupName,
                   picture: groupImage,
                   appbar: appbar,
                   bottomNavigationBar: bottomNavigationBar)),

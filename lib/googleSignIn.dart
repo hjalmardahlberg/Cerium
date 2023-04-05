@@ -1,4 +1,5 @@
 import 'package:provider/provider.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'provider.dart';
 import 'package:flutter/material.dart';
 //import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -69,6 +70,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
                 provider.googleLogin();
               },
             ),
+
           ),
           SizedBox(height: 40),
         ],
