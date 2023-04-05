@@ -1,20 +1,23 @@
-import 'dart:collection';
+
 
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
+
 
 //import 'package:google_fonts/google_fonts.dart';
 import 'Group.dart';
+
 
 class MyGroups extends StatefulWidget {
   const MyGroups(
       {super.key,
       required this.title,
       required this.appbar,
+      required this.appbar2,
       required this.bottomNavigationBar});
 
   final String title;
   final AppBar appbar;
+  final AppBar appbar2;
   final BottomAppBar bottomNavigationBar;
 
   @override
@@ -34,7 +37,19 @@ class _MyGroups extends State<MyGroups> {
 
     String groupImage = 'images/wallsten.jpg';
     String groupName = 'Grupp med Wallsten';
-    list.add(GroupBox(fem, ffem, width, height, widget.appbar, widget.bottomNavigationBar,
+
+
+    list.add(
+      const Center(child:Text(
+        'Groups',
+        style: TextStyle(
+          fontSize: 24.0, // Set the font size to 24
+          decoration: TextDecoration.underline, // Underline the text
+        ),
+      ),
+      ),
+    );
+    list.add(groupBox(fem, ffem, width, height,widget.appbar2, widget.bottomNavigationBar,
         context, groupImage, groupName));
     return Scaffold(
       appBar: widget.appbar,
@@ -50,7 +65,7 @@ class _MyGroups extends State<MyGroups> {
   }
 }
 
-Container GroupBox(double fem, double ffem, double width, double height, appbar,
+Container groupBox(double fem, double ffem, double width, double height, appbar,
     bottomNavigationBar, context, String groupImage, String groupName) {
   return Container(
     // event3JfJ (23:33)
@@ -68,7 +83,7 @@ Container GroupBox(double fem, double ffem, double width, double height, appbar,
                   bottomNavigationBar: bottomNavigationBar)),
         );
       },
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         height: 138.5 * fem,
         child: Stack(
@@ -137,18 +152,4 @@ Container GroupBox(double fem, double ffem, double width, double height, appbar,
       ),
     ),
   );
-}
-
-class NextPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.cyan.shade800,
-        title: const Text('Create'),
-      ),
-      body:
-          const Center(child: Image(image: AssetImage('images/wallsten.jpg'))),
-    );
-  }
 }
