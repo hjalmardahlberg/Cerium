@@ -23,6 +23,8 @@ class _AddEventPageState extends State<AddEventPage> {
   DateTime? _stopSelectedDate;
   TimeOfDay? _startSelectedTime;
   TimeOfDay? _stopSelectedTime;
+  TextEditingController _eventNameController = TextEditingController();
+  TextEditingController _eventInfoController = TextEditingController();
 
   Future<void> _getImage() async {
     try {
@@ -58,13 +60,16 @@ class _AddEventPageState extends State<AddEventPage> {
               if (_imageFile == null) EventPickImage(height, width, _imageFile),
               if (_imageFile != null) EventImage(height, width, _imageFile),
               SizedBox(height: 16),
-              AddEventTextForm('Enter your events name'),
+              AddEventTextForm('Enter your events name', _eventNameController),
               SizedBox(height: 16),
               DatePickerRow(context, width),
               SizedBox(height: 16),
               TimePickerRow(context, width),
               SizedBox(height: 16),
-              AddEventTextForm('Enter your events info'),
+              AddEventTextForm('Enter your events info', _eventInfoController),
+                // When the user presses the button, show an alert dialog containing
+                // the text that the user has entered into the text field.
+
             ],
           ),
         ),
@@ -212,12 +217,20 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  TextFormField AddEventTextForm(String text) {
+  TextFormField AddEventTextForm(
+      String text, TextEditingController controller) {
     return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         labelText: text,
       ),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Enter last Name';
+        }
+        return null;
+      },
     );
   }
 
