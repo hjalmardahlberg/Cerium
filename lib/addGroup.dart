@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import 'package:firebase_auth/firebase_auth.dart'; //for fetching user
+import 'package:http/http.dart' as http; //https requests
+import 'dart:convert'; //converting json to arbitrary shit or vice verca
+
+
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage(
       {Key? key, required this.appbar, required this.bottomNavigationBar})
@@ -74,8 +79,31 @@ class _AddGroupPageState extends State<AddGroupPage> {
   }
 
   ElevatedButton addGroupButton() {
+    final user = FirebaseAuth.instance.currentUser!;
+
     return ElevatedButton.icon(
-      onPressed: () {},
+      onPressed: () async {
+        String? groupName = _eventNameController.text;
+
+        final userData = {
+          'id': user.uid,
+          'name': user.displayName,
+          'email': user.email,
+        };
+
+        final url = 'http://192.121.208.57:8080/group/create/' + groupName;
+        final headers = {'Content-Type': 'application/json'};
+        final body = jsonEncode(userData);
+        //print(body.toString());
+        final response =
+            await http.put(Uri.parse(url), headers: headers, body: body);
+
+        if (response.statusCode == 200) {
+          print('Created Group successfully!');
+        } else {
+          print('Error sending user data: ${response.statusCode}');
+        }
+      },
 
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.green,
@@ -84,7 +112,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
         Icons.add,
         size: 24.0,
       ),
-      label: const Text('Group'), // <-- Text
+      label: const Text('Create Group'), // <-- Text
     );
   }
 

@@ -185,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   BottomAppBar finalBottomAppBar(BuildContext context, String pageName) {
     final user = FirebaseAuth.instance.currentUser!;
+
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
