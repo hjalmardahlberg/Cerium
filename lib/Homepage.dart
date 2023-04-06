@@ -236,6 +236,85 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
+            icon: Icon(Icons.cabin_rounded),
+            onPressed: () async { // CREATE GROUP
+
+              String? groupName = "Best group1";
+
+              final userData = {
+                'id': user.uid,
+                'name': user.displayName,
+                'email': user.email,
+              };
+
+              final url = 'http://192.121.208.57:8080/group/create/' + groupName;
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response =
+              await http.put(Uri.parse(url), headers: headers, body: body);
+
+              if (response.statusCode == 200) {
+                print('Created Group successfully!');
+              } else {
+                print('Error sending user data: ${response.statusCode}');
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.run_circle_rounded),
+            onPressed: () async { // JOIN GROUP
+
+              String? groupName = "Best group1";
+
+              final userData = {
+                'id': user.uid,
+                'name': user.displayName,
+                'email': user.email,
+                'joinFlag': true,
+              };
+
+              final url = 'http://192.121.208.57:8080/group/join/' + groupName;
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response =
+              await http.put(Uri.parse(url), headers: headers, body: body);
+
+              if (response.statusCode == 200) {
+                print('Joined group successfully!');
+              } else {
+                print('Error sending user data: ${response.statusCode}');
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () async { // LEAVE GROUP
+
+              String? groupName = "Best group1";
+
+              final userData = {
+                'id': user.uid,
+                'name': user.displayName,
+                'email': user.email,
+              };
+
+              final url = 'http://192.121.208.57:8080/group/leave/' + groupName;
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response =
+              await http.put(Uri.parse(url), headers: headers, body: body);
+
+              if (response.statusCode == 200) {
+                print('Left Group successfully!');
+              } else {
+                print('Error sending user data: ${response.statusCode}');
+              }
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.arrow_upward),
             onPressed: () async {
               final userData = {
