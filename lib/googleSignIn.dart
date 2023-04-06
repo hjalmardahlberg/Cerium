@@ -63,7 +63,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
 
               Buttons.GoogleDark,
               onPressed: () async {
-                //log in functionality
+                //TODO: Implement log in functionality
                 final provider =
                 Provider.of<GoogleSignInProvider>(context,
                     listen: false);
