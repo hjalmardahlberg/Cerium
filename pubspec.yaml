@@ -31,9 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   animated_background: ^2.0.0
   flutter_signin_button: ^2.0.0
+
+  jwt_decoder: ^2.0.1
 
   googleapis: ^10.1.0
 

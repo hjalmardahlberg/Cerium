@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+
 //import 'package:google_fonts/google_fonts.dart';
 import 'Event.dart';
 import 'addEvent.dart';
 import 'MyGroups.dart';
+
+import 'addGroup.dart';
 import 'profile_widget.dart';
 import 'provider.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +24,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -37,7 +41,16 @@ class _MyHomePageState extends State<MyHomePage> {
     final appbar = finalAppBar();
 
     final bottomNavigationBar = finalBottomAppBar(context, 'MyHomePage');
-
+    eventList.add(
+      Center(child:Text(
+        'Events',
+        style: TextStyle(
+          fontSize: 24.0, // Set the font size to 24
+          decoration: TextDecoration.underline, // Underline the text
+        ),
+      ),
+      ),
+    );
     eventList.add(EventBox(
         'images/wallsten.jpg',
         '2023-03-23  kl:14:00',
@@ -46,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ffem,
         width,
         height,
-        appbar,
+        homeAppBar(),
         bottomNavigationBar,
         context));
     eventList.add(EventBox(
@@ -72,7 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   AppBar finalAppBar() {
     return AppBar(
-      backgroundColor: Colors.red.shade800,
+      automaticallyImplyLeading: false,
+      backgroundColor: Color.fromARGB(255, 153, 255, 255),
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
@@ -85,16 +99,23 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => MyGroups(title: 'Groups')));
+                        builder: (_) => MyGroups(
+                              title: 'Groups',
+                              appbar: homeAppBar(),
+                              appbar2: finalAppBar(),
+                              bottomNavigationBar:
+                                  finalBottomAppBar(context, 'MyGroups'),
+                            )));
               },
             ),
           ),
           Expanded(
             flex: 2,
             child: Center(
-              child: Image.asset("images/tempus_logo_tansp_horizontal.png",
-              height: 160,
-              width: 160,
+              child: Image.asset(
+                "images/tempus_logo_tansp_horizontal.png",
+                height: 160,
+                width: 160,
               ),
               //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
             ),
@@ -104,10 +125,56 @@ class _MyHomePageState extends State<MyHomePage> {
               icon: Icon(Icons.person),
               iconSize: 50,
               onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => ProfileWidget()));
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  AppBar homeAppBar() {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: Color.fromARGB(255, 153, 255, 255),
+      titleSpacing: 0,
+      title: Row(
+        children: <Widget>[
+          Expanded(
+            child: IconButton(
+              padding: EdgeInsets.all(5),
+              icon: Icon(Icons.home),
+              iconSize: 50,
+              onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                builder: (_) => ProfileWidget()));
+                        builder: (_) => MyHomePage(
+                          title: 'Home',
+                        )));
+              },
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Image.asset(
+                "images/tempus_logo_tansp_horizontal.png",
+                height: 160,
+                width: 160,
+              ),
+              //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
+            ),
+          ),
+          Expanded(
+            child: IconButton(
+              icon: Icon(Icons.person),
+              iconSize: 50,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => ProfileWidget()));
               },
             ),
           ),
@@ -125,7 +192,8 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: Icon(Icons.event),
             onPressed: () async {
-              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+              final provider =
+                  Provider.of<GoogleSignInProvider>(context, listen: false);
               final events = await provider.getPrimaryCalendarEvents();
 
               for (Event event in events) {
@@ -137,28 +205,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 //print('Event description: ${event.description}');
               }
 
-              /*
-              String? events;
-              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
-              try {
-                events = await provider.getCalendarEvents();
-              }catch(e){
-                print(e.toString());
-              }
-              print(events);
-              */
             },
           ),
           IconButton(
             icon: Icon(Icons.hail_rounded),
-            onPressed: () async{
-              final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+            onPressed: () async {
+              final provider =
+                  Provider.of<GoogleSignInProvider>(context, listen: false);
 
               if (pageName != 'AddEventPage') {
                 // kommer fetcha första veckan i april (TEMP)
                 final start = DateTime(2023, 4, 1);
                 final end = DateTime(2023, 4, 7);
-                final events = await provider.getCalendarEventsInterval(start, end);
+                final events =
+                    await provider.getCalendarEventsInterval(start, end);
 
                 print("BODY:");
                 print(events);
@@ -176,14 +236,46 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
+            icon: Icon(Icons.arrow_upward),
+            onPressed: () async {
+              final userData = {
+                'id': user.uid,
+                'name': user.displayName,
+                'email': user.email,
+              };
+
+              final url = 'http://192.121.208.57:8080/save';
+              final headers = {'Content-Type': 'application/json'};
+              final body = jsonEncode(userData);
+              //print(body.toString());
+              final response =
+                  await http.post(Uri.parse(url), headers: headers, body: body);
+
+              if (response.statusCode == 200) {
+                print('User data sent successfully!');
+              } else {
+                print('Error sending user data: ${response.statusCode}');
+              }
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              if (pageName != 'AddEventPage') {
+              if (pageName == 'MyGroups') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => AddGroupPage(
+                          appbar: finalAppBar(),
+                          bottomNavigationBar:
+                              finalBottomAppBar(context, 'AddGroupPage'))),
+                );
+              } else if (pageName != 'AddEventPage') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (_) => AddEventPage(
-                          appbar: finalAppBar(),
+                          appbar: homeAppBar(),
                           bottomNavigationBar:
                               finalBottomAppBar(context, 'AddEventPage'))),
                 );
@@ -191,87 +283,11 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.cabin_rounded),
-            onPressed: () async{ // create group
-
-              String? groupName = "Best Group2";
-
-              final userData = {
-                'id': user.uid,
-                'name' :user.displayName,
-                'email' : user.email,
-              };
-
-              final url = 'http://192.121.208.57:8080/group/create/'+ groupName;
-              final headers = {'Content-Type': 'application/json'};
-              final body = jsonEncode(userData);
-              //print(body.toString());
-              final response = await http.put(Uri.parse(url),headers: headers, body: body);
-
-              if (response.statusCode == 200){
-                print('Group data sent successfully!');
-              }else{
-                print('Error sending user data: ${response.statusCode}');
-              }
-
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.run_circle_rounded), // JOIN GROUP
-            onPressed: () async{
-
-              String? groupName = "Best Group2";
-
-              final userData = {
-                'id': user.uid,
-                'name' :user.displayName,
-                'email' : user.email,
-                'joinFlag': true,
-              };
-
-              final url = 'http://192.121.208.57:8080/group/join/'+ groupName;
-              final headers = {'Content-Type': 'application/json'};
-              final body = jsonEncode(userData);
-              //print(body.toString());
-              final response = await http.put(Uri.parse(url),headers: headers, body: body);
-
-              if (response.statusCode == 200){
-                print('Joined group successfully!');
-              }else{
-                print('Error sending user data: ${response.statusCode}');
-              }
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.exit_to_app), // Leave GROUP
-            onPressed: () async{
-
-              String? groupName = "Best Group2";
-
-              final userData = {
-                'id': user.uid,
-                'name' :user.displayName,
-                'email' : user.email,
-              };
-
-              final url = 'http://192.121.208.57:8080/group/leave/'+ groupName;
-              final headers = {'Content-Type': 'application/json'};
-              final body = jsonEncode(userData);
-              //print(body.toString());
-              final response = await http.put(Uri.parse(url),headers: headers, body: body);
-
-              if (response.statusCode == 200){
-                print('Left group successfully!');
-              }else{
-                print('Error sending user data: ${response.statusCode}');
-              }
-            },
-          ),
-          IconButton(
             icon: Icon(Icons.navigate_next),
-            onPressed: () { //TEMP LOGIN BUTTON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            onPressed: () {
+              //TEMP LOGIN BUTTON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
               final provider =
-              Provider.of<GoogleSignInProvider>(context, listen: false);
+                  Provider.of<GoogleSignInProvider>(context, listen: false);
               provider.googleLogin();
             },
           ),

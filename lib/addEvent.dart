@@ -24,6 +24,8 @@ class _AddEventPageState extends State<AddEventPage> {
   DateTime? _stopSelectedDate;
   TimeOfDay? _startSelectedTime;
   TimeOfDay? _stopSelectedTime;
+  TextEditingController _eventNameController = TextEditingController();
+  TextEditingController _eventInfoController = TextEditingController();
 
   Future<void> _getImage() async {
     try {
@@ -58,14 +60,16 @@ class _AddEventPageState extends State<AddEventPage> {
             children: [
               if (_imageFile == null) EventPickImage(height, width, _imageFile),
               if (_imageFile != null) EventImage(height, width, _imageFile),
-              SizedBox(height: 16),
-              AddEventTextForm('Enter your event name'),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
+              AddEventTextForm('Enter your events name', _eventNameController),
+              const SizedBox(height: 16),
               DatePickerRow(context, width),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TimePickerRow(context, width),
-              SizedBox(height: 16),
-              AddEventTextForm('Enter your event info'),
+              const SizedBox(height: 16),
+              AddEventTextForm('Enter your events info', _eventInfoController),
+              const SizedBox(height: 16),
+              addEventButton(),
             ],
           ),
         ),
@@ -74,10 +78,24 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
+  ElevatedButton addEventButton() {
+    return ElevatedButton.icon(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green,
+      ),
+      icon: const Icon(
+        Icons.add,
+        size: 24.0,
+      ),
+      label: Text('Event'),
+    );
+  }
+
   IconButton DatePicker(BuildContext context, DateTimeRange? dateRange,
       Function(DateTimeRange)? onDatesSelected) {
     return IconButton(
-      icon: Icon(Icons.calendar_today),
+      icon: const Icon(Icons.calendar_today),
       onPressed: () async {
         final DateTimeRange? pickedDateRange = await showDateRangePicker(
           context: context,
@@ -109,19 +127,19 @@ class _AddEventPageState extends State<AddEventPage> {
               _stopSelectedDate = dateRange.end;
             });
           }),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Text(
             _startSelectedDate != null
                 ? DateFormat('EEE, M/d/y').format(_startSelectedDate!)
                 : 'Select start date',
           ),
-          Text(' to '),
+          const Text(' to '),
           Text(
             _startSelectedDate != null
                 ? DateFormat('EEE, M/d/y').format(_stopSelectedDate!)
                 : 'Select stop date',
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
         ],
       ),
     );
@@ -130,7 +148,7 @@ class _AddEventPageState extends State<AddEventPage> {
   IconButton TimePicker(BuildContext context, TimeOfDay time,
       Function(TimeOfDay)? onTimeSelected) {
     return IconButton(
-      icon: Icon(Icons.access_time),
+      icon: const Icon(Icons.access_time),
       onPressed: () async {
         final TimeOfDay? pickedTime = await showTimePicker(
           context: context,
@@ -149,7 +167,7 @@ class _AddEventPageState extends State<AddEventPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           IconButton(
-            icon: Icon(Icons.access_time),
+            icon: const Icon(Icons.access_time),
             onPressed: () async {
               final TimeOfDay? startSelectedTime = await showTimePicker(
                 context: context,
@@ -169,19 +187,19 @@ class _AddEventPageState extends State<AddEventPage> {
               }
             },
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Text(
             _startSelectedTime != null
                 ? _startSelectedTime!.format(context)
                 : 'Select start time',
           ),
-          Text(' - '),
+          const Text(' - '),
           Text(
             _stopSelectedTime != null
                 ? _stopSelectedTime!.format(context)
                 : 'Select stop time',
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Text(
               _startSelectedTime != null &&
@@ -203,7 +221,7 @@ class _AddEventPageState extends State<AddEventPage> {
                       )
                   ? 'Stop time cannot be earlier than start time'
                   : '',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.red,
               ),
             ),
@@ -213,12 +231,20 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  TextFormField AddEventTextForm(String text) {
+  TextFormField AddEventTextForm(
+      String text, TextEditingController controller) {
     return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         labelText: text,
       ),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Enter last Name';
+        }
+        return null;
+      },
     );
   }
 
