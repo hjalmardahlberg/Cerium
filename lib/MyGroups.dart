@@ -1,11 +1,7 @@
-
-
 import 'package:flutter/material.dart';
-
 
 //import 'package:google_fonts/google_fonts.dart';
 import 'Group.dart';
-
 
 class MyGroups extends StatefulWidget {
   const MyGroups(
@@ -38,19 +34,22 @@ class _MyGroups extends State<MyGroups> {
     String groupImage = 'images/wallsten.jpg';
     String groupName = 'Grupp med Wallsten';
 
-
     list.add(
-      const Center(child:Text(
-        'Groups',
-        style: TextStyle(
-          fontSize: 24.0, // Set the font size to 24
-          decoration: TextDecoration.underline, // Underline the text
+      const Center(
+        child: Padding(
+          padding: EdgeInsets.only(top: 10.0),
+          child: Text(
+            'Groups',
+            style: TextStyle(
+              fontSize: 24.0, // Set the font size to 24
+              decoration: TextDecoration.underline, // Underline the text
+            ),
+          ),
         ),
       ),
-      ),
     );
-    list.add(groupBox(fem, ffem, width, height,widget.appbar2, widget.bottomNavigationBar,
-        context, groupImage, groupName));
+    list.add(groupBox(fem, ffem, width, height, widget.appbar2,
+        widget.bottomNavigationBar, context, groupImage, groupName));
     return Scaffold(
       appBar: widget.appbar,
       body: ListView.builder(

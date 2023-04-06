@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
+//import 'package:flutter/gestures.dart';
 
 //import 'package:google_fonts/google_fonts.dart';
-import 'Event.dart';
+import 'event.dart';
 import 'addEvent.dart';
 import 'MyGroups.dart';
 import 'addGroup.dart';
@@ -17,7 +17,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:http/http.dart' as http;
 
-import 'package:jwt_decoder/jwt_decoder.dart';
+//import 'package:jwt_decoder/jwt_decoder.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -31,26 +31,37 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    //Event list
     List<Widget> eventList = <Widget>[];
+    //Sizes
     double baseWidth = 390;
     double fem = MediaQuery.of(context).size.width / baseWidth;
     double ffem = fem * 0.97;
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    final appbar = finalAppBar();
 
+    //appbar
+    final appbar = groupAppBar();
+
+    //bottomNavigationBar
     final bottomNavigationBar = finalBottomAppBar(context, 'MyHomePage');
+
+    //Adds events to the event list
     eventList.add(
-      Center(child:Text(
-        'Events',
-        style: TextStyle(
-          fontSize: 24.0, // Set the font size to 24
-          decoration: TextDecoration.underline, // Underline the text
-        ),
-      ),
-      ),
+        const Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: 10.0),
+            child: Text(
+              'Events',
+              style: TextStyle(
+                fontSize: 24.0,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        )
     );
-    eventList.add(EventBox(
+    eventList.add(eventBox(
         'images/wallsten.jpg',
         '2023-03-23  kl:14:00',
         'Möte med Wallsten',
@@ -61,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
         homeAppBar(),
         bottomNavigationBar,
         context));
-    eventList.add(EventBox(
+    eventList.add(eventBox(
         'images/edvard_inception.png',
         '2023-03-23  kl:17:00',
         'Möte med Frugan',
@@ -69,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ffem,
         width,
         height,
-        appbar,
+        homeAppBar(),
         bottomNavigationBar,
         context));
 
@@ -82,18 +93,20 @@ class _MyHomePageState extends State<MyHomePage> {
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
-  AppBar finalAppBar() {
+  //AppBar that takes you back to group screen
+  AppBar groupAppBar() {
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: Color.fromARGB(255, 153, 255, 255),
+      //backgroundColor: const Color.fromARGB(255, 153, 255, 255),
+      backgroundColor: Colors.white,
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
           Expanded(
             child: IconButton(
-              padding: EdgeInsets.all(5),
-              icon: Icon(Icons.group),
-              iconSize: 50,
+              padding: const EdgeInsets.all(5),
+              icon: const Icon(Icons.group,color: Colors.black,),
+              iconSize: 40,
               onPressed: () {
                 Navigator.push(
                     context,
@@ -101,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (_) => MyGroups(
                               title: 'Groups',
                               appbar: homeAppBar(),
-                              appbar2: finalAppBar(),
+                              appbar2: groupAppBar(),
                               bottomNavigationBar:
                                   finalBottomAppBar(context, 'MyGroups'),
                             )));
@@ -121,8 +134,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: IconButton(
-              icon: Icon(Icons.person),
-              iconSize: 50,
+              icon: const Icon(Icons.person,color: Colors.black,),
+              iconSize: 40,
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => ProfileWidget()));
@@ -134,23 +147,25 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  //AppBar that takes you back to event screen
   AppBar homeAppBar() {
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: Color.fromARGB(255, 153, 255, 255),
+     // backgroundColor: const Color.fromARGB(255, 153, 255, 255),
+      backgroundColor: Colors.white,
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
           Expanded(
             child: IconButton(
-              padding: EdgeInsets.all(5),
-              icon: Icon(Icons.home),
-              iconSize: 50,
+              padding: const EdgeInsets.all(5),
+              icon: const Icon(Icons.home,color: Colors.black,),
+              iconSize: 40,
               onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => MyHomePage(
+                        builder: (_) => const MyHomePage(
                           title: 'Home',
                         )));
               },
@@ -169,8 +184,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: IconButton(
-              icon: Icon(Icons.person),
-              iconSize: 50,
+              icon: const Icon(Icons.person,color: Colors.black,),
+              iconSize: 40,
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => ProfileWidget()));
@@ -189,7 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           IconButton(
-            icon: Icon(Icons.event),
+            icon: const Icon(Icons.event),
             onPressed: () async {
               final provider =
                   Provider.of<GoogleSignInProvider>(context, listen: false);
@@ -206,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.hail_rounded),
+            icon: const Icon(Icons.hail_rounded),
             onPressed: () async {
               final provider =
                   Provider.of<GoogleSignInProvider>(context, listen: false);
@@ -234,7 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.arrow_upward),
+            icon: const Icon(Icons.arrow_upward),
             onPressed: () async {
               final userData = {
                 'id': user.uid,
@@ -242,7 +257,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 'email': user.email,
               };
 
-              final url = 'http://192.121.208.57:8080/save';
+              const url = 'http://192.121.208.57:8080/save';
               final headers = {'Content-Type': 'application/json'};
               final body = jsonEncode(userData);
               //print(body.toString());
@@ -257,14 +272,14 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () {
               if (pageName == 'MyGroups') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (_) => AddGroupPage(
-                          appbar: finalAppBar(),
+                          appbar: groupAppBar(),
                           bottomNavigationBar:
                               finalBottomAppBar(context, 'AddGroupPage'))),
                 );
@@ -281,7 +296,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.navigate_next),
+            icon: const Icon(Icons.navigate_next),
             onPressed: () {
               //TEMP LOGIN BUTTON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
               final provider =
@@ -295,7 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Container EventBox(
+Container eventBox(
     String eventImage,
     String eventTime,
     String eventName,
@@ -320,7 +335,7 @@ Container EventBox(
                   bottomNavigationBar: bottomNavigationBar)),
         );
       },
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         height: 138.5 * fem,
         child: Stack(
@@ -336,8 +351,8 @@ Container EventBox(
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20 * fem),
-                      border: Border.all(color: Color(0xff000000)),
-                      color: Color(0xffffffff),
+                      border: Border.all(color: const Color(0xff000000)),
+                      color: const Color(0xffffffff),
                     ),
                   ),
                 ),
@@ -357,7 +372,7 @@ Container EventBox(
                       fontSize: 12 * ffem,
                       fontWeight: FontWeight.w400,
                       height: 1.2125 * ffem / fem,
-                      color: Color(0xff000000),
+                      color: const Color(0xff000000),
                     ),
                   ),
                 ),
@@ -377,7 +392,7 @@ Container EventBox(
                       fontSize: 12 * ffem,
                       fontWeight: FontWeight.w400,
                       height: 1.2125 * ffem / fem,
-                      color: Color(0xff000000),
+                      color: const Color(0xff000000),
                     ),
                   ),
                 ),
@@ -397,7 +412,7 @@ Container EventBox(
                       fontSize: 12 * ffem,
                       fontWeight: FontWeight.w400,
                       height: 1.2125 * ffem / fem,
-                      color: Color(0xff000000),
+                      color: const Color(0xff000000),
                     ),
                   ),
                 ),
@@ -429,18 +444,4 @@ Container EventBox(
       ),
     ),
   );
-}
-
-class NextPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.cyan.shade800,
-        title: const Text('Create'),
-      ),
-      body:
-          const Center(child: Image(image: AssetImage('images/wallsten.jpg'))),
-    );
-  }
 }

@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
+
 
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage(
@@ -23,8 +22,8 @@ class _AddGroupPageState extends State<AddGroupPage> {
   DateTime? _stopSelectedDate;
   TimeOfDay? _startSelectedTime;
   TimeOfDay? _stopSelectedTime;
-  TextEditingController _eventNameController = TextEditingController();
-  TextEditingController _eventInfoController = TextEditingController();
+  TextEditingController _groupNameController = TextEditingController();
+  TextEditingController _groupInfoController = TextEditingController();
 
   Future<void> _getImage() async {
     try {
@@ -57,13 +56,13 @@ class _AddGroupPageState extends State<AddGroupPage> {
           padding: const EdgeInsets.all(8),
           child: Column(
             children: [
-              if (_imageFile == null) EventPickImage(height, width, _imageFile),
-              if (_imageFile != null) EventImage(height, width, _imageFile),
-              SizedBox(height: 16),
-              AddEventTextForm('Enter your Group name', _eventNameController),
-              SizedBox(height: 16),
-              AddEventTextForm('Enter your group info', _eventInfoController),
-              SizedBox(height: 16),
+              if (_imageFile == null) pickImage(height, width, _imageFile),
+              if (_imageFile != null) addImage(height, width, _imageFile),
+              const SizedBox(height: 16),
+              addTextForm('Enter your Group name', _groupNameController),
+              const SizedBox(height: 16),
+              addTextForm('Enter your group info', _groupInfoController),
+              const SizedBox(height: 16),
               addGroupButton(),
             ],
           ),
@@ -73,27 +72,29 @@ class _AddGroupPageState extends State<AddGroupPage> {
     );
   }
 
-  ElevatedButton addGroupButton() {
-    return ElevatedButton.icon(
-      onPressed: () {},
-
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green,
+  Align addGroupButton() {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: ElevatedButton.icon(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.lightBlue.shade300,
+        ),
+        icon: const Icon(
+          Icons.add,
+          size: 24.0,
+        ),
+        label: const Text('Group'),
       ),
-      icon: const Icon(
-        Icons.add,
-        size: 24.0,
-      ),
-      label: const Text('Group'), // <-- Text
     );
   }
 
-  TextFormField AddEventTextForm(
+  TextFormField addTextForm(
       String text, TextEditingController controller) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
         labelText: text,
       ),
       validator: (value) {
@@ -105,12 +106,12 @@ class _AddGroupPageState extends State<AddGroupPage> {
     );
   }
 
-  SizedBox EventPickImage(double height, double width, File? _imageFile) {
+  SizedBox pickImage(double height, double width, File? _imageFile) {
     return SizedBox(
         height: height / 4,
         child: Container(
           width: width,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Color(0xBBABA6A6),
           ),
           child: IconButton(
@@ -120,12 +121,12 @@ class _AddGroupPageState extends State<AddGroupPage> {
         ));
   }
 
-  SizedBox EventImage(double height, double width, File? _imageFile) {
+  SizedBox addImage(double height, double width, File? _imageFile) {
     return SizedBox(
         height: height / 4,
         child: Container(
           width: width,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             border: Border(bottom: BorderSide(color: Color(0xff000000))),
             color: Color(0x0000000),
           ),
