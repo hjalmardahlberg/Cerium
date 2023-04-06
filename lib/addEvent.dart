@@ -1,11 +1,9 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-//ÄNDRAS TILL ADD GROUP
 class AddEventPage extends StatefulWidget {
   const AddEventPage(
       {Key? key, required this.appbar, required this.bottomNavigationBar})
@@ -19,18 +17,25 @@ class AddEventPage extends StatefulWidget {
 }
 
 class _AddEventPageState extends State<AddEventPage> {
+  //the picked image
   File? _imageFile;
+  //the picked start date
   DateTime? _startSelectedDate;
+  //the picked stop date
   DateTime? _stopSelectedDate;
+  //the picked start time
   TimeOfDay? _startSelectedTime;
+  //the picked stop time
   TimeOfDay? _stopSelectedTime;
-  TextEditingController _eventNameController = TextEditingController();
-  TextEditingController _eventInfoController = TextEditingController();
+  //the event name
+  final TextEditingController _eventNameController = TextEditingController();
+  //the event info
+  final TextEditingController _eventInfoController = TextEditingController();
 
   Future<void> _getImage() async {
     try {
       final pickedFile =
-          await ImagePicker().getImage(source: ImageSource.gallery);
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         setState(() {
           _imageFile = File(pickedFile.path);
@@ -58,16 +63,16 @@ class _AddEventPageState extends State<AddEventPage> {
           padding: const EdgeInsets.all(8),
           child: Column(
             children: [
-              if (_imageFile == null) EventPickImage(height, width, _imageFile),
-              if (_imageFile != null) EventImage(height, width, _imageFile),
+              if (_imageFile == null) pickImage(height, width),
+              if (_imageFile != null) addImage(height, width, _imageFile),
               const SizedBox(height: 16),
-              AddEventTextForm('Enter your events name', _eventNameController),
+              addTextForm('Enter your events name', _eventNameController),
               const SizedBox(height: 16),
-              DatePickerRow(context, width),
+              datePickerRow(context, width),
               const SizedBox(height: 16),
-              TimePickerRow(context, width),
+              timePickerRow(context, width),
               const SizedBox(height: 16),
-              AddEventTextForm('Enter your events info', _eventInfoController),
+              addTextForm('Enter your events info', _eventInfoController),
               const SizedBox(height: 16),
               addEventButton(),
             ],
@@ -78,21 +83,24 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  ElevatedButton addEventButton() {
-    return ElevatedButton.icon(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green,
+  Align addEventButton() {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: ElevatedButton.icon(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.lightBlue.shade300,
+        ),
+        icon: const Icon(
+          Icons.add,
+          size: 24.0,
+        ),
+        label: const Text('Event'),
       ),
-      icon: const Icon(
-        Icons.add,
-        size: 24.0,
-      ),
-      label: Text('Event'),
     );
   }
 
-  IconButton DatePicker(BuildContext context, DateTimeRange? dateRange,
+  IconButton datePicker(BuildContext context, DateTimeRange? dateRange,
       Function(DateTimeRange)? onDatesSelected) {
     return IconButton(
       icon: const Icon(Icons.calendar_today),
@@ -100,7 +108,7 @@ class _AddEventPageState extends State<AddEventPage> {
         final DateTimeRange? pickedDateRange = await showDateRangePicker(
           context: context,
           firstDate: DateTime.now(),
-          lastDate: DateTime.now().add(Duration(days: 365)),
+          lastDate: DateTime.now().add(const Duration(days: 365)),
           initialDateRange: dateRange ??
               DateTimeRange(start: DateTime.now(), end: DateTime.now()),
         );
@@ -112,12 +120,12 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  Center DatePickerRow(BuildContext context, double width) {
+  Center datePickerRow(BuildContext context, double width) {
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          DatePicker(
+          datePicker(
               context,
               DateTimeRange(
                   start: _startSelectedDate ?? DateTime.now(),
@@ -145,23 +153,7 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  IconButton TimePicker(BuildContext context, TimeOfDay time,
-      Function(TimeOfDay)? onTimeSelected) {
-    return IconButton(
-      icon: const Icon(Icons.access_time),
-      onPressed: () async {
-        final TimeOfDay? pickedTime = await showTimePicker(
-          context: context,
-          initialTime: time ?? TimeOfDay.now(),
-        );
-        if (pickedTime != null) {
-          onTimeSelected?.call(pickedTime);
-        }
-      },
-    );
-  }
-
-  Center TimePickerRow(BuildContext context, double width) {
+  Center timePickerRow(BuildContext context, double width) {
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -231,12 +223,11 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  TextFormField AddEventTextForm(
-      String text, TextEditingController controller) {
+  TextFormField addTextForm(String text, TextEditingController controller) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
         labelText: text,
       ),
       validator: (value) {
@@ -248,12 +239,12 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  SizedBox EventPickImage(double height, double width, File? _imageFile) {
+  SizedBox pickImage(double height, double width) {
     return SizedBox(
         height: height / 4,
         child: Container(
           width: width,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Color(0xBBABA6A6),
           ),
           child: IconButton(
@@ -263,16 +254,16 @@ class _AddEventPageState extends State<AddEventPage> {
         ));
   }
 
-  SizedBox EventImage(double height, double width, File? _imageFile) {
+  SizedBox addImage(double height, double width, File? imageFile) {
     return SizedBox(
         height: height / 4,
         child: Container(
           width: width,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             border: Border(bottom: BorderSide(color: Color(0xff000000))),
-            color: Color(0x0000000),
+            color: Color(0x00000000),
           ),
-          child: Image.file(_imageFile!),
+          child: Image.file(imageFile!),
         ));
   }
 }
