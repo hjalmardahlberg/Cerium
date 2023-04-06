@@ -53,6 +53,7 @@ dependencies:
   # Google Icon
   #font_awesome_flutter: ^10.4.0
 
+  jwt_decoder: ^2.0.1
 
   #State Management
   provider: ^6.0.5

@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'Group.dart';
 
+import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+
 class MyGroups extends StatefulWidget {
   const MyGroups(
       {super.key,
@@ -89,14 +93,16 @@ class _MyGroups extends State<MyGroups> {
 
 
   void _showJoinGroup(TextEditingController joinGroupController) {
+    final user = FirebaseAuth.instance.currentUser!;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Enter The Event Name'),
+          title: const Text('Enter Group Name'),
           content: TextFormField(
             controller: joinGroupController,
-            decoration: const InputDecoration(hintText: 'Event name...'),
+            decoration: const InputDecoration(hintText: 'Group name...'),
           ),
           actions: <Widget>[
             TextButton(
@@ -107,10 +113,33 @@ class _MyGroups extends State<MyGroups> {
             ),
             TextButton(
               child: const Text('JOIN'),
-              onPressed: () {
+              onPressed: () async {
                 // do something with the text entered in the TextFormField
-                String enteredText = joinGroupController.text;
-                print('Entered Text: $enteredText');
+
+                String? groupName = joinGroupController.text;
+                print('Entered Text: $groupName');
+
+
+                final userData = {
+                  'id': user.uid,
+                  'name': user.displayName,
+                  'email': user.email,
+                  'joinFlag': true,
+                };
+
+                final url = 'http://192.121.208.57:8080/group/join/' + groupName;
+                final headers = {'Content-Type': 'application/json'};
+                final body = jsonEncode(userData);
+                //print(body.toString());
+                final response =
+                    await http.put(Uri.parse(url), headers: headers, body: body);
+
+                if (response.statusCode == 200) {
+                  print('Joined group successfully!');
+                } else {
+                  print('Error sending user data: ${response.statusCode}');
+                }
+
                 Navigator.of(context).pop();
               },
             ),

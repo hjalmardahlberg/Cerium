@@ -83,9 +83,9 @@ class _AddGroupPageState extends State<AddGroupPage> {
     return Align(
       alignment: Alignment.bottomRight,
       child: ElevatedButton.icon(
-        onPressed: () {
+        onPressed: () async {
         
-          String? groupName = _eventNameController.text;
+          String? groupName = _groupNameController.text;
 
           final userData = {
             'id': user.uid,

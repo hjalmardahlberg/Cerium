@@ -1,6 +1,9 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
 
 class Group extends StatefulWidget {
   const Group(
@@ -58,6 +61,8 @@ class _Group extends State<Group> {
   }
 
   Stack grouppNameAndExit() {
+    final user = FirebaseAuth.instance.currentUser!;
+
     return Stack(
         children: [
           Padding(
@@ -73,7 +78,33 @@ class _Group extends State<Group> {
           Align(
             alignment: Alignment.topRight,
             child: IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                // Innan denna implementation fixa sådana att man är i den faktiska gruppen
+                // Så man kan fetcha group name
+                // Lägg till "are you sure you want to leave the group" popup innan också.
+                /*
+                String? groupName =
+
+                final userData = {
+                  'id': user.uid,
+                  'name': user.displayName,
+                  'email': user.email,
+                };
+
+                final url = 'http://192.121.208.57:8080/group/leave/' + groupName;
+                final headers = {'Content-Type': 'application/json'};
+                final body = jsonEncode(userData);
+                //print(body.toString());
+                final response =
+                    await http.put(Uri.parse(url), headers: headers, body: body);
+
+                if (response.statusCode == 200) {
+                  print('Left Group successfully!');
+                } else {
+                  print('Error sending user data: ${response.statusCode}');
+                }
+                */
+              },
               icon: const Icon(
                 Icons.exit_to_app_outlined,
                 size: 30.0,
@@ -114,7 +145,7 @@ class _Group extends State<Group> {
         Icons.sync,
         size: 24.0,
       ),
-      label: const Text('sync calenders'),
+      label: const Text('sync calendars'),
     );
   }
 
@@ -128,7 +159,7 @@ class _Group extends State<Group> {
         Icons.send,
         size: 24.0,
       ),
-      label: const Text('Send calender'),
+      label: const Text('Send calendar'),
     );
   }
 
