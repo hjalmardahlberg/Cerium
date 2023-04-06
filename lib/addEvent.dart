@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+//ÄNDRAS TILL ADD GROUP
 class AddEventPage extends StatefulWidget {
   const AddEventPage(
       {Key? key, required this.appbar, required this.bottomNavigationBar})

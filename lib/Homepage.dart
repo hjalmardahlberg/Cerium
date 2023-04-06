@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'Event.dart';
 import 'addEvent.dart';
 import 'MyGroups.dart';
+
 import 'addGroup.dart';
 import 'profile_widget.dart';
 import 'provider.dart';
@@ -203,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 //print('Event location: ${event.location}');
                 //print('Event description: ${event.description}');
               }
+
             },
           ),
           IconButton(
