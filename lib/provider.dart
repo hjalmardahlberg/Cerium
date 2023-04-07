@@ -50,8 +50,7 @@ class GoogleSignInProvider extends ChangeNotifier{
       await FirebaseAuth.instance.signInWithCredential(credential);
       final fire_base_user = FirebaseAuth.instance.currentUser!;
 
-      print("LKAJSHDLKASJDKJASD");
-      print(fire_base_user.uid);
+      //print(fire_base_user.uid);
 
       final userData = {
         'id': fire_base_user.uid,

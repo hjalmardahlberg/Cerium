@@ -5,6 +5,10 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 
+import 'provider.dart';
+import 'package:provider/provider.dart';
+import 'package:googleapis/calendar/v3.dart' show Event;
+
 class Group extends StatefulWidget {
   const Group(
       {Key? key,
@@ -151,7 +155,37 @@ class _Group extends State<Group> {
 
   ElevatedButton sendCalender() {
     return ElevatedButton.icon(
-      onPressed: () {},
+      onPressed: () async {
+        final provider =
+        Provider.of<GoogleSignInProvider>(context, listen: false);
+
+        // kommer fetcha första veckan i april (TEMP)
+        final start = DateTime(2023, 4, 1);
+        final end = DateTime(2023, 4, 7);
+        final events =
+            await provider.getCalendarEventsInterval(start, end);
+
+        final eventData = {
+          'start': events[0].start?.dateTime?.toIso8601String(),
+          'end': events[0].end?.dateTime?.toIso8601String(),
+        };
+
+        print(jsonEncode(eventData));
+
+        /*
+        print("BODY:");
+        print(jsonEncode(events));
+        print("");
+
+        for (Event event in events) {
+          // print(jsonEncode(event));
+          print('Event summary: ${event.summary}');
+          print('Event start time: ${event.start?.dateTime}');
+          print('Event end time: ${event.end?.dateTime}');
+          print("");
+        }
+        */
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.lightBlue.shade300,
       ),
