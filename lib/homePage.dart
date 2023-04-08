@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'event.dart';
 import 'addEvent.dart';
-import 'MyGroups.dart';
+import 'myGroups.dart';
 import 'addGroup.dart';
 import 'profile_widget.dart';
 import 'provider.dart';
@@ -29,19 +29,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   @override
   Widget build(BuildContext context) {
     //Event list
     List<Widget> eventList = <Widget>[];
+
     //Sizes
     double baseWidth = 390;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
+    double fem = MediaQuery
+        .of(context)
+        .size
+        .width / baseWidth;
     double ffem = fem * 0.97;
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double height = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     //appbar
-    final appbar = groupAppBar();
+    final appbar = groupAppBar(context);
 
     //bottomNavigationBar
     final bottomNavigationBar = finalBottomAppBar(context, 'MyHomePage');
@@ -63,7 +74,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     eventList.add(eventBox(
         'images/wallsten.jpg',
-        '2023-03-23  kl:14:00',
+        'Möte med Wallsten om viktiga saker',
+        '2023-03-23',
+        '14:00',
         'Möte med Wallsten',
         fem,
         ffem,
@@ -74,7 +87,9 @@ class _MyHomePageState extends State<MyHomePage> {
         context));
     eventList.add(eventBox(
         'images/edvard_inception.png',
-        '2023-03-23  kl:17:00',
+        'Det ska tittas serier med frugan',
+        '2023-03-23',
+        '17:00',
         'Möte med Frugan',
         fem,
         ffem,
@@ -84,39 +99,41 @@ class _MyHomePageState extends State<MyHomePage> {
         bottomNavigationBar,
         context));
 
-    return Scaffold(
-      appBar: appbar,
-      body: ListView(
-        children: eventList,
-      ),
-      bottomNavigationBar: bottomNavigationBar,
-    ); // This trailing comma makes auto-formatting nicer for build methods.
+    return
+      Scaffold(
+        appBar: appbar,
+        body: ListView(
+          children: eventList,
+        ),
+        bottomNavigationBar: bottomNavigationBar,
+
+      ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
   //AppBar that takes you back to group screen
-  AppBar groupAppBar() {
+  AppBar groupAppBar(context) {
     return AppBar(
       automaticallyImplyLeading: false,
-      //backgroundColor: const Color.fromARGB(255, 153, 255, 255),
-      backgroundColor: Colors.white,
+
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
           Expanded(
             child: IconButton(
               padding: const EdgeInsets.all(5),
-              icon: const Icon(Icons.group,color: Colors.black,),
+              icon: const Icon(Icons.group),
               iconSize: 40,
               onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => MyGroups(
+                        builder: (_) =>
+                            MyGroups(
                               title: 'Groups',
                               appbar: homeAppBar(),
-                              appbar2: groupAppBar(),
+                              appbar2: groupAppBar(context),
                               bottomNavigationBar:
-                                  finalBottomAppBar(context, 'MyGroups'),
+                              finalBottomAppBar(context, 'MyGroups'),
                             )));
               },
             ),
@@ -134,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: IconButton(
-              icon: const Icon(Icons.person,color: Colors.black,),
+              icon: const Icon(Icons.person),
               iconSize: 40,
               onPressed: () {
                 Navigator.push(context,
@@ -151,21 +168,21 @@ class _MyHomePageState extends State<MyHomePage> {
   AppBar homeAppBar() {
     return AppBar(
       automaticallyImplyLeading: false,
-     // backgroundColor: const Color.fromARGB(255, 153, 255, 255),
-      backgroundColor: Colors.white,
+      // backgroundColor: const Color.fromARGB(255, 153, 255, 255),
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
           Expanded(
             child: IconButton(
               padding: const EdgeInsets.all(5),
-              icon: const Icon(Icons.home,color: Colors.black,),
+              icon: const Icon(Icons.home),
               iconSize: 40,
               onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const MyHomePage(
+                        builder: (_) =>
+                        const MyHomePage(
                           title: 'Home',
                         )));
               },
@@ -184,7 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             child: IconButton(
-              icon: const Icon(Icons.person,color: Colors.black,),
+              icon: const Icon(Icons.person),
               iconSize: 40,
               onPressed: () {
                 Navigator.push(context,
@@ -207,7 +224,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.event),
             onPressed: () async {
               final provider =
-                  Provider.of<GoogleSignInProvider>(context, listen: false);
+              Provider.of<GoogleSignInProvider>(context, listen: false);
               final events = await provider.getPrimaryCalendarEvents();
 
               for (Event event in events) {
@@ -224,14 +241,14 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.hail_rounded),
             onPressed: () async {
               final provider =
-                  Provider.of<GoogleSignInProvider>(context, listen: false);
+              Provider.of<GoogleSignInProvider>(context, listen: false);
 
               if (pageName != 'AddEventPage') {
                 // kommer fetcha första veckan i april (TEMP)
                 final start = DateTime(2023, 4, 1);
                 final end = DateTime(2023, 4, 7);
                 final events =
-                    await provider.getCalendarEventsInterval(start, end);
+                await provider.getCalendarEventsInterval(start, end);
 
                 print("BODY:");
                 print(events);
@@ -262,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
               final body = jsonEncode(userData);
               //print(body.toString());
               final response =
-                  await http.post(Uri.parse(url), headers: headers, body: body);
+              await http.post(Uri.parse(url), headers: headers, body: body);
 
               if (response.statusCode == 200) {
                 print('User data sent successfully!');
@@ -278,18 +295,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => AddGroupPage(
-                          appbar: groupAppBar(),
-                          bottomNavigationBar:
+                      builder: (_) =>
+                          AddGroupPage(
+                              appbar: groupAppBar(context),
+                              bottomNavigationBar:
                               finalBottomAppBar(context, 'AddGroupPage'))),
                 );
               } else if (pageName != 'AddEventPage') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => AddEventPage(
-                          appbar: homeAppBar(),
-                          bottomNavigationBar:
+                      builder: (_) =>
+                          AddEventPage(
+                              appbar: homeAppBar(),
+                              bottomNavigationBar:
                               finalBottomAppBar(context, 'AddEventPage'))),
                 );
               }
@@ -300,7 +319,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               //TEMP LOGIN BUTTON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
               final provider =
-                  Provider.of<GoogleSignInProvider>(context, listen: false);
+              Provider.of<GoogleSignInProvider>(context, listen: false);
               provider.googleLogin();
             },
           ),
@@ -310,8 +329,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Container eventBox(
-    String eventImage,
+Container eventBox(String eventImage,
+    String eventInfo,
+    String eventDate,
     String eventTime,
     String eventName,
     double fem,
@@ -329,10 +349,15 @@ Container eventBox(
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (_) => EventPage(
-                  picture: eventImage,
-                  appbar: appbar,
-                  bottomNavigationBar: bottomNavigationBar)),
+              builder: (_) =>
+                  EventPage(
+                    picture: eventImage,
+                    appbar: appbar,
+                    bottomNavigationBar: bottomNavigationBar,
+                    theEventName: eventName,
+                    eventInfo: eventInfo,
+                    date: eventDate,
+                    time: eventTime,)),
         );
       },
       child: SizedBox(
@@ -340,108 +365,105 @@ Container eventBox(
         height: 138.5 * fem,
         child: Stack(
           children: [
-            Positioned(
-              // eventboxQTS (23:34)
-              left: 0 * fem,
-              top: 0 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 325 * fem,
-                  height: 135 * fem,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20 * fem),
-                      border: Border.all(color: const Color(0xff000000)),
-                      color: const Color(0xffffffff),
-                    ),
-                  ),
+          Positioned(
+          // eventboxQTS (23:34)
+          left: 0 * fem,
+          top: 0 * fem,
+          child: Align(
+            child: SizedBox(
+              width: 325 * fem,
+              height: 135 * fem,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20 * fem),
+                  border: Border.all(color: const Color(0xff000000)),
+                  color: Theme.of(context).appBarTheme.backgroundColor,
                 ),
               ),
             ),
-            Positioned(
-              // tidWFa (23:35)
-              left: 19 * fem,
-              top: 116 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 85 * fem,
-                  height: 15 * fem,
-                  child: Text(
-                    'Tid och datum:',
-                    style: TextStyle(
-                      fontSize: 12 * ffem,
-                      fontWeight: FontWeight.w400,
-                      height: 1.2125 * ffem / fem,
-                      color: const Color(0xff000000),
-                    ),
-                  ),
-                ),
+          ),
+        ),
+      Positioned(
+        // tidWFa (23:35)
+        left: 19 * fem,
+        top: 116 * fem,
+        child: Align(
+          child: SizedBox(
+            width: 85 * fem,
+            height: 15 * fem,
+            child: Text(
+              'Tid och datum:',
+              style: TextStyle(
+                fontSize: 12 * ffem,
+                fontWeight: FontWeight.w400,
+                height: 1.2125 * ffem / fem,
               ),
             ),
-            Positioned(
-              // kl1400okU (23:36)
-              left: 113 * fem,
-              top: 116 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 122 * fem,
-                  height: 15 * fem,
-                  child: Text(
-                    eventTime,
-                    style: TextStyle(
-                      fontSize: 12 * ffem,
-                      fontWeight: FontWeight.w400,
-                      height: 1.2125 * ffem / fem,
-                      color: const Color(0xff000000),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              // mtemedwallstenuHi (23:37)
-              left: 19 * fem,
-              top: 100 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 109 * fem,
-                  height: 15 * fem,
-                  child: Text(
-                    eventName,
-                    style: TextStyle(
-                      fontSize: 12 * ffem,
-                      fontWeight: FontWeight.w400,
-                      height: 1.2125 * ffem / fem,
-                      color: const Color(0xff000000),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              // wallstoeno8C (23:38)
-              left: 0 * fem,
-              top: 0 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 325 * fem,
-                  height: 95 * fem,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20 * fem),
-                      topRight: Radius.circular(20 * fem),
-                    ),
-                    child: Image.asset(
-                      eventImage,
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
+      Positioned(
+        // kl1400okU (23:36)
+        left: 105 * fem,
+        top: 116 * fem,
+        child: Align(
+          child: SizedBox(
+            width: 122 * fem,
+            height: 15 * fem,
+            child: Text(
+              '$eventTime $eventDate',
+              style: TextStyle(
+                fontSize: 12 * ffem,
+                fontWeight: FontWeight.w400,
+                height: 1.2125 * ffem / fem,
+              ),
+            ),
+          ),
+        ),
+      ),
+      Positioned(
+        // mtemedwallstenuHi (23:37)
+        left: 19 * fem,
+        top: 100 * fem,
+        child: Align(
+          child: SizedBox(
+            width: 109 * fem,
+            height: 15 * fem,
+            child: Text(
+              eventName,
+              style: TextStyle(
+                fontSize: 12 * ffem,
+                fontWeight: FontWeight.w400,
+                height: 1.2125 * ffem / fem,
+              ),
+            ),
+          ),
+        ),
+      ),
+      Positioned(
+        // wallstoeno8C (23:38)
+        left: 0 * fem,
+        top: 0 * fem,
+        child: Align(
+          child: SizedBox(
+            width: 325 * fem,
+            height: 95 * fem,
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20 * fem),
+                topRight: Radius.circular(20 * fem),
+              ),
+              child: Image.asset(
+                eventImage,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+      ),
+      ],
+    ),
+  ),
     ),
   );
 }

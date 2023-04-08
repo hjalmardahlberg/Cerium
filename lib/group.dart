@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 
 class Group extends StatefulWidget {
@@ -7,10 +5,12 @@ class Group extends StatefulWidget {
       {Key? key,
       required this.groupName,
       required this.picture,
+      //required this.group,
       required this.appbar,
       required this.bottomNavigationBar})
       : super(key: key);
 
+  //final Group group;
   final String groupName;
   final String picture;
   final AppBar appbar;
@@ -35,14 +35,11 @@ class _Group extends State<Group> {
   Widget build(BuildContext context) {
     double baseWidth = 390;
     double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        grouppNameAndExit(),
+        groupNameAndExit(),
         chatLog(),
         chatBox(),
         sendAndSyncCalenders(),
@@ -57,7 +54,7 @@ class _Group extends State<Group> {
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
-  Stack grouppNameAndExit() {
+  Stack groupNameAndExit() {
     return Stack(
         children: [
           Padding(
@@ -178,16 +175,4 @@ class _Group extends State<Group> {
   }
 }
 
-class NextPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.cyan.shade800,
-        title: const Text('Create'),
-      ),
-      body:
-          const Center(child: Image(image: AssetImage('images/wallsten.jpg'))),
-    );
-  }
-}
+

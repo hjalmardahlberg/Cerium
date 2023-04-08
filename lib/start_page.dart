@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
-import 'HomePage.dart';
+import 'homePage.dart';
 
 
 class StartPage extends StatelessWidget{
@@ -15,12 +15,12 @@ class StartPage extends StatelessWidget{
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting){
           print("WE ARE WAITING");
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData){
           print("WE ARE LOGGED IN POG");
-          return MyHomePage(title: "Tempus");
+          return const MyHomePage(title: "Tempus");
         } else if (snapshot.hasError){
-          return Center(child: Text('Something Went Wrong!'));
+          return const Center(child: Text('Something Went Wrong!'));
         } else{
           print("WE ARE LOGGED OUT");
           return SignUpWidget();

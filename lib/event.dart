@@ -5,12 +5,20 @@ class EventPage extends StatefulWidget {
       {Key? key,
       required this.picture,
       required this.appbar,
-      required this.bottomNavigationBar})
+      required this.bottomNavigationBar,
+      required this.theEventName,
+      required this.eventInfo,
+      required this.date,
+      required this.time})
       : super(key: key);
 
   final String picture;
   final AppBar appbar;
   final BottomAppBar bottomNavigationBar;
+  final String theEventName;
+  final String eventInfo;
+  final String date;
+  final String time;
 
   @override
   State<EventPage> createState() => _EventPageState();
@@ -21,10 +29,6 @@ class _EventPageState extends State<EventPage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    String theEventName = 'Möte med Wallsten';
-    String date = '2023-03-23';
-    String time = '20:00-21:00';
-    String eventInfo = 'Möte med Wallsten';
 
     return Scaffold(
       appBar: widget.appbar,
@@ -32,9 +36,9 @@ class _EventPageState extends State<EventPage> {
         child: Column(
           children: [
             eventImage(height, width),
-            eventName(theEventName),
-            dateAndTime(date, time),
-            Expanded(child: eventInformation(eventInfo, height, width)),
+            eventName(widget.theEventName),
+            dateAndTime(widget.date, widget.time),
+            eventInformation(widget.eventInfo, height, width),
             Expanded(child: eventParticipants()),
           ],
         ),
@@ -45,37 +49,41 @@ class _EventPageState extends State<EventPage> {
 
   Row eventParticipants() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: const [
         Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Icon(Icons.group, size: 24),
+          padding: EdgeInsets.only(left:15.0,right: 5),
+          child: Icon(Icons.group, size: 30),
         ),
-        Text('deltagare', style: TextStyle(fontSize: 24)),
+        Text('Deltagare', style: TextStyle(fontSize: 24)),
+        Icon(Icons.group_add, size: 30),
       ],
     );
   }
 
-  SizedBox eventInformation(String eventInfo, double height, double width) {
-    return SizedBox(
-      height: height / 5,
-      width: width / 1.1,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: Colors.white,
-            border: Border.all(
-              color: Colors.black,
-              width: 2,
+  Expanded eventInformation(String eventInfo, double height, double width) {
+    return Expanded(
+      child: SizedBox(
+        height: height / 5,
+        width: width / 1.1,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.white,
+              border: Border.all(
+                color: Colors.black,
+                width: 2,
+              ),
             ),
-          ),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(eventInfo, style: const TextStyle(fontSize: 20)),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10.0, left: 15),
+                child: Text(eventInfo, style: const TextStyle(fontSize: 16)),
+              ),
             ),
           ),
         ),
@@ -88,12 +96,12 @@ class _EventPageState extends State<EventPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Padding(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 10),
           child: Icon(Icons.calendar_month, size: 24),
         ),
         Text(date, style: const TextStyle(fontSize: 24)),
         const Padding(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 10),
           child: Icon(
             Icons.access_time,
             size: 24,
@@ -107,24 +115,28 @@ class _EventPageState extends State<EventPage> {
   Padding eventName(String eventName) {
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),
-      child: Text(eventName, style: const TextStyle(fontSize: 24)),
+      child: Text(eventName,
+          style: const TextStyle(
+              fontSize: 24, decoration: TextDecoration.underline)),
     );
   }
 
   SizedBox eventImage(double height, double width) {
     return SizedBox(
       height: height / 4,
-      child: Container(
-        width: width,
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xff000000))),
-          color: Color(0xffffffff),
-        ),
-        child: FittedBox(
-          fit: BoxFit.fitHeight,
-          child: Image(
-            image: AssetImage(widget.picture),
+      child: ClipRRect(
+        child: Container(
+          width: width,
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: Color(0xff000000))),
+            color: Color(0xffffffff),
+          ),
+          child: FittedBox(
             fit: BoxFit.cover,
+            child: Image(
+              image: AssetImage(widget.picture),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
