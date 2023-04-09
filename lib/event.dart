@@ -72,7 +72,7 @@ class _EventPageState extends State<EventPage> {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: Colors.white,
+              color: Theme.of(context).appBarTheme.foregroundColor,
               border: Border.all(
                 color: Colors.black,
                 width: 2,
@@ -128,7 +128,7 @@ class _EventPageState extends State<EventPage> {
         child: Container(
           width: width,
           decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: Color(0xff000000))),
+            //border: Border(bottom: BorderSide(color: Color(0xff000000))),
             color: Color(0xffffffff),
           ),
           child: FittedBox(

@@ -118,11 +118,10 @@ class _MyHomePageState extends State<MyHomePage> {
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
-          Expanded(
-            child: IconButton(
-              padding: const EdgeInsets.all(5),
+             IconButton(
+              padding: const EdgeInsets.all(10),
               icon: const Icon(Icons.group),
-              iconSize: 40,
+              iconSize: 30,
               onPressed: () {
                 Navigator.push(
                     context,
@@ -137,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             )));
               },
             ),
-          ),
+
           Expanded(
             flex: 2,
             child: Center(
@@ -149,10 +148,12 @@ class _MyHomePageState extends State<MyHomePage> {
               //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
             ),
           ),
-          Expanded(
+          Align(
+            alignment: Alignment.topRight,
             child: IconButton(
-              icon: const Icon(Icons.person),
-              iconSize: 40,
+              padding: const EdgeInsets.all(10),
+              icon: const Icon(Icons.settings),
+              iconSize: 30,
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => ProfileWidget()));
@@ -172,11 +173,10 @@ class _MyHomePageState extends State<MyHomePage> {
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
-          Expanded(
-            child: IconButton(
-              padding: const EdgeInsets.all(5),
+             IconButton(
+              padding: const EdgeInsets.all(10),
               icon: const Icon(Icons.home),
-              iconSize: 40,
+              iconSize: 30,
               onPressed: () {
                 Navigator.push(
                     context,
@@ -187,7 +187,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         )));
               },
             ),
-          ),
           Expanded(
             flex: 2,
             child: Center(
@@ -199,10 +198,12 @@ class _MyHomePageState extends State<MyHomePage> {
               //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
             ),
           ),
-          Expanded(
+          Align(
+            alignment: Alignment.topRight,
             child: IconButton(
-              icon: const Icon(Icons.person),
-              iconSize: 40,
+              padding: const EdgeInsets.all(10),
+              icon: const Icon(Icons.settings),
+              iconSize: 30,
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => ProfileWidget()));
