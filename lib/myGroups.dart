@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 //import 'package:google_fonts/google_fonts.dart';
-import 'package:projecttest/Theme/themeConstants.dart';
 import 'group.dart';
+import 'groupListProvider.dart';
 
 /*
 class Group {
@@ -23,6 +26,7 @@ class Group {
   }
 }*/
 
+
 class MyGroups extends StatefulWidget {
   const MyGroups(
       {super.key,
@@ -40,23 +44,32 @@ class MyGroups extends StatefulWidget {
   State<MyGroups> createState() => _MyGroups();
 }
 
+
+
 class _MyGroups extends State<MyGroups> {
 
   List<Widget> list = <Widget>[];
+  double baseWidth = 390;
+  double fem=0;
+  double ffem=0;
+  double width=0;
+  double height =0;
+
 
   @override
   Widget build(BuildContext context) {
+    final listProvider = Provider.of<GroupProvider>(context);
     double baseWidth = 390;
-    double fem = MediaQuery
+    fem = MediaQuery
         .of(context)
         .size
         .width / baseWidth;
-    double ffem = fem * 0.97;
-    double width = MediaQuery
+    ffem = fem * 0.97;
+    width = MediaQuery
         .of(context)
         .size
         .width;
-    double height = MediaQuery
+    height = MediaQuery
         .of(context)
         .size
         .height;
@@ -65,42 +78,65 @@ class _MyGroups extends State<MyGroups> {
 
     String groupImage = 'images/wallsten.jpg';
     String groupName = 'Grupp med Wallsten';
-
-    list.add(
-      const Center(
-        child: Padding(
-          padding: EdgeInsets.only(top: 10.0),
-          child: Text(
-            'Groups',
-            style: TextStyle(
-              fontSize: 24.0, // Set the font size to 24
-              decoration: TextDecoration.underline, // Underline the text
-            ),
-          ),
-        ),
-      ),
-    );
-    list.add(groupBox(
-        fem,
-        ffem,
-        width,
-        height,
-        widget.appbar2,
-        widget.bottomNavigationBar,
-        context,
-        groupImage,
-        groupName));
-
     return Scaffold(
       appBar: widget.appbar,
       body: Column(
         children: [
-          Expanded(child: groupList()),
+          groupText(),
+          Expanded(child: groupList(listProvider)),
           joinGroup(_joinGroupController),
+          addToList("Cerium","morganmixtape6@gmail.com",listProvider),
+          addToList("Katt Älskare","catEater42069@gmail.com",listProvider),
         ],
       ),
       bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
+  }
+
+  ElevatedButton addToList(name,a_mail,listProvider) {
+    return ElevatedButton(
+        onPressed: () async {
+        final groupData = {
+          "name":name,
+          "a_mail":a_mail
+        };
+        final body = jsonEncode(groupData);
+        jsonDecoder(body,listProvider);
+        }
+
+        ,child: const Text('skicka grupp!'));
+  }
+
+  Center groupText() {
+    return const Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: 10.0),
+            child: Text(
+              'Groups',
+              style: TextStyle(
+                fontSize: 24.0, // Set the font size to 24
+                decoration: TextDecoration.underline, // Underline the text
+              ),
+            ),
+          ),
+        );
+  }
+  void jsonDecoder(String test,listProvider) {
+    final result = jsonDecode(test);
+    print(result['name']);
+    setState(() {
+      listProvider.addItem(groupBox(
+          fem,
+          ffem,
+          width,
+          height,
+          widget.appbar2,
+          widget.bottomNavigationBar,
+          context,
+          "images/wallsten.jpg",
+          result['name']
+      ));
+    });
   }
 
   Expanded joinGroup(TextEditingController joinGroupController) {
@@ -157,10 +193,15 @@ class _MyGroups extends State<MyGroups> {
     );
   }
 
-  ListView groupList() {
-    return ListView(
-      children: list,
-    );
+  ListView groupList(listProvider) {
+    return ListView.builder(
+        itemCount: listProvider.items.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            title: listProvider.items[index],
+          );
+        }
+        );
   }
 
 
