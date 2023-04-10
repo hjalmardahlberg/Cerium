@@ -64,14 +64,15 @@ public class Users {
         return g_id;
     }
 
-    public Groups getGroup(String groupName) {
+    public List<Groups> getGroup(String groupName) {
+        List<Groups> toReturn = new ArrayList<>();
         for (int i = 0; i < this.g_id.size(); i++ ) {
             Groups currGroup = this.g_id.get(i);
-            if(currGroup.getName().equals(groupName)){
-                return currGroup;
+            if(currGroup.getName().equals(groupName)) {
+                toReturn.add(currGroup);
             }
         }
-        throw new RuntimeException("Unable to find group with given name!");
+        return toReturn;
     }
 
     public Boolean alreadyInGroup(String groupName) {

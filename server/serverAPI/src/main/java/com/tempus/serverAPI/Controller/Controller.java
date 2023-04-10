@@ -4,6 +4,7 @@ import com.tempus.serverAPI.Models.Users;
 import com.tempus.serverAPI.Models.Groups;
 import com.tempus.serverAPI.Models.Events;
 
+import com.tempus.serverAPI.Repo.GoogleEventRepo;
 import com.tempus.serverAPI.Repo.GroupRepo;
 import com.tempus.serverAPI.Repo.UserRepo;
 import com.tempus.serverAPI.Repo.EventRepo;
@@ -23,6 +24,9 @@ public class Controller {
 
     @Autowired
     private EventRepo eventRepo;
+
+    @Autowired
+    private GoogleEventRepo googleEventRepo;
 
     @GetMapping(value = "/")
     public String getPage(){
@@ -70,30 +74,33 @@ public class Controller {
     @PutMapping(value = "/group/create/{g_name}")
     public String createGroup(@PathVariable String g_name, @RequestBody Users user) {
 
-        if (groupRepo.findByName(g_name).isEmpty() || user.getJoinFlag()) {
+        if (!groupRepo.findByNameAndAdmin(g_name, user.getEmail()).isEmpty()) {
+            throw new RuntimeException("Cannot create a group with already existing name");
+        }
+        else {
         Users updatedUser = userRepo.findById(user.getId()).get();
         Groups gCreate = new Groups();
         gCreate.setName(g_name);
         gCreate.setUser(updatedUser);
-        gCreate.setAdmin(updatedUser.getName());
+        gCreate.setAdmin(updatedUser.getEmail());
         user.getGroups().add(gCreate);
         groupRepo.save(gCreate);
         userRepo.save(updatedUser);
-        return "success";
-        //return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
+        return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
         }
-        else {
-            throw new RuntimeException("Group-name already exists!");
-        }
+
     }
 
-    @PutMapping(value = "/group/join/{g_name}")
-    public String joinGroup(@PathVariable String g_name, @RequestBody Users user) {
+    @PutMapping(value = "/group/join/{g_name}&{a_email}")
+    public String joinGroup(@PathVariable String g_name, @PathVariable String a_email, @RequestBody Users user) {
 
         Users userJoin = userRepo.findById(user.getId()).get();
-        List<Groups> Queries = groupRepo.findByName(g_name);
+        List<Groups> Queries = groupRepo.findByNameAndAdmin(g_name, a_email);
 
-        if (!groupRepo.findByName(g_name).isEmpty() && user.getJoinFlag()) {
+        if(Queries.isEmpty()) {
+            throw new RuntimeException("Error joining group, this error should not occur");
+        }
+        else {
             for (int i = 0; i < Queries.size(); i++) {
                 Groups currGroup = Queries.get(i);
                 if(currGroup.getUser().getId() == userJoin.getId()){
@@ -108,24 +115,31 @@ public class Controller {
             groupRepo.save(groupToJoin);
             userRepo.save(userJoin);
             return "Successfully joined the group: " + groupToJoin.getName();
-
-        }
-        else {
-            throw new RuntimeException("Cannot join a group that doesn't exist!");
         }
 
     }
 
 
-    @PutMapping(value = "/group/leave/{g_name}")
-    public String leaveGroup(@PathVariable String g_name, @RequestBody Users user) {
+    @PutMapping(value = "/group/leave/{g_name}&{a_email}")
+    public String leaveGroup(@PathVariable String g_name, @PathVariable String a_email, @RequestBody Users user) {
         Users updateUser = userRepo.findById(user.getId()).get();
-        Groups groupToDelete = updateUser.getGroup(g_name);
-        updateUser.getGroups().remove(updateUser.getGroups().indexOf(groupToDelete)); //bruuuuh
-        groupRepo.delete(groupToDelete);
-        return "User successfully left the group: " + groupToDelete.getName();
+        List<Groups> groupToDelete = updateUser.getGroup(g_name);
+        if (groupToDelete.isEmpty()) {
+            throw new RuntimeException("Fatal error, this error should not occur");
+        }
+        for (int i = 0; i < groupToDelete.size(); i++) {
+            Groups curr = groupToDelete.get(i);
+
+            if (curr.getAdmin().equals(a_email)) {
+                updateUser.getGroups().remove(i);
+                groupRepo.delete(curr);
+                return "User successfully left the group: " + curr.getName();
+            }
+        }
+        throw new RuntimeException("Fatal error occured when user " + user.getEmail() + " tried to leave group: " + g_name);
     }
 
+    //FIXME
     @PutMapping(value = "/event/create/{e_name}")
     public String createEvent(@RequestBody Groups group, @PathVariable String e_name) {
         Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
@@ -134,7 +148,6 @@ public class Controller {
             Events selEvent = gEvents.get(i);
             if(selEvent.getGroup().getName().equals(group.getName())) {
                 throw new RuntimeException("Event with given name already exists within that group");
-
             }
         }
         Events createdEvent = new Events();
@@ -147,14 +160,15 @@ public class Controller {
 
     }
 
-
-
+    //FIXME
     @DeleteMapping(value = "/event/delete/{e_name}")
     public String delEvent(@PathVariable String e_name, @RequestBody Groups group) {
         Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
         //Events selectedEvent = eventRepo.
         return "Success";
     }
+
+
 
     @PutMapping(value = "/update/{id}")
     public String updateUser(@PathVariable String id, @RequestBody Users user) {
@@ -168,22 +182,30 @@ public class Controller {
 
     @DeleteMapping(value = "/group/delete/{g_name}")
     public String delGroup(@PathVariable String g_name, @RequestBody Users user) {
-        Users selectedUser = userRepo.findById(user.getId()).get();
-        List<Groups> selectedGroup = groupRepo.findByName(g_name);
-        if(selectedGroup.isEmpty()) {
+        List<Groups> selectedGroup = groupRepo.findByNameAndAdmin(g_name, user.getEmail());
+        if (selectedGroup.isEmpty()) {
             throw new RuntimeException("Cannot delete a group that does not exist");
         }
-        Groups hmm = selectedGroup.get(0);
-        if(hmm.getAdmin().equals(selectedUser.getName())){
-            for(int i = 0; i < selectedGroup.size(); i++) {
-                groupRepo.delete(selectedGroup.get(i));
+        else if (selectedGroup.get(0).getAdmin().equals(user.getEmail())){
+            for (int i = 0; i < selectedGroup.size(); i++) {
+                Groups currGroup = selectedGroup.get(i);
+                Users currUser = selectedGroup.get(i).getUser();
+                int hmm = currUser.getGroups().indexOf(currGroup);
+                currUser.getGroups().remove(hmm);
+                groupRepo.delete(currGroup);
+
             }
-            return "Successfully deleted " + hmm.getName();
+            return "Successfully deleted " + selectedGroup.get(0).getName();
         }
         else {
-            throw new RuntimeException("User is not owner of the group");
+            throw new RuntimeException("User not admin");
         }
 
+    }
+
+    @PostMapping(value = "/gEvent/new")
+    public String importEvents(@RequestBody Users user) {
+        return "hmm";
     }
 
     @DeleteMapping(value = "/delete/{id}")

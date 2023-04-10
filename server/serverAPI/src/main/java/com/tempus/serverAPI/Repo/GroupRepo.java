@@ -9,6 +9,8 @@ public interface GroupRepo extends JpaRepository<Groups, Long> {
 
     List<Groups> findByName(String name);
 
+    List<Groups> findByNameAndAdmin(String name, String admin);
+
 
 
 
