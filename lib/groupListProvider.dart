@@ -10,4 +10,8 @@ class GroupProvider  extends ChangeNotifier {
     _items.add(item);
     notifyListeners();
   }
+  void emptyItem() {
+    _items = [];
+    notifyListeners();
+  }
 }

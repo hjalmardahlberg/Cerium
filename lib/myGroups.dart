@@ -84,10 +84,9 @@ class _MyGroups extends State<MyGroups> {
         children: [
           groupText(),
           Expanded(child: groupList(listProvider)),
-          joinGroup(_joinGroupController),
-          addToList("Cerium","morganmixtape6@gmail.com",listProvider),
-          addToList("Katt Älskare","catEater42069@gmail.com",listProvider),
+          joinGroup(_joinGroupController,listProvider),
         ],
+
       ),
       bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
@@ -130,8 +129,6 @@ class _MyGroups extends State<MyGroups> {
           ffem,
           width,
           height,
-          widget.appbar2,
-          widget.bottomNavigationBar,
           context,
           "images/wallsten.jpg",
           result['name']
@@ -139,25 +136,40 @@ class _MyGroups extends State<MyGroups> {
     });
   }
 
-  Expanded joinGroup(TextEditingController joinGroupController) {
-    return Expanded(
-      flex: 1,
-      child: Container(
-        margin: const EdgeInsets.only(right: 16, bottom: 16),
+  Container joinGroup(TextEditingController joinGroupController,listProvider) {
+    return Container(
+        margin: const EdgeInsets.all(16),
         // Adjust the value as needed
         child: Align(
           alignment: Alignment.bottomRight,
-          child: ElevatedButton(
-            onPressed: () {
-              _showJoinGroup(joinGroupController);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.lightBlue.shade300,
+          child:Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+
+            children: [
+              Expanded(child:addToList("Cerium","morganmixtape6@gmail.com",listProvider),),
+            const SizedBox(width: 5,),
+    Expanded(child:addToList("Katt Älskare","catEater42069@gmail.com",listProvider),),
+            const SizedBox(width: 5,),
+              Expanded(child: ElevatedButton(
+                  onPressed: () async {
+                    setState(() {
+                      listProvider.emptyItem();
+                    });
+                  },
+                  child: const Text('Rensa grupp')),),
+              const SizedBox(width: 5,),
+            ElevatedButton(
+              onPressed: () {
+                _showJoinGroup(joinGroupController);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightBlue.shade300,
+              ),
+              child: const Text('Join group'),
             ),
-            child: const Text('Join group'),
-          ),
+          ],)
         ),
-      ),
     );
   }
 
@@ -195,6 +207,7 @@ class _MyGroups extends State<MyGroups> {
 
   ListView groupList(listProvider) {
     return ListView.builder(
+        shrinkWrap: true,
         itemCount: listProvider.items.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
@@ -205,13 +218,9 @@ class _MyGroups extends State<MyGroups> {
   }
 
 
-  Container groupBox(double fem, double ffem, double width, double height,
-      appbar,
-      bottomNavigationBar, context, String groupImage, String groupName) {
-    return Container(
-      // event3JfJ (23:33)
-      margin: EdgeInsets.fromLTRB(width / 12, 10 * fem, 0 * fem, 10 * fem),
-      child: GestureDetector(
+  GestureDetector groupBox(double fem, double ffem, double width, double height,
+            context, String groupImage, String groupName) {
+    return GestureDetector(
         onTap: () {
           Navigator.push(
             context,
@@ -221,10 +230,15 @@ class _MyGroups extends State<MyGroups> {
                     Group(
                         groupName: groupName,
                         picture: groupImage,
-                        appbar: appbar,
-                        bottomNavigationBar: bottomNavigationBar)),
+                        appbar: widget.appbar2,
+                        bottomNavigationBar: widget.bottomNavigationBar)),
           );
+
+
         },
+         child:Container(
+           // event3JfJ (23:33)
+           margin: EdgeInsets.fromLTRB(width / 12, 10 * fem, 0 * fem, 10 * fem),
         child: SizedBox(
           width: double.infinity,
           height: 138.5 * fem,
@@ -253,7 +267,7 @@ class _MyGroups extends State<MyGroups> {
               ),
               Positioned(
                 // mtemdwallstenuHi (23:37)
-                left: width / 4,
+                left: 10,
                 top: 109 * fem,
                 child: Align(
                   alignment: Alignment.center,

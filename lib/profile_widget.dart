@@ -79,6 +79,7 @@ class ProfileWidget extends StatelessWidget {
                           context,
                           listen: false);
                       provider.logout();
+                      Navigator.popUntil(context,ModalRoute.withName('/login'));
                     },
                   ),
                 ),
