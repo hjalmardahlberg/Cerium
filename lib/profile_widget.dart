@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'provider.dart';
 import 'googleSignIn.dart';
 
+import 'start_page.dart';
+
 class ProfileWidget extends StatelessWidget{
   //final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
@@ -26,6 +28,9 @@ class ProfileWidget extends StatelessWidget{
               final provider =
               Provider.of<GoogleSignInProvider>(context, listen: false);
               provider.logout();
+              
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (_) => StartPage()));
             },
           )
         ],
@@ -57,7 +62,7 @@ class ProfileWidget extends StatelessWidget{
             ),
             SizedBox(height: 50),
             Text(
-              'USER ID: ' + user.uid!,
+              '',//'''USER ID: ' + user.uid!,
               style: TextStyle(color: Colors.white, fontSize: 19),
             ),
             SizedBox(height: 10),
