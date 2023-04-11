@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:projecttest/profile_widget.dart';
+import 'groupParticipants.dart';
 
 class Group extends StatefulWidget {
   const Group(
@@ -31,6 +33,65 @@ class _Group extends State<Group> {
     super.dispose();
   }
 
+  AppBar appBar(context) {
+    return AppBar(
+      titleSpacing: 0,
+      title: Row(
+        children: <Widget>[
+          IconButton(
+            padding: const EdgeInsets.all(0),
+            icon: Column(
+              children: [
+                const Icon(Icons.group),
+                const Text(
+                  'Deltagare',
+                  style: TextStyle(fontSize: 10),
+                ),
+              ],
+            ),
+            iconSize: 30,
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      GroupParticipants(
+                        groupName: widget.groupName,
+                        bottomNavigationBar: widget.bottomNavigationBar,
+                      ),
+                  transitionDuration: Duration.zero,
+                ),
+              );
+            },
+          ),
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Image.asset(
+                "images/tempus_logo_tansp_horizontal.png",
+                height: 160,
+                width: 160,
+              ),
+              //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
+            ),
+          ),
+          Align(
+            alignment: Alignment.topRight,
+            child: IconButton(
+              padding: const EdgeInsets.all(10),
+              icon: const Icon(Icons.settings),
+              iconSize: 30,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => ProfileWidget()));
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double baseWidth = 390;
@@ -48,7 +109,7 @@ class _Group extends State<Group> {
 
     populateChatList();
     return Scaffold(
-      appBar: widget.appbar,
+      appBar: appBar(context),
       body: body,
       bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.

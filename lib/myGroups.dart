@@ -26,7 +26,6 @@ class Group {
   }
 }*/
 
-
 class MyGroups extends StatefulWidget {
   const MyGroups(
       {super.key,
@@ -44,35 +43,22 @@ class MyGroups extends StatefulWidget {
   State<MyGroups> createState() => _MyGroups();
 }
 
-
-
 class _MyGroups extends State<MyGroups> {
-
   List<Widget> list = <Widget>[];
   double baseWidth = 390;
-  double fem=0;
-  double ffem=0;
-  double width=0;
-  double height =0;
-
+  double fem = 0;
+  double ffem = 0;
+  double width = 0;
+  double height = 0;
 
   @override
   Widget build(BuildContext context) {
     final listProvider = Provider.of<GroupProvider>(context);
     double baseWidth = 390;
-    fem = MediaQuery
-        .of(context)
-        .size
-        .width / baseWidth;
+    fem = MediaQuery.of(context).size.width / baseWidth;
     ffem = fem * 0.97;
-    width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    height = MediaQuery
-        .of(context)
-        .size
-        .height;
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
 
     TextEditingController _joinGroupController = TextEditingController();
 
@@ -84,92 +70,94 @@ class _MyGroups extends State<MyGroups> {
         children: [
           groupText(),
           Expanded(child: groupList(listProvider)),
-          joinGroup(_joinGroupController,listProvider),
+          joinGroup(_joinGroupController, listProvider),
         ],
-
       ),
       bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
-  ElevatedButton addToList(name,a_mail,listProvider) {
+  ElevatedButton addToList(name, a_mail, groupImage, listProvider) {
     return ElevatedButton(
         onPressed: () async {
-        final groupData = {
-          "name":name,
-          "a_mail":a_mail
-        };
-        final body = jsonEncode(groupData);
-        jsonDecoder(body,listProvider);
-        }
-
-        ,child: const Text('skicka grupp!'));
+          final groupData = {"name": name, "a_mail": a_mail};
+          final body = jsonEncode(groupData);
+          jsonDecoder(body, groupImage, listProvider);
+        },
+        child: const Text('skicka grupp!'));
   }
 
   Center groupText() {
     return const Center(
-          child: Padding(
-            padding: EdgeInsets.only(top: 10.0),
-            child: Text(
-              'Groups',
-              style: TextStyle(
-                fontSize: 24.0, // Set the font size to 24
-                decoration: TextDecoration.underline, // Underline the text
-              ),
-            ),
+      child: Padding(
+        padding: EdgeInsets.only(top: 10.0),
+        child: Text(
+          'Grupper',
+          style: TextStyle(
+            fontSize: 24.0, // Set the font size to 24
+            decoration: TextDecoration.underline, // Underline the text
           ),
-        );
+        ),
+      ),
+    );
   }
-  void jsonDecoder(String test,listProvider) {
+
+  void jsonDecoder(String test, groupImage, listProvider) {
     final result = jsonDecode(test);
     print(result['name']);
     setState(() {
       listProvider.addItem(groupBox(
-          fem,
-          ffem,
-          width,
-          height,
-          context,
-          "images/wallsten.jpg",
-          result['name']
-      ));
+          fem, ffem, width, height, context, groupImage, result['name']));
     });
   }
 
-  Container joinGroup(TextEditingController joinGroupController,listProvider) {
+  Container joinGroup(TextEditingController joinGroupController, listProvider) {
     return Container(
-        margin: const EdgeInsets.all(16),
-        // Adjust the value as needed
-        child: Align(
+      margin: const EdgeInsets.all(16),
+      // Adjust the value as needed
+      child: Align(
           alignment: Alignment.bottomRight,
-          child:Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.end,
-
             children: [
-              Expanded(child:addToList("Cerium","morganmixtape6@gmail.com",listProvider),),
-            const SizedBox(width: 5,),
-    Expanded(child:addToList("Katt Älskare","catEater42069@gmail.com",listProvider),),
-            const SizedBox(width: 5,),
-              Expanded(child: ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      listProvider.emptyItem();
-                    });
-                  },
-                  child: const Text('Rensa grupp')),),
-              const SizedBox(width: 5,),
-            ElevatedButton(
-              onPressed: () {
-                _showJoinGroup(joinGroupController);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue.shade300,
+              Expanded(
+                child: addToList("Cerium", "morganmixtape6@gmail.com",
+                    "images/edvard_inception.png", listProvider),
               ),
-              child: const Text('Join group'),
-            ),
-          ],)
-        ),
+              const SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                child: addToList("Katt Älskare", "catEater42069@gmail.com",
+                    "images/wallsten.jpg", listProvider),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                child: ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        listProvider.emptyItem();
+                      });
+                    },
+                    child: const Text('Rensa grupp')),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _showJoinGroup(joinGroupController);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlue.shade300,
+                ),
+                child: const Text('Join group'),
+              ),
+            ],
+          )),
     );
   }
 
@@ -213,75 +201,71 @@ class _MyGroups extends State<MyGroups> {
           return ListTile(
             title: listProvider.items[index],
           );
-        }
-        );
+        });
   }
 
-
   GestureDetector groupBox(double fem, double ffem, double width, double height,
-            context, String groupImage, String groupName) {
+      context, String groupImage, String groupName) {
     return GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
               //TODO:Fix
-                builder: (_) =>
-                    Group(
-                        groupName: groupName,
-                        picture: groupImage,
-                        appbar: widget.appbar2,
-                        bottomNavigationBar: widget.bottomNavigationBar)),
-          );
-
-
-        },
-         child:Container(
-           // event3JfJ (23:33)
-           margin: EdgeInsets.fromLTRB(width / 12, 10 * fem, 0 * fem, 10 * fem),
+              builder: (_) => Group(
+                  groupName: groupName,
+                  picture: groupImage,
+                  appbar: widget.appbar2,
+                  bottomNavigationBar: widget.bottomNavigationBar)),
+        );
+      },
+      child: Material(
+        elevation: 15.0,
+        borderRadius: BorderRadius.circular(10),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey.shade800
+            : Colors.white,
         child: SizedBox(
           width: double.infinity,
-          height: 138.5 * fem,
+          height: width / 4,
           child: Stack(
             children: [
               Positioned(
                 // eventboxQTS (23:34)
                 left: 0 * fem,
                 top: 0 * fem,
-                child: Align(
-                  child: SizedBox(
-                    width: 325 * fem,
-                    height: 135 * fem,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20 * fem),
-                        border: Border.all(color: Colors.black),
-                        color: Theme
-                            .of(context)
-                            .appBarTheme
-                            .backgroundColor,
-                      ),
+                child: SizedBox(
+                  height: 135 * fem,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10 * fem),
                     ),
                   ),
                 ),
               ),
               Positioned(
-                // mtemdwallstenuHi (23:37)
-                left: 10,
-                top: 109 * fem,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    width: 109 * fem,
-                    height: 15 * fem,
-                    child: Text(
-                      groupName,
-                      style: TextStyle(
-                        fontSize: 12 * ffem,
-                        fontWeight: FontWeight.w400,
-                        height: 1.2125 * ffem / fem,
+                top: 0 * fem,
+                left: (140 * fem),
+                child: SizedBox(
+                  height: width / 4,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Expanded(
+                      Center(
+                        child: Text(
+                          groupName,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w400,
+                            height: 1.2125 * ffem / fem,
+                          ),
+                        ),
+                        //  ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -291,16 +275,16 @@ class _MyGroups extends State<MyGroups> {
                 top: 0 * fem,
                 child: Align(
                   child: SizedBox(
-                    width: 325 * fem,
-                    height: 95 * fem,
+                    width: width / 3,
+                    height: width / 4,
                     child: ClipRRect(
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20 * fem),
-                        topRight: Radius.circular(20 * fem),
+                        topLeft: Radius.circular(10 * fem),
+                        bottomLeft: Radius.circular(10 * fem),
                       ),
                       child: Image.asset(
                         groupImage,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       ),
                     ),
                   ),

@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:http/http.dart' as http;
 
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage(
@@ -12,18 +14,16 @@ class AddGroupPage extends StatefulWidget {
   final AppBar appbar;
   final BottomAppBar bottomNavigationBar;
 
+
   @override
   State<AddGroupPage> createState() => _AddGroupPageState();
 }
 
 class _AddGroupPageState extends State<AddGroupPage> {
   File? _imageFile;
-  DateTime? _startSelectedDate;
-  DateTime? _stopSelectedDate;
-  TimeOfDay? _startSelectedTime;
-  TimeOfDay? _stopSelectedTime;
   TextEditingController _groupNameController = TextEditingController();
   TextEditingController _groupInfoController = TextEditingController();
+  final user = FirebaseAuth.instance.currentUser!;
 
   Future<void> _getImage() async {
     try {
@@ -72,25 +72,66 @@ class _AddGroupPageState extends State<AddGroupPage> {
     );
   }
 
-  Align addGroupButton() {
-    return Align(
-      alignment: Alignment.bottomRight,
-      child: ElevatedButton.icon(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.lightBlue.shade300,
+  void _handleAddGroupButtonPressed() async {
+    if (user.email != null && _groupNameController.text != '' && _groupInfoController.text != '') {
+      final eventData = {
+        'name': _groupNameController.text,
+        'info':_groupInfoController.text,
+        'email': user.email,
+      };
+      const url = 'http://192.121.208.57:8080/save';
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode(eventData);
+      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('User data sent successfully!');
+      } else {
+        print('Error sending user data: ${response.statusCode}');
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Please fill in all fields.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Expanded addGroupButton() {
+    return Expanded(
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            _handleAddGroupButtonPressed();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.lightBlue.shade300,
+          ),
+          icon: const Icon(
+            Icons.add,
+            size: 24.0,
+          ),
+          label: const Text('Group'),
         ),
-        icon: const Icon(
-          Icons.add,
-          size: 24.0,
-        ),
-        label: const Text('Group'),
       ),
     );
   }
 
-  TextFormField addTextForm(
-      String text, TextEditingController controller) {
+  TextFormField addTextForm(String text, TextEditingController controller) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -121,16 +162,20 @@ class _AddGroupPageState extends State<AddGroupPage> {
         ));
   }
 
-  SizedBox addImage(double height, double width, File? _imageFile) {
-    return SizedBox(
+  GestureDetector addImage(double height, double width, File? imageFile) {
+    return GestureDetector(
+      onTap: _getImage,
+      child: SizedBox(
         height: height / 4,
         child: Container(
           width: width,
           decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: Color(0xff000000))),
-            color: Color(0x0000000),
+            // border: Border(bottom: BorderSide(color: Color(0xff000000))),
+            color: Color(0x00000000),
           ),
-          child: Image.file(_imageFile!),
-        ));
+          child: Image.file(imageFile!),
+        ),
+      ),
+    );
   }
 }

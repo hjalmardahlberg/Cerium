@@ -59,13 +59,14 @@ class _MyHomePageState extends State<MyHomePage> {
           eventText(),
           Expanded(
             child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: eventList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: eventList[index],
-                  );
-                }),
+              shrinkWrap: true,
+              itemCount: eventList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: eventList[index],
+                );
+              },
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -82,10 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               addToList(
                   'images/wallsten.jpg',
-                  'Möte med Wallsten om viktiga saker',
+                  'Möte med Wallsten om viktiga saker.',
                   '2023-03-23',
                   '14:00',
-                  'Möte med Wallsten'),
+                  'Möte ned Wallsten'),
               const SizedBox(
                 width: 5,
               ),
@@ -147,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Padding(
         padding: EdgeInsets.only(top: 10.0),
         child: Text(
-          'Events',
+          'Event',
           style: TextStyle(
             fontSize: 24.0,
             decoration: TextDecoration.underline,
@@ -175,11 +176,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(
                   context,
                   PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => MyGroups(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        MyGroups(
                       title: 'Groups',
                       appbar: homeAppBar(),
                       appbar2: groupAppBar(context, 'addGroup'),
-                      bottomNavigationBar: finalBottomAppBar(context, 'MyGroups'),
+                      bottomNavigationBar:
+                          finalBottomAppBar(context, 'MyGroups'),
                     ),
                     transitionDuration: Duration.zero,
                   ),
@@ -228,11 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.home),
             iconSize: 30,
             onPressed: () {
-
-              Navigator.pop(context, MyHomePage(title: 'title'));
-
-              
-
+              Navigator.pop(context, const MyHomePage(title: 'title'));
             },
           ),
           Expanded(
@@ -376,7 +375,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Container eventBox(
+GestureDetector eventBox(
     String eventImage,
     String eventInfo,
     String eventDate,
@@ -389,102 +388,135 @@ Container eventBox(
     appbar,
     bottomNavigationBar,
     context) {
-  return Container(
-    // event3JfJ (23:33)
-    margin: EdgeInsets.fromLTRB(width / 12, 10 * fem, 0 * fem, 10 * fem),
-    child: GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => EventPage(
-                    picture: eventImage,
-                    appbar: appbar,
-                    bottomNavigationBar: bottomNavigationBar,
-                    theEventName: eventName,
-                    eventInfo: eventInfo,
-                    date: eventDate,
-                    time: eventTime,
-                  )),
-        );
-      },
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => EventPage(
+                  picture: eventImage,
+                  appbar: appbar,
+                  bottomNavigationBar: bottomNavigationBar,
+                  theEventName: eventName,
+                  eventInfo: eventInfo,
+                  date: eventDate,
+                  time: eventTime,
+                )),
+      );
+    },
+    child:Material(
+      elevation: 15.0,
+      borderRadius: BorderRadius.circular(10),
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey.shade800
+          : Colors.white,
       child: SizedBox(
         width: double.infinity,
-        height: 138.5 * fem,
+        height: width / 3,
         child: Stack(
           children: [
             Positioned(
               // eventboxQTS (23:34)
               left: 0 * fem,
               top: 0 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 325 * fem,
-                  height: 135 * fem,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20 * fem),
-                      border: Border.all(color: const Color(0xff000000)),
-                      color: Theme.of(context).appBarTheme.backgroundColor,
-                    ),
+              child: SizedBox(
+                height: 135 * fem,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10 * fem),
                   ),
                 ),
               ),
             ),
             Positioned(
-              // tidWFa (23:35)
-              left: 19 * fem,
-              top: 116 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 85 * fem,
-                  height: 15 * fem,
-                  child: Text(
-                    'Tid och datum:',
-                    style: TextStyle(
-                      fontSize: 12 * ffem,
-                      fontWeight: FontWeight.w400,
-                      height: 1.2125 * ffem / fem,
+              top: 10 * fem,
+              left: (200 * fem),
+              child: SizedBox(
+                width: (width * 0.4),
+                height: width / 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Expanded(
+                    Center(
+                      child: Text(
+                        eventName,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w400,
+                          height: 1.2125 * ffem / fem,
+                        ),
+                      ),
+                      //  ),
                     ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              // kl1400okU (23:36)
-              left: 105 * fem,
-              top: 116 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 122 * fem,
-                  height: 15 * fem,
-                  child: Text(
-                    '$eventTime $eventDate',
-                    style: TextStyle(
-                      fontSize: 12 * ffem,
-                      fontWeight: FontWeight.w400,
-                      height: 1.2125 * ffem / fem,
+
+                    const SizedBox(
+                      height: 10,
                     ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              // mtemedwallstenuHi (23:37)
-              left: 19 * fem,
-              top: 100 * fem,
-              child: Align(
-                child: SizedBox(
-                  width: 109 * fem,
-                  height: 15 * fem,
-                  child: Text(
-                    eventName,
-                    style: TextStyle(
-                      fontSize: 12 * ffem,
-                      fontWeight: FontWeight.w400,
-                      height: 1.2125 * ffem / fem,
+
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'Tid:',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.2125 * ffem / fem,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  eventTime,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.2125 * ffem / fem,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row( children: [
+                              Text(
+                                'Datum:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.2125 * ffem / fem,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  eventDate,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.2125 * ffem / fem,
+                                  ),
+                                ),
+                              ),
+                            ],),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -494,16 +526,16 @@ Container eventBox(
               top: 0 * fem,
               child: Align(
                 child: SizedBox(
-                  width: 325 * fem,
-                  height: 95 * fem,
+                  width: width / 2,
+                  height: width / 3,
                   child: ClipRRect(
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20 * fem),
-                      topRight: Radius.circular(20 * fem),
+                      topLeft: Radius.circular(10 * fem),
+                      bottomLeft: Radius.circular(10 * fem),
                     ),
                     child: Image.asset(
                       eventImage,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
                     ),
                   ),
                 ),
