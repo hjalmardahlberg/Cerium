@@ -47,9 +47,11 @@ class _EventPageState extends State<EventPage> {
           eventInformation(widget.eventInfo, height, width),
         ],
       ),
-      bottomNavigationBar: widget.bottomNavigationBar,
+     //bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
+
+
 
   void _handleschemasyncButtonPressed(schema) async {
     if (schema != null && widget.date == null && widget.time == null) {
@@ -73,7 +75,7 @@ class _EventPageState extends State<EventPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Error'),
-            content: Text('Please fill in all fields.'),
+            content: Text('Här ska man skicka in sitt schema sen'),
             actions: [
               TextButton(
                 child: Text('OK'),
@@ -94,7 +96,7 @@ class _EventPageState extends State<EventPage> {
         _handleschemasyncButtonPressed("mitt schema");
       },
       icon: const Icon(
-        Icons.sync_rounded,
+        Icons.send,
         size: 24.0,
       ),
     );
@@ -203,7 +205,7 @@ class _EventPageState extends State<EventPage> {
         ),
         Text(time, style: const TextStyle(fontSize: 24)),
         Visibility(
-          visible: date == null || time == null,
+          visible: date != null || time == null,
           child: Padding(
             padding: const EdgeInsets.only(left: 25, right: 25),
             child: schemaSyncButton(),

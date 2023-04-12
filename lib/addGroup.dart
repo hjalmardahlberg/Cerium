@@ -68,7 +68,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
           ),
         ),
       ),
-      bottomNavigationBar: widget.bottomNavigationBar,
+    //  bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 

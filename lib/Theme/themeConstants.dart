@@ -27,9 +27,6 @@ final darkTheme = ThemeData(
   appBarTheme: const AppBarTheme(
     iconTheme:  IconThemeData(color: Colors.white),
   ),
-  primaryIconTheme: const IconThemeData(
-    color: Colors.white, // change the default icon color to white in the dark theme
-  ),
 );
 
 final themeData = ThemeData(

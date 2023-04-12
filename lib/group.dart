@@ -111,7 +111,7 @@ class _Group extends State<Group> {
     return Scaffold(
       appBar: appBar(context),
       body: body,
-      bottomNavigationBar: widget.bottomNavigationBar,
+      //bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 

@@ -156,7 +156,7 @@ class _GroupParticipants extends State<GroupParticipants> {
     return Scaffold(
       appBar: appBar(context),
       body: body,
-      bottomNavigationBar: widget.bottomNavigationBar,
+      //bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 }

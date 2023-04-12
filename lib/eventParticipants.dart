@@ -156,7 +156,7 @@ class _EventParticipants extends State<EventParticipants> {
     return Scaffold(
       appBar: appBar(context),
       body: body,
-      bottomNavigationBar: widget.bottomNavigationBar,
+     // bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 }

@@ -35,6 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double ffem = 0;
   double width = 0;
   double height = 0;
+  final TextEditingController _joinGroupController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //bottomNavigationBar
     final bottomNavigationBar = finalBottomAppBar(context, 'MyHomePage');
+
 
     return Scaffold(
       appBar: appbar,
@@ -262,13 +264,47 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _showJoinGroup(TextEditingController joinGroupController,context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Enter The Group Name'),
+          content: TextFormField(
+            controller: joinGroupController,
+            decoration: const InputDecoration(hintText: 'Group name...'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('JOIN'),
+              onPressed: () {
+                // do something with the text entered in the TextFormField
+                String enteredText = joinGroupController.text;
+                print('Entered Text: $enteredText');
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   BottomAppBar finalBottomAppBar(BuildContext context, String pageName) {
     final user = FirebaseAuth.instance.currentUser!;
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          IconButton(
+          Expanded(
+      flex: 1,
+      child: IconButton(
             icon: const Icon(Icons.event),
             onPressed: () async {
               final provider =
@@ -285,7 +321,8 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
-          IconButton(
+          ),
+         /* IconButton(
             icon: const Icon(Icons.hail_rounded),
             onPressed: () async {
               final provider =
@@ -335,8 +372,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 print('Error sending user data: ${response.statusCode}');
               }
             },
-          ),
-          IconButton(
+          ),*/
+
+          Expanded(
+            flex: 2,
+            child:IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
               if (pageName == 'MyGroups') {
@@ -360,20 +400,36 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.navigate_next),
-            onPressed: () {
-              //TEMP LOGIN BUTTON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              final provider =
-                  Provider.of<GoogleSignInProvider>(context, listen: false);
-              provider.googleLogin();
-            },
           ),
+    pageName == 'MyGroups' ?
+    Expanded(
+        flex: 1,
+          child:TextButton(
+            onPressed: () {
+              _showJoinGroup(_joinGroupController,context);
+            },
+            child: Text('Join group',style: TextStyle(color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,),),
+          ),
+      )
+        :Expanded(
+          flex: 1,
+          child:TextButton(
+            onPressed: () {
+              _showJoinGroup(_joinGroupController,context);
+            },
+            child: Text('Join event',style: TextStyle(color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,),),
+          ),
+        ),
         ],
       ),
     );
   }
 }
+
 
 GestureDetector eventBox(
     String eventImage,

@@ -41,6 +41,8 @@ class _AddEventPageState extends State<AddEventPage> {
   //the event info
   final TextEditingController _eventInfoController = TextEditingController();
 
+
+
   final user = FirebaseAuth.instance.currentUser!;
 
   Future<void> _getImage() async {
@@ -104,7 +106,7 @@ class _AddEventPageState extends State<AddEventPage> {
           ),
         ),
       ),
-      bottomNavigationBar: widget.bottomNavigationBar,
+    //  bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 

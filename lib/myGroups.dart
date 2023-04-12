@@ -144,52 +144,8 @@ class _MyGroups extends State<MyGroups> {
                     },
                     child: const Text('Rensa grupp')),
               ),
-              const SizedBox(
-                width: 5,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _showJoinGroup(joinGroupController);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlue.shade300,
-                ),
-                child: const Text('Join group'),
-              ),
             ],
           )),
-    );
-  }
-
-  void _showJoinGroup(TextEditingController joinGroupController) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Enter The Group Name'),
-          content: TextFormField(
-            controller: joinGroupController,
-            decoration: const InputDecoration(hintText: 'Group name...'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('CANCEL'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('JOIN'),
-              onPressed: () {
-                // do something with the text entered in the TextFormField
-                String enteredText = joinGroupController.text;
-                print('Entered Text: $enteredText');
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
