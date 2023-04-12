@@ -412,7 +412,7 @@ GestureDetector eventBox(
           : Colors.white,
       child: SizedBox(
         width: double.infinity,
-        height: width / 3,
+        height: width / 4,
         child: Stack(
           children: [
             Positioned(
@@ -430,21 +430,21 @@ GestureDetector eventBox(
             ),
             Positioned(
               top: 10 * fem,
-              left: (200 * fem),
+              left: (140 * fem),
               child: SizedBox(
-                width: (width * 0.4),
-                height: width / 2,
+                height: width / 4,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Expanded(
-                    Center(
+                    Padding(
+                      padding: EdgeInsets.only(top:5),
                       child: Text(
                         eventName,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 15,
                           fontWeight: FontWeight.w400,
                           height: 1.2125 * ffem / fem,
                         ),
@@ -453,65 +453,34 @@ GestureDetector eventBox(
                     ),
 
                     const SizedBox(
-                      height: 10,
+                      height: 5,
                     ),
-
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
+                        padding: const EdgeInsets.only(left: 0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  'Tid:',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.2125 * ffem / fem,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  eventTime,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.2125 * ffem / fem,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row( children: [
-                              Text(
-                                'Datum:',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.2125 * ffem / fem,
-                                ),
+                             Text(
+                              eventDate,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
+                                height: 1.2125 * ffem / fem,
                               ),
-                              const SizedBox(
-                                width: 5,
-                              ),
+                            ),
+
                               Expanded(
-                                child: Text(
-                                  eventDate,
+                                child:  Text(
+                                  'Kl: $eventTime',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w400,
                                     height: 1.2125 * ffem / fem,
                                   ),
                                 ),
                               ),
-                            ],),
                           ],
                         ),
                       ),
@@ -526,8 +495,8 @@ GestureDetector eventBox(
               top: 0 * fem,
               child: Align(
                 child: SizedBox(
-                  width: width / 2,
-                  height: width / 3,
+                  width: width / 3,
+                  height: width / 4,
                   child: ClipRRect(
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(10 * fem),

@@ -249,21 +249,30 @@ class _MyGroups extends State<MyGroups> {
                 child: SizedBox(
                   height: width / 4,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Expanded(
-                      Center(
+                        Padding(
+                          padding: EdgeInsets.only(top:20),
                         child: Text(
                           groupName,
-                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 15,
                             fontWeight: FontWeight.w400,
                             height: 1.2125 * ffem / fem,
                           ),
                         ),
                         //  ),
+                      ),
+                      Text(
+                        'Ägare: Wallsten',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey.withOpacity(0.9),
+                          height: 1.2125 * ffem / fem,
+                        ),
                       ),
                     ],
                   ),

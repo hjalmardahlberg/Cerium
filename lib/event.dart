@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
 import 'eventParticipants.dart';
@@ -41,10 +44,59 @@ class _EventPageState extends State<EventPage> {
           eventImage(height, width),
           eventName(widget.theEventName),
           dateAndTime(widget.date, widget.time),
-          Expanded(child:  eventInformation(widget.eventInfo, height, width),),
+          eventInformation(widget.eventInfo, height, width),
         ],
       ),
       bottomNavigationBar: widget.bottomNavigationBar,
+    );
+  }
+
+  void _handleschemasyncButtonPressed(schema) async {
+    if (schema != null && widget.date == null && widget.time == null) {
+      final schemaData = {
+        'schema': schema,
+      };
+      const url = 'http://192.121.208.57:8080/save';
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode(schemaData);
+      final response =
+          await http.post(Uri.parse(url), headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('User data sent successfully!');
+      } else {
+        print('Error sending user data: ${response.statusCode}');
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Please fill in all fields.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  IconButton schemaSyncButton() {
+    return IconButton(
+      onPressed: () async {
+        _handleschemasyncButtonPressed("mitt schema");
+      },
+      icon: const Icon(
+        Icons.sync_rounded,
+        size: 24.0,
+      ),
     );
   }
 
@@ -63,10 +115,9 @@ class _EventPageState extends State<EventPage> {
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       EventParticipants(
-                        eventName: widget.theEventName,
-                        bottomNavigationBar:
-                        widget.bottomNavigationBar,
-                      ),
+                    eventName: widget.theEventName,
+                    bottomNavigationBar: widget.bottomNavigationBar,
+                  ),
                   transitionDuration: Duration.zero,
                 ),
               );
@@ -100,24 +151,10 @@ class _EventPageState extends State<EventPage> {
     );
   }
 
-  Row eventParticipants() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: const [
-        Padding(
-          padding: EdgeInsets.only(left: 15.0, right: 5),
-          child: Icon(Icons.group, size: 30),
-        ),
-        Text('Deltagare', style: TextStyle(fontSize: 24)),
-        Icon(Icons.group_add, size: 30),
-      ],
-    );
-  }
-
   Expanded eventInformation(String eventInfo, double height, double width) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
+        padding: const EdgeInsets.all(10),
         child: SizedBox(
           height: height / 5,
           width: width,
@@ -164,7 +201,14 @@ class _EventPageState extends State<EventPage> {
             size: 24,
           ),
         ),
-        Text(time, style: const TextStyle(fontSize: 24))
+        Text(time, style: const TextStyle(fontSize: 24)),
+        Visibility(
+          visible: date == null || time == null,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 25, right: 25),
+            child: schemaSyncButton(),
+          ),
+        ),
       ],
     );
   }
