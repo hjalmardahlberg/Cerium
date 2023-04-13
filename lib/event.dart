@@ -10,7 +10,6 @@ class EventPage extends StatefulWidget {
       {Key? key,
       required this.picture,
       required this.appbar,
-      required this.bottomNavigationBar,
       required this.theEventName,
       required this.eventInfo,
       required this.date,
@@ -19,7 +18,6 @@ class EventPage extends StatefulWidget {
 
   final String picture;
   final AppBar appbar;
-  final BottomAppBar bottomNavigationBar;
   final String theEventName;
   final String eventInfo;
   final String date;
@@ -126,7 +124,6 @@ class _EventPageState extends State<EventPage> {
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       EventParticipants(
                     eventName: widget.theEventName,
-                    bottomNavigationBar: widget.bottomNavigationBar,
                   ),
                   transitionDuration: Duration.zero,
                 ),

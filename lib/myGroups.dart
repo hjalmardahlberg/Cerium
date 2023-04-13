@@ -3,28 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-//import 'package:google_fonts/google_fonts.dart';
+
 import 'group.dart';
 import 'groupListProvider.dart';
 
-/*
-class Group {
-  final int id;
-  final String owner;
-  final String name;
-  final String userId;
-
-  Group({required this.id, required this.owner, required this.name, required this.userId});
-
-  factory Group.fromJson(Map<String, dynamic> json) {
-    return Group(
-      id: json['g_id'] as int,
-      owner: json['owner'] as String,
-      name: json['name'] as String,
-      userId: json['u_id'] as String,
-    );
-  }
-}*/
 
 class MyGroups extends StatefulWidget {
   const MyGroups(
@@ -32,12 +14,11 @@ class MyGroups extends StatefulWidget {
       required this.title,
       required this.appbar,
       required this.appbar2,
-      required this.bottomNavigationBar});
+      });
 
   final String title;
   final AppBar appbar;
   final AppBar appbar2;
-  final BottomAppBar bottomNavigationBar;
 
   @override
   State<MyGroups> createState() => _MyGroups();
@@ -50,6 +31,7 @@ class _MyGroups extends State<MyGroups> {
   double ffem = 0;
   double width = 0;
   double height = 0;
+  final TextEditingController _joinGroupController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -60,20 +42,17 @@ class _MyGroups extends State<MyGroups> {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    TextEditingController _joinGroupController = TextEditingController();
 
-    String groupImage = 'images/wallsten.jpg';
-    String groupName = 'Grupp med Wallsten';
+
     return Scaffold(
       //appBar: widget.appbar,
       body: Column(
         children: [
           groupText(),
           Expanded(child: groupList(listProvider)),
-          joinGroup(_joinGroupController, listProvider),
+          joinGroup(listProvider),
         ],
       ),
-    //  bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
@@ -111,7 +90,39 @@ class _MyGroups extends State<MyGroups> {
     });
   }
 
-  Container joinGroup(TextEditingController joinGroupController, listProvider) {
+  void _showJoinGroup(TextEditingController joinGroupController, context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Enter The Group Name'),
+          content: TextFormField(
+            controller: joinGroupController,
+            decoration: const InputDecoration(hintText: 'Group name...'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('JOIN'),
+              onPressed: () {
+                // do something with the text entered in the TextFormField
+                String enteredText = joinGroupController.text;
+                print('Entered Text: $enteredText');
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Container joinGroup(listProvider) {
     return Container(
       margin: const EdgeInsets.all(16),
       // Adjust the value as needed
@@ -144,6 +155,17 @@ class _MyGroups extends State<MyGroups> {
                     },
                     child: const Text('Rensa grupp')),
               ),
+              Expanded(
+                flex: 1,
+                child:TextButton(
+                  onPressed: () {
+                    _showJoinGroup(_joinGroupController,context);
+                  },
+                  child: Text('Join event',style: TextStyle(color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,),),
+                ),
+              ),
             ],
           )),
     );
@@ -172,7 +194,7 @@ class _MyGroups extends State<MyGroups> {
                   groupName: groupName,
                   picture: groupImage,
                   appbar: widget.appbar2,
-                  bottomNavigationBar: widget.bottomNavigationBar)),
+                  )),
         );
       },
       child: Material(

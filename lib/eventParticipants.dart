@@ -1,4 +1,4 @@
-import 'dart:io';
+
 
 
 import 'package:flutter/material.dart';
@@ -8,13 +8,12 @@ import 'Theme/themeConstants.dart';
 
 class EventParticipants extends StatefulWidget {
   const EventParticipants({Key? key,
-    required this.eventName,
-    required this.bottomNavigationBar})
+    required this.eventName,})
       : super(key: key);
 
   //final Group group;
   final String eventName;
-  final BottomAppBar bottomNavigationBar;
+
 
   @override
   State<EventParticipants> createState() => _EventParticipants();
@@ -69,10 +68,6 @@ class _EventParticipants extends State<EventParticipants> {
         .of(context)
         .size
         .width;
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
 
 
     Padding groupName() {
@@ -156,7 +151,6 @@ class _EventParticipants extends State<EventParticipants> {
     return Scaffold(
       appBar: appBar(context),
       body: body,
-     // bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 }

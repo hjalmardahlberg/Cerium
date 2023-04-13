@@ -1,6 +1,3 @@
-import 'dart:io';
-
-
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
 import 'package:provider/provider.dart';
@@ -8,13 +5,12 @@ import 'Theme/themeConstants.dart';
 
 class GroupParticipants extends StatefulWidget {
   const GroupParticipants({Key? key,
-    required this.groupName,
-    required this.bottomNavigationBar})
+    required this.groupName,})
       : super(key: key);
 
   //final Group group;
   final String groupName;
-  final BottomAppBar bottomNavigationBar;
+
 
   @override
   State<GroupParticipants> createState() => _GroupParticipants();
@@ -69,10 +65,6 @@ class _GroupParticipants extends State<GroupParticipants> {
         .of(context)
         .size
         .width;
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
 
 
     Padding groupName() {
@@ -156,7 +148,6 @@ class _GroupParticipants extends State<GroupParticipants> {
     return Scaffold(
       appBar: appBar(context),
       body: body,
-      //bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 }

@@ -9,14 +9,14 @@ class Group extends StatefulWidget {
       required this.picture,
       //required this.group,
       required this.appbar,
-      required this.bottomNavigationBar})
+    })
       : super(key: key);
 
   //final Group group;
   final String groupName;
   final String picture;
   final AppBar appbar;
-  final BottomAppBar bottomNavigationBar;
+
 
   @override
   State<Group> createState() => _Group();
@@ -57,7 +57,6 @@ class _Group extends State<Group> {
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       GroupParticipants(
                         groupName: widget.groupName,
-                        bottomNavigationBar: widget.bottomNavigationBar,
                       ),
                   transitionDuration: Duration.zero,
                 ),
@@ -95,7 +94,7 @@ class _Group extends State<Group> {
   @override
   Widget build(BuildContext context) {
     double baseWidth = 390;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
+
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
