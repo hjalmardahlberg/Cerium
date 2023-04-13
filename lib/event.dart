@@ -107,9 +107,17 @@ class _EventPageState extends State<EventPage> {
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
-          IconButton(
-            padding: const EdgeInsets.all(10),
-            icon: const Icon(Icons.group),
+      IconButton(
+      padding: const EdgeInsets.all(0),
+      icon: Column(
+        children: [
+          const Icon(Icons.group),
+          const Text(
+            'Deltagare',
+            style: TextStyle(fontSize: 10),
+          ),
+        ],
+      ),
             iconSize: 30,
             onPressed: () {
               Navigator.push(

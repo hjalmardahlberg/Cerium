@@ -9,11 +9,11 @@ import 'package:http/http.dart' as http;
 
 class AddEventPage extends StatefulWidget {
   const AddEventPage(
-      {Key? key, required this.appbar, required this.bottomNavigationBar})
+      {Key? key, required this.appbar})
       : super(key: key);
 
   final AppBar appbar;
-  final BottomAppBar bottomNavigationBar;
+
 
   @override
   State<AddEventPage> createState() => _AddEventPageState();

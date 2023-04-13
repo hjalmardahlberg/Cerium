@@ -96,13 +96,13 @@ class _GroupParticipants extends State<GroupParticipants> {
           children: [
             Padding(
               // wallstoeno8C (23:38)
-              padding: EdgeInsets.only(left: 0),
+              padding: const EdgeInsets.only(left: 0),
               child: CircleAvatar(
                 radius: 30,
                 backgroundImage: AssetImage(image),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 20,
             ),
             Text(
@@ -138,7 +138,7 @@ class _GroupParticipants extends State<GroupParticipants> {
               color: themeManager.isDarkMode ? Colors.white : Colors.black,)),
 
           ),),
-        Divider(color: Colors.grey),
+        const Divider(color: Colors.grey),
         Expanded(
           child: ListView.builder(
             shrinkWrap: true,

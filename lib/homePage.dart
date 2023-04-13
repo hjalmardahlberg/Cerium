@@ -36,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double width = 0;
   double height = 0;
   final TextEditingController _joinGroupController = TextEditingController();
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -51,60 +52,116 @@ class _MyHomePageState extends State<MyHomePage> {
     final appbar = groupAppBar(context, '');
 
     //bottomNavigationBar
-    final bottomNavigationBar = finalBottomAppBar(context, 'MyHomePage');
+    final bottomAppBar = finalBottomAppBar(context, 'MyHomePage');
 
+
+    PageController _pageController = PageController(initialPage: 0);
+    final _bottomNavigationBarItems = [
+      const BottomNavigationBarItem(icon: Icon(Icons.event),backgroundColor: Colors.white, label:'Event'),
+      BottomNavigationBarItem(icon:const Icon(Icons.add),label:_currentIndex == 0?'Lägg till event':'Lägg till grupp',),
+      const BottomNavigationBarItem( icon: Icon(Icons.group),backgroundColor: Colors.white,label:'Grupper')
+    ];
 
     return Scaffold(
       appBar: appbar,
-      body: Column(
+      body: PageView(
+        controller:  _pageController,
+        onPageChanged: (newIndex){
+          setState(() {
+            _currentIndex = newIndex*2;
+          });
+        },
         children: [
-          eventText(),
-          Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: eventList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: eventList[index],
-                );
-              },
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              addToList(
-                  'images/edvard_inception.png',
-                  'Det ska tittas serier med frugan',
-                  '2023-03-23',
-                  '17:00',
-                  'Möte med Frugan'),
-              const SizedBox(
-                width: 5,
-              ),
-              addToList(
-                  'images/wallsten.jpg',
-                  'Möte med Wallsten om viktiga saker.',
-                  '2023-03-23',
-                  '14:00',
-                  'Möte ned Wallsten'),
-              const SizedBox(
-                width: 5,
-              ),
-              ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      eventList = [];
-                    });
-                  },
-                  child: const Text('Rensa events'))
-            ],
+         MyEvents(),
+         MyGroups(
+            title: 'Groups',
+            appbar: homeAppBar(),
+            appbar2: groupAppBar(context, 'addGroup'),
+            bottomNavigationBar: finalBottomAppBar(context, 'MyGroups'),
           ),
         ],
       ),
-      bottomNavigationBar: bottomNavigationBar,
+      bottomNavigationBar: BottomNavigationBar(
+       // type: BottomNavigationBarType.fixed,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey.shade800
+          : Colors.white,
+          currentIndex: _currentIndex,
+          items:_bottomNavigationBarItems,
+        onTap: (index) {
+          if (index == 1) { // middle item
+            setState(() {
+              _currentIndex == 0?
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => AddEventPage(
+                        appbar: homeAppBar(),)),
+              ):Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => AddGroupPage(
+                        appbar: homeAppBar(),
+                       )),
+              );// set current index to middle page index
+            });
+          } else {
+            _pageController.animateToPage(index, duration: const Duration(microseconds: 500), curve: Curves.ease);
+          }
+        },
+      ),//bottomAppBar,
+
     ); // This trailing comma makes auto-formatting nicer for build methods.
+  }
+
+  Column MyEvents() {
+    return Column(
+      children: [
+        eventText(),
+        Expanded(
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: eventList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                title: eventList[index],
+              );
+            },
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            addToList(
+                'images/edvard_inception.png',
+                'Det ska tittas serier med frugan',
+                '2023-03-23',
+                '17:00',
+                'Möte med Frugan'),
+            const SizedBox(
+              width: 5,
+            ),
+            addToList(
+                'images/wallsten.jpg',
+                'Möte med Wallsten om viktiga saker.',
+                '2023-03-23',
+                '14:00',
+                'Möte ned Wallsten'),
+            const SizedBox(
+              width: 5,
+            ),
+            ElevatedButton(
+                onPressed: () async {
+                  setState(() {
+                    eventList = [];
+                  });
+                },
+                child: const Text('Rensa events'))
+          ],
+        ),
+      ],
+    );
   }
 
   ElevatedButton addToList(image, info, date, time, name) {
@@ -163,11 +220,11 @@ class _MyHomePageState extends State<MyHomePage> {
   //AppBar that takes you back to group screen
   AppBar groupAppBar(context, String page) {
     return AppBar(
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
-          IconButton(
+        /*  IconButton(
             padding: const EdgeInsets.all(10),
             icon: const Icon(Icons.group),
             iconSize: 30,
@@ -191,10 +248,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               }
             },
-          ),
+          ),*/
           Expanded(
-            flex: 2,
-            child: Center(
+            flex: 1,
+            child: Align(
+              alignment: Alignment.topLeft,
               child: Image.asset(
                 "images/tempus_logo_tansp_horizontal.png",
                 height: 160,
@@ -223,29 +281,30 @@ class _MyHomePageState extends State<MyHomePage> {
   //AppBar that takes you back to event screen
   AppBar homeAppBar() {
     return AppBar(
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       // backgroundColor: const Color.fromARGB(255, 153, 255, 255),
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
-          IconButton(
+         /* IconButton(
             padding: const EdgeInsets.all(10),
             icon: const Icon(Icons.home),
             iconSize: 30,
             onPressed: () {
               Navigator.pop(context, const MyHomePage(title: 'title'));
             },
-          ),
+          ),*/
           Expanded(
             flex: 2,
-            child: Center(
+              child:Align(
+                alignment: Alignment.topLeft,
               child: Image.asset(
                 "images/tempus_logo_tansp_horizontal.png",
                 height: 160,
                 width: 160,
               ),
               //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
-            ),
+      ),
           ),
           Align(
             alignment: Alignment.topRight,
@@ -264,7 +323,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showJoinGroup(TextEditingController joinGroupController,context) {
+  void _showJoinGroup(TextEditingController joinGroupController, context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -296,6 +355,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+
   BottomAppBar finalBottomAppBar(BuildContext context, String pageName) {
     final user = FirebaseAuth.instance.currentUser!;
     return BottomAppBar(
@@ -303,26 +363,26 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Expanded(
-      flex: 1,
-      child: IconButton(
-            icon: const Icon(Icons.event),
-            onPressed: () async {
-              final provider =
-                  Provider.of<GoogleSignInProvider>(context, listen: false);
-              final events = await provider.getPrimaryCalendarEvents();
+            flex: 1,
+            child: IconButton(
+              icon: const Icon(Icons.event),
+              onPressed: () async {
+                final provider =
+                    Provider.of<GoogleSignInProvider>(context, listen: false);
+                final events = await provider.getPrimaryCalendarEvents();
 
-              for (Event event in events) {
-                //print('Event ID: ${event.id}');
-                print('Event summary: ${event.summary}');
-                print('Event start time: ${event.start?.dateTime}');
-                print('Event end time: ${event.end?.dateTime}');
-                //print('Event location: ${event.location}');
-                //print('Event description: ${event.description}');
-              }
-            },
+                for (Event event in events) {
+                  //print('Event ID: ${event.id}');
+                  print('Event summary: ${event.summary}');
+                  print('Event start time: ${event.start?.dateTime}');
+                  print('Event end time: ${event.end?.dateTime}');
+                  //print('Event location: ${event.location}');
+                  //print('Event description: ${event.description}');
+                }
+              },
+            ),
           ),
-          ),
-         /* IconButton(
+          /* IconButton(
             icon: const Icon(Icons.hail_rounded),
             onPressed: () async {
               final provider =
@@ -376,32 +436,30 @@ class _MyHomePageState extends State<MyHomePage> {
 
           Expanded(
             flex: 2,
-            child:IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              if (pageName == 'MyGroups') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => AddGroupPage(
-                          appbar: groupAppBar(context, 'addGroup'),
-                          bottomNavigationBar:
-                              finalBottomAppBar(context, 'AddGroupPage'))),
-                );
-              } else if (pageName != 'AddEventPage') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => AddEventPage(
-                          appbar: homeAppBar(),
-                          bottomNavigationBar:
-                              finalBottomAppBar(context, 'AddEventPage'))),
-                );
-              }
-            },
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                if (pageName == 'MyGroups') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => AddGroupPage(
+                            appbar: groupAppBar(context, 'addGroup'),
+                            )),
+                  );
+                } else if (pageName != 'AddEventPage') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => AddEventPage(
+                            appbar: homeAppBar(),
+                          )),
+                  );
+                }
+              },
+            ),
           ),
-          ),
-    pageName == 'MyGroups' ?
+          /* pageName == 'MyGroups' ?
     Expanded(
         flex: 1,
           child:TextButton(
@@ -423,13 +481,40 @@ class _MyHomePageState extends State<MyHomePage> {
                 ? Colors.white
                 : Colors.black,),),
           ),
-        ),
+        ),*/
+          Expanded(
+            flex: 1,
+            child:
+          IconButton(
+              padding: const EdgeInsets.all(10),
+              icon: const Icon(Icons.group),
+              iconSize: 30,
+              onPressed: () {
+                if (pageName == 'addGroup') {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          MyGroups(
+                        title: 'Groups',
+                        appbar: homeAppBar(),
+                        appbar2: groupAppBar(context, 'addGroup'),
+                        bottomNavigationBar:
+                            finalBottomAppBar(context, 'MyGroups'),
+                      ),
+                      transitionDuration: Duration.zero,
+                    ),
+                  );
+                }
+              }),
+          ),
         ],
       ),
     );
   }
 }
-
 
 GestureDetector eventBox(
     String eventImage,
@@ -460,7 +545,7 @@ GestureDetector eventBox(
                 )),
       );
     },
-    child:Material(
+    child: Material(
       elevation: 15.0,
       borderRadius: BorderRadius.circular(10),
       color: Theme.of(context).brightness == Brightness.dark
@@ -495,7 +580,7 @@ GestureDetector eventBox(
                   children: [
                     // Expanded(
                     Padding(
-                      padding: EdgeInsets.only(top:5),
+                      padding: const EdgeInsets.only(top: 5),
                       child: Text(
                         eventName,
                         textAlign: TextAlign.center,
@@ -518,7 +603,7 @@ GestureDetector eventBox(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                             Text(
+                            Text(
                               eventDate,
                               style: TextStyle(
                                 fontSize: 10,
@@ -526,17 +611,16 @@ GestureDetector eventBox(
                                 height: 1.2125 * ffem / fem,
                               ),
                             ),
-
-                              Expanded(
-                                child:  Text(
-                                  'Kl: $eventTime',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.2125 * ffem / fem,
-                                  ),
+                            Expanded(
+                              child: Text(
+                                'Kl: $eventTime',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.2125 * ffem / fem,
                                 ),
                               ),
+                            ),
                           ],
                         ),
                       ),

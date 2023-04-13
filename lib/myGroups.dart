@@ -65,7 +65,7 @@ class _MyGroups extends State<MyGroups> {
     String groupImage = 'images/wallsten.jpg';
     String groupName = 'Grupp med Wallsten';
     return Scaffold(
-      appBar: widget.appbar,
+      //appBar: widget.appbar,
       body: Column(
         children: [
           groupText(),
@@ -73,7 +73,7 @@ class _MyGroups extends State<MyGroups> {
           joinGroup(_joinGroupController, listProvider),
         ],
       ),
-      bottomNavigationBar: widget.bottomNavigationBar,
+    //  bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 

@@ -8,11 +8,11 @@ import 'package:http/http.dart' as http;
 
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage(
-      {Key? key, required this.appbar, required this.bottomNavigationBar})
+      {Key? key, required this.appbar})
       : super(key: key);
 
   final AppBar appbar;
-  final BottomAppBar bottomNavigationBar;
+
 
 
   @override

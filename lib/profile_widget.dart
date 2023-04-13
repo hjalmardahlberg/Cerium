@@ -17,7 +17,7 @@ class ProfileWidget extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title:  Text('Settings', style: TextStyle(fontSize: 20,color:themeManager.isDarkMode?Colors.white:Colors.black,),),
         centerTitle: true,
       ),
       body: Padding(
