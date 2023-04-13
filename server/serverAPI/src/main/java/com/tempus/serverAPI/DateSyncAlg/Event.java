@@ -9,14 +9,14 @@ import java.time.format.DateTimeFormatter;
 public class Event {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private String name;
+
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS'Z'");
 ;
-    public Event(String name, String startTime, String endTime) {
+    public Event(String startTime, String endTime) {
         LocalDateTime s_time = LocalDateTime.parse(startTime, formatter);
         LocalDateTime e_time = LocalDateTime.parse(endTime, formatter);
 
-        this.name = name;
+
         this.startTime = s_time;
         this.endTime = e_time;
     }
@@ -38,10 +38,7 @@ public class Event {
     }
 
 
-    public String getEventName()
-    {
-        return this.name;
-    }
+
 
     @Override
     public String toString() 

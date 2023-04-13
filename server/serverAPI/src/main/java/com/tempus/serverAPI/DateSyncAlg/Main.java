@@ -46,15 +46,15 @@ public class Main {
         LocalDateTime date_16 = LocalDateTime.of(1999, 12, 26, 14, 50, 0);
 
         //Skapar alla event med de skapade datumen och konverterar om till vårat format
-        Event e_1 = new Event("e1", date_1.format(formatter), date_2.format(formatter)); 
-        Event e_2 = new Event("e2", date_3.format(formatter), date_4.format(formatter));
-        Event e_3 = new Event("e3", date_5.format(formatter), date_6.format(formatter));
-        Event e_4 = new Event("e4", date_7.format(formatter), date_8.format(formatter));
-        Event e_5 = new Event("e5", date_9.format(formatter), date_10.format(formatter));
-        Event e_6 = new Event("e6", date_11.format(formatter), date_12.format(formatter));
-        Event e_7 = new Event("e7", date_13.format(formatter), date_14.format(formatter));
-        Event e_8 = new Event("e8", date_15.format(formatter), date_16.format(formatter));
-        Event e_9 = new Event("e9", date_17.format(formatter), date_18.format(formatter));
+        Event e_1 = new Event(date_1.format(formatter), date_2.format(formatter));
+        Event e_2 = new Event( date_3.format(formatter), date_4.format(formatter));
+        Event e_3 = new Event(date_5.format(formatter), date_6.format(formatter));
+        Event e_4 = new Event(date_7.format(formatter), date_8.format(formatter));
+        Event e_5 = new Event(date_9.format(formatter), date_10.format(formatter));
+        Event e_6 = new Event(date_11.format(formatter), date_12.format(formatter));
+        Event e_7 = new Event(date_13.format(formatter), date_14.format(formatter));
+        Event e_8 = new Event(date_15.format(formatter), date_16.format(formatter));
+        Event e_9 = new Event(date_17.format(formatter), date_18.format(formatter));
 
 
         List<Event> lst = new ArrayList<>();

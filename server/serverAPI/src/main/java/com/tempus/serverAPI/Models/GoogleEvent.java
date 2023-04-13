@@ -1,14 +1,16 @@
 package com.tempus.serverAPI.Models;
 
+import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
@@ -18,9 +20,13 @@ import lombok.ToString;
 public class GoogleEvent {
 
     @Id
-    @Column(name = "u_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull
-    private String u_id;
+    private Long id;
+
+    @Column(name = "userid")
+    @NotNull
+    private String userid;
 
     @Column(name = "start")
     @NotNull
@@ -29,6 +35,8 @@ public class GoogleEvent {
     @Column(name = "end")
     @NotNull
     private String end;
+
+
 
 
 

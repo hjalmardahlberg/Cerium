@@ -1,8 +1,8 @@
 package com.tempus.serverAPI.Controller;
 
-import com.tempus.serverAPI.Models.Users;
-import com.tempus.serverAPI.Models.Groups;
-import com.tempus.serverAPI.Models.Events;
+import com.tempus.serverAPI.DateSyncAlg.Datesync;
+import com.tempus.serverAPI.DateSyncAlg.Event;
+import com.tempus.serverAPI.Models.*;
 
 import com.tempus.serverAPI.Repo.GoogleEventRepo;
 import com.tempus.serverAPI.Repo.GroupRepo;
@@ -47,9 +47,11 @@ public class Controller {
         return user.getGroups();
     }
 
-    @GetMapping(value = "/groups/{g_name}/users")
-    public List<Users> getUsersFromGroup(@PathVariable String g_name) {
-        List<Groups> QueryResult = groupRepo.findByName(g_name);//TODO: Förbättra detta med Lista av user ids i Groups.
+
+    //TODO: Förbättra detta med Lista av user ids i Groups.
+    @GetMapping(value = "/groups/users")
+    public List<Users> getUsersFromGroup(@RequestBody Groups group) {
+        List<Groups> QueryResult = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin());
         System.out.println("Group size: " + QueryResult.size());
         List<Users> toReturn = new ArrayList<>();
         for(int i = 0; i < QueryResult.size(); i++) {
@@ -203,10 +205,42 @@ public class Controller {
 
     }
 
-    @PostMapping(value = "/gEvent/new")
-    public String importEvents(@RequestBody Users user) {
-        return "hmm";
+    @PostMapping(value = "/gEvent/import")
+    public String importEvents(@RequestBody GroupSchedule hmm) {
+
+        for (int i = 0; i < hmm.getSchedules().size(); i++) {
+            UserSchedule currSchedule = hmm.getSchedules().get(i);
+            GoogleEvent currEvent = new GoogleEvent();
+            currEvent.setStart(currSchedule.getStart());
+            currEvent.setEnd(currSchedule.getEnd());
+            currEvent.setUserid(hmm.getU_id());
+            googleEventRepo.save(currEvent);
+        }
+        return "Successfully imported user schedule";
     }
+
+     @GetMapping(value = "/event/sync")
+     public List<String> syncSchedules(@RequestBody Users user, @RequestBody Groups group) {
+        List<Groups> Query = groupRepo.findByNameAndAdmin(group.getName(), user.getEmail());
+        if (!Query.isEmpty()) {
+            List<Event> events = new ArrayList<>();
+            Datesync toProcess = new Datesync();
+            for (int i = 0; i < Query.size(); i++) {
+                for (int j = 0; j < googleEventRepo.findByUserid(Query.get(i).getUser().getId()).size(); j++) {
+                    GoogleEvent currGEv = googleEventRepo.findByUserid(Query.get(i).getUser().getId()).get(j);
+                    Event evCreate = new Event(currGEv.getStart(), currGEv.getEnd());
+                    events.add(evCreate);
+                }
+            }
+            toProcess.setDateSyncLst(events);
+            toProcess.sortDates();
+            toProcess.pickPossDates();
+            return toProcess.possDates;
+        }
+        else {
+            throw new RuntimeException("User isn't admin"); //Extrem limitation
+        }
+     }
 
     @DeleteMapping(value = "/delete/{id}")
     public String delUser(@PathVariable String u_id) {

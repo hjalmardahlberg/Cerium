@@ -22,6 +22,7 @@ public class Users {
     @Column(name = "u_id")
     @NotNull
     private String id;
+
     @Column(name = "name")
     @NotNull
     private String name;
