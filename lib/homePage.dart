@@ -54,63 +54,99 @@ class _MyHomePageState extends State<MyHomePage> {
     //bottomNavigationBar
     final bottomAppBar = finalBottomAppBar(context, 'MyHomePage');
 
-
     PageController _pageController = PageController(initialPage: 0);
     final _bottomNavigationBarItems = [
-      const BottomNavigationBarItem(icon: Icon(Icons.event),backgroundColor: Colors.white, label:'Event'),
-      BottomNavigationBarItem(icon:const Icon(Icons.add),label:_currentIndex == 0?'Lägg till event':'Lägg till grupp',),
-      const BottomNavigationBarItem( icon: Icon(Icons.group),backgroundColor: Colors.white,label:'Grupper')
+      const BottomNavigationBarItem(
+          icon: Icon(Icons.event),
+          backgroundColor: Colors.white,
+          label: 'Event'),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.add),
+        label: _currentIndex == 0 ? 'Lägg till event' : 'Lägg till grupp',
+      ),
+      const BottomNavigationBarItem(
+          icon: Icon(Icons.group),
+          backgroundColor: Colors.white,
+          label: 'Grupper')
     ];
 
     return Scaffold(
       appBar: appbar,
       body: PageView(
-        controller:  _pageController,
-        onPageChanged: (newIndex){
+        controller: _pageController,
+        onPageChanged: (newIndex) {
           setState(() {
-            _currentIndex = newIndex*2;
+            _currentIndex = newIndex * 2;
           });
         },
         children: [
-         MyEvents(),
-         MyGroups(
-            title: 'Groups',
-            appbar: homeAppBar(),
-            appbar2: groupAppBar(context, 'addGroup'),
-            bottomNavigationBar: finalBottomAppBar(context, 'MyGroups'),
+          Container(
+            decoration: _currentIndex == 2
+                ? const BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                    ),
+                  )
+                : null,
+            child: MyEvents(),
+          ),
+          Container(
+            decoration: _currentIndex == 0
+                ? const BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                    ),
+                  )
+                : null,
+            child: MyGroups(
+              title: 'Groups',
+              appbar: homeAppBar(),
+              appbar2: groupAppBar(context, 'addGroup'),
+              bottomNavigationBar: finalBottomAppBar(context, 'MyGroups'),
+            ),
           ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-       // type: BottomNavigationBarType.fixed,
+        // type: BottomNavigationBarType.fixed,
         backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey.shade800
-          : Colors.white,
-          currentIndex: _currentIndex,
-          items:_bottomNavigationBarItems,
+            ? Colors.grey.shade800
+            : Colors.white,
+        currentIndex: _currentIndex,
+        items: _bottomNavigationBarItems,
         onTap: (index) {
-          if (index == 1) { // middle item
+          if (index == 1) {
+            // middle item
             setState(() {
-              _currentIndex == 0?
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => AddEventPage(
-                        appbar: homeAppBar(),)),
-              ):Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => AddGroupPage(
-                        appbar: homeAppBar(),
-                       )),
-              );// set current index to middle page index
+              _currentIndex == 0
+                  ? Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => AddEventPage(
+                                appbar: homeAppBar(),
+                              )),
+                    )
+                  : Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => AddGroupPage(
+                                appbar: homeAppBar(),
+                              )),
+                    ); // set current index to middle page index
             });
           } else {
-            _pageController.animateToPage(index, duration: const Duration(microseconds: 500), curve: Curves.ease);
+            _pageController.animateToPage(index,
+                duration: const Duration(microseconds: 500),
+                curve: Curves.ease);
           }
         },
-      ),//bottomAppBar,
-
+      ), //bottomAppBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
@@ -224,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
-        /*  IconButton(
+          /*  IconButton(
             padding: const EdgeInsets.all(10),
             icon: const Icon(Icons.group),
             iconSize: 30,
@@ -286,7 +322,7 @@ class _MyHomePageState extends State<MyHomePage> {
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
-         /* IconButton(
+          /* IconButton(
             padding: const EdgeInsets.all(10),
             icon: const Icon(Icons.home),
             iconSize: 30,
@@ -296,15 +332,15 @@ class _MyHomePageState extends State<MyHomePage> {
           ),*/
           Expanded(
             flex: 2,
-              child:Align(
-                alignment: Alignment.topLeft,
+            child: Align(
+              alignment: Alignment.topLeft,
               child: Image.asset(
                 "images/tempus_logo_tansp_horizontal.png",
                 height: 160,
                 width: 160,
               ),
               //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
-      ),
+            ),
           ),
           Align(
             alignment: Alignment.topRight,
@@ -354,7 +390,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-
 
   BottomAppBar finalBottomAppBar(BuildContext context, String pageName) {
     final user = FirebaseAuth.instance.currentUser!;
@@ -444,7 +479,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (_) => AddGroupPage(
-                            appbar: groupAppBar(context, 'addGroup'),
+                              appbar: groupAppBar(context, 'addGroup'),
                             )),
                   );
                 } else if (pageName != 'AddEventPage') {
@@ -452,8 +487,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(
                         builder: (_) => AddEventPage(
-                            appbar: homeAppBar(),
-                          )),
+                              appbar: homeAppBar(),
+                            )),
                   );
                 }
               },
@@ -484,31 +519,30 @@ class _MyHomePageState extends State<MyHomePage> {
         ),*/
           Expanded(
             flex: 1,
-            child:
-          IconButton(
-              padding: const EdgeInsets.all(10),
-              icon: const Icon(Icons.group),
-              iconSize: 30,
-              onPressed: () {
-                if (pageName == 'addGroup') {
-                  Navigator.pop(context);
-                } else {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          MyGroups(
-                        title: 'Groups',
-                        appbar: homeAppBar(),
-                        appbar2: groupAppBar(context, 'addGroup'),
-                        bottomNavigationBar:
-                            finalBottomAppBar(context, 'MyGroups'),
+            child: IconButton(
+                padding: const EdgeInsets.all(10),
+                icon: const Icon(Icons.group),
+                iconSize: 30,
+                onPressed: () {
+                  if (pageName == 'addGroup') {
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            MyGroups(
+                          title: 'Groups',
+                          appbar: homeAppBar(),
+                          appbar2: groupAppBar(context, 'addGroup'),
+                          bottomNavigationBar:
+                              finalBottomAppBar(context, 'MyGroups'),
+                        ),
+                        transitionDuration: Duration.zero,
                       ),
-                      transitionDuration: Duration.zero,
-                    ),
-                  );
-                }
-              }),
+                    );
+                  }
+                }),
           ),
         ],
       ),
