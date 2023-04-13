@@ -205,8 +205,22 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           IconButton(
-            icon: const Icon(Icons.event),
+            icon: const Icon(Icons.sync),
             onPressed: () async {
+
+              final g_body =
+              {
+                "name": "grupp1",
+                "admin": "viktorkangasniemi@gmail.com",
+              };
+
+              final body = jsonEncode(g_body);
+
+              final url = 'http://192.121.208.57:8080/event/sync' + "/grupp1" + "&viktorkangasniemi@gmail.com";
+              final headers = {'Content-Type': 'application/json'};
+              final response = http.get(Uri.parse(url), headers: headers);
+
+              /*
               final provider =
                   Provider.of<GoogleSignInProvider>(context, listen: false);
               final events = await provider.getPrimaryCalendarEvents();
@@ -219,6 +233,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 //print('Event location: ${event.location}');
                 //print('Event description: ${event.description}');
               }
+              */
+
             },
           ),
           IconButton(
@@ -234,18 +250,43 @@ class _MyHomePageState extends State<MyHomePage> {
                 final events =
                     await provider.getCalendarEventsInterval(start, end);
 
-                print("BODY:");
-                print(events);
-                print("");
+                //print("BODY:");
+                //print(events);
+                //print("");
+
+                List<Map<String, dynamic>> ev_lst = [];
+
                 for (Event event in events) {
+
+                  final ev_data =
+                  {
+                  'start': event.start?.dateTime?.toIso8601String(),
+                  'end': event.end?.dateTime?.toIso8601String(),
+                  };
+
+                  ev_lst.add(ev_data);
                   //print('Event ID: ${event.id}');
-                  print('Event summary: ${event.summary}');
-                  print('Event start time: ${event.start?.dateTime}');
-                  print('Event end time: ${event.end?.dateTime}');
+                  //print('Event summary: ${event.summary}');
+                  //print('Event start time: ${event.start?.dateTime}');
+                  //print('Event end time: ${event.end?.dateTime}');
                   //print('Event location: ${event.location}');
                   //print('Event description: ${event.description}');
                   print("");
                 }
+
+                final final_data_body =
+                {
+                  'u_id' : user.uid,
+                  'schedules': ev_lst,
+                };
+
+                print(final_data_body);
+
+                final url = 'http://192.121.208.57:8080/gEvent/import';
+                final headers = {'Content-Type': 'application/json'};
+                final body = jsonEncode(final_data_body);
+
+                final response = http.post(Uri.parse(url), headers: headers, body: body);
               }
             },
           ),
