@@ -30,7 +30,7 @@ public class Users {
     @NotNull
     private String email;
     @Transient
-    private Boolean joinFlag = false;
+    private Boolean sentSchedule = false;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

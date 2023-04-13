@@ -44,7 +44,6 @@ public class Groups {
   @JsonIgnore
   private List<Events> events = new ArrayList<Events>();
 
-
   public long getId() {
 
     return g_id;

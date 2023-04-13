@@ -2,6 +2,7 @@ package com.tempus.serverAPI.Controller;
 
 import com.tempus.serverAPI.DateSyncAlg.Datesync;
 import com.tempus.serverAPI.DateSyncAlg.Event;
+import com.tempus.serverAPI.Exceptions.UserNotFoundException;
 import com.tempus.serverAPI.Models.*;
 
 import com.tempus.serverAPI.Repo.GoogleEventRepo;
@@ -10,6 +11,7 @@ import com.tempus.serverAPI.Repo.UserRepo;
 import com.tempus.serverAPI.Repo.EventRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.*;
 
@@ -41,10 +43,16 @@ public class Controller {
 
 
 
-    @GetMapping(value = "/user/{u_id}/groups")
-    public List<Groups> getUserGroups(@PathVariable String u_id) {
-        Users user = userRepo.findById(u_id).get();
-        return user.getGroups();
+    @GetMapping(value = "/user/groups")
+    public List<Groups> getUserGroups(@RequestBody Users user) {
+        if (userRepo.findById(user.getId()).isPresent()) {
+            Users result = userRepo.findById(user.getId()).get();
+            return result.getGroups();
+        }
+        else {
+            throw new UserNotFoundException();
+        }
+
     }
 
 
@@ -52,10 +60,9 @@ public class Controller {
     @GetMapping(value = "/groups/users")
     public List<Users> getUsersFromGroup(@RequestBody Groups group) {
         List<Groups> QueryResult = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin());
-        System.out.println("Group size: " + QueryResult.size());
         List<Users> toReturn = new ArrayList<>();
-        for(int i = 0; i < QueryResult.size(); i++) {
-            Users currUser = (QueryResult.get(i).getUser());
+        for (Groups groups : QueryResult) {
+            Users currUser = (groups.getUser());
             toReturn.add(currUser);
         }
         return toReturn;
@@ -80,15 +87,21 @@ public class Controller {
             throw new RuntimeException("Cannot create a group with already existing name");
         }
         else {
-        Users updatedUser = userRepo.findById(user.getId()).get();
-        Groups gCreate = new Groups();
-        gCreate.setName(g_name);
-        gCreate.setUser(updatedUser);
-        gCreate.setAdmin(updatedUser.getEmail());
-        user.getGroups().add(gCreate);
-        groupRepo.save(gCreate);
-        userRepo.save(updatedUser);
-        return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
+            if (userRepo.findById(user.getId()).isEmpty()) {
+                throw new UserNotFoundException();
+            }
+            else {
+                Users updatedUser = userRepo.findById(user.getId()).get();
+                Groups gCreate = new Groups();
+                gCreate.setName(g_name);
+                gCreate.setUser(updatedUser);
+                gCreate.setAdmin(updatedUser.getEmail());
+                user.getGroups().add(gCreate);
+                groupRepo.save(gCreate);
+                userRepo.save(updatedUser);
+                return "Created a group with the ID: " + gCreate.getId() + "to the user: " + updatedUser.getName();
+            }
+
         }
 
     }
@@ -96,6 +109,9 @@ public class Controller {
     @PutMapping(value = "/group/join/{g_name}&{a_email}")
     public String joinGroup(@PathVariable String g_name, @PathVariable String a_email, @RequestBody Users user) {
 
+       if (userRepo.findById(user.getId()).isEmpty()) {
+           throw new UserNotFoundException();
+       }
         Users userJoin = userRepo.findById(user.getId()).get();
         List<Groups> Queries = groupRepo.findByNameAndAdmin(g_name, a_email);
 
@@ -103,9 +119,8 @@ public class Controller {
             throw new RuntimeException("Error joining group, this error should not occur");
         }
         else {
-            for (int i = 0; i < Queries.size(); i++) {
-                Groups currGroup = Queries.get(i);
-                if(currGroup.getUser().getId() == userJoin.getId()){
+            for (Groups currGroup : Queries) {
+                if (currGroup.getUser().getId().equals(userJoin.getId())) {
                     throw new RuntimeException("Cannot join a group that user is already a member of!");
                 }
             }
@@ -124,21 +139,27 @@ public class Controller {
 
     @PutMapping(value = "/group/leave/{g_name}&{a_email}")
     public String leaveGroup(@PathVariable String g_name, @PathVariable String a_email, @RequestBody Users user) {
-        Users updateUser = userRepo.findById(user.getId()).get();
-        List<Groups> groupToDelete = updateUser.getGroup(g_name);
-        if (groupToDelete.isEmpty()) {
-            throw new RuntimeException("Fatal error, this error should not occur");
+        if (userRepo.findById(user.getId()).isEmpty()) {
+            throw new UserNotFoundException();
         }
-        for (int i = 0; i < groupToDelete.size(); i++) {
-            Groups curr = groupToDelete.get(i);
-
-            if (curr.getAdmin().equals(a_email)) {
-                updateUser.getGroups().remove(i);
-                groupRepo.delete(curr);
-                return "User successfully left the group: " + curr.getName();
+        else {
+            Users updateUser = userRepo.findById(user.getId()).get();
+            List<Groups> groupToDelete = updateUser.getGroup(g_name);
+            if (groupToDelete.isEmpty()) {
+                throw new RuntimeException("Error when trying leave group " + g_name + ", user is not a member of that group");
             }
+            for (int i = 0; i < groupToDelete.size(); i++) {
+                Groups curr = groupToDelete.get(i);
+
+                if (curr.getAdmin().equals(a_email)) {
+                    updateUser.getGroups().remove(i);
+                    groupRepo.delete(curr);
+                    return "User successfully left the group: " + curr.getName();
+                }
+            }
+            throw new RuntimeException("Fatal error occured when user " + user.getEmail() + " tried to leave group: " + g_name);
         }
-        throw new RuntimeException("Fatal error occured when user " + user.getEmail() + " tried to leave group: " + g_name);
+
     }
 
     //FIXME
@@ -172,13 +193,19 @@ public class Controller {
 
 
 
-    @PutMapping(value = "/update/{id}")
-    public String updateUser(@PathVariable String id, @RequestBody Users user) {
-        Users updatedUser = userRepo.findById(id).get();
-        updatedUser.setName(user.getName());
-        updatedUser.setEmail(user.getEmail());
-        userRepo.save(updatedUser);
-        return "Updated user info";
+    @PutMapping(value = "/update")
+    public String updateUser(@RequestBody Users user) {
+        if (userRepo.findById(user.getId()).isEmpty()) {
+            throw new UserNotFoundException();
+        }
+        else {
+            Users updatedUser = userRepo.findById(user.getId()).get();
+            updatedUser.setName(user.getName());
+            updatedUser.setEmail(user.getEmail());
+            userRepo.save(updatedUser);
+            return "Updated user info";
+        }
+
     }
 
 
@@ -208,24 +235,37 @@ public class Controller {
     @PostMapping(value = "/gEvent/import")
     public String importEvents(@RequestBody GroupSchedule hmm) {
 
-        for (int i = 0; i < hmm.getSchedules().size(); i++) {
-            UserSchedule currSchedule = hmm.getSchedules().get(i);
-            GoogleEvent currEvent = new GoogleEvent();
-            currEvent.setStart(currSchedule.getStart());
-            currEvent.setEnd(currSchedule.getEnd());
-            currEvent.setUserid(hmm.getU_id());
-            googleEventRepo.save(currEvent);
+        if (googleEventRepo.findByUserid(hmm.getU_id()) != null) {
+            throw new RuntimeException("User schedule already exist");
         }
-        return "Successfully imported user schedule";
+        else {
+            for (int i = 0; i < hmm.getSchedules().size(); i++) {
+                UserSchedule currSchedule = hmm.getSchedules().get(i);
+                GoogleEvent currEvent = new GoogleEvent();
+                currEvent.setStart(currSchedule.getStart());
+                currEvent.setEnd(currSchedule.getEnd());
+                currEvent.setUserid(hmm.getU_id());
+                googleEventRepo.save(currEvent);
+            }
+            Users toUpdate = userRepo.findById(hmm.getU_id()).get();
+            toUpdate.setSentSchedule(true);
+            return "Successfully imported user schedule";
+        }
+
     }
 
-     @GetMapping(value = "/event/sync")
-     public List<String> syncSchedules(@RequestBody Users user, @RequestBody Groups group) {
-        List<Groups> Query = groupRepo.findByNameAndAdmin(group.getName(), user.getEmail());
+
+    //FIXME: Sketchy code, fixa säkerhet och permissions
+     @GetMapping(value = "/event/sync/{g_name}&{a_email}")
+     public List<String> syncSchedules(@PathVariable String g_name, @PathVariable String a_email) {
+        List<Groups> Query = groupRepo.findByNameAndAdmin(g_name, a_email);
         if (!Query.isEmpty()) {
             List<Event> events = new ArrayList<>();
             Datesync toProcess = new Datesync();
             for (int i = 0; i < Query.size(); i++) {
+                if (!Query.get(i).getUser().getSentSchedule()) {
+                    throw new RuntimeException("User " + Query.get(i).getUser().getEmail() + " hasn't imported their schedule, this error should've been caught in the frontend");
+                } //TODO: Detta ska fångas i frontend
                 for (int j = 0; j < googleEventRepo.findByUserid(Query.get(i).getUser().getId()).size(); j++) {
                     GoogleEvent currGEv = googleEventRepo.findByUserid(Query.get(i).getUser().getId()).get(j);
                     Event evCreate = new Event(currGEv.getStart(), currGEv.getEnd());
@@ -235,6 +275,7 @@ public class Controller {
             toProcess.setDateSyncLst(events);
             toProcess.sortDates();
             toProcess.pickPossDates();
+            System.out.println(toProcess.possDates);
             return toProcess.possDates;
         }
         else {
