@@ -23,8 +23,6 @@ class ProfileWidget extends StatelessWidget {
         centerTitle: true,
       ),
       body: Padding(
-        //alignment: Alignment.center,
-        //color: Colors.blueGrey.shade900,
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -66,14 +64,6 @@ class ProfileWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            /*   const Text(
-              'USER ID:',
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              user.uid!,
-              style: const TextStyle(fontSize: 15),
-            ),*/
             Expanded(
               child: Align(
                 alignment: Alignment.bottomRight,

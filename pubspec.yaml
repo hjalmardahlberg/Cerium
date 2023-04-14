@@ -38,6 +38,7 @@ dependencies:
 
   googleapis: ^10.1.0
 
+
   # Google Sign In
   firebase_auth: ^4.3.0
   google_sign_in: ^6.0.2

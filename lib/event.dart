@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
+import 'Theme/themeConstants.dart';
 import 'eventParticipants.dart';
 
 class EventPage extends StatefulWidget {
@@ -32,6 +34,7 @@ class _EventPageState extends State<EventPage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    final themeManager = Provider.of<ThemeManager>(context);
 
     return Scaffold(
       appBar: appBar(context),
@@ -42,7 +45,7 @@ class _EventPageState extends State<EventPage> {
           eventImage(height, width),
           eventName(widget.theEventName),
           dateAndTime(widget.date, widget.time),
-          eventInformation(widget.eventInfo, height, width),
+          eventInformation(widget.eventInfo, height, width,themeManager),
         ],
       ),
      //bottomNavigationBar: widget.bottomNavigationBar,
@@ -158,7 +161,7 @@ class _EventPageState extends State<EventPage> {
     );
   }
 
-  Expanded eventInformation(String eventInfo, double height, double width) {
+  Expanded eventInformation(String eventInfo, double height, double width,themeManager) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -172,9 +175,9 @@ class _EventPageState extends State<EventPage> {
               borderRadius: BorderRadius.circular(15),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade800,
+                  color: themeManager.isDarkMode ? Colors.grey.shade800 : Colors.white,
                   borderRadius: BorderRadius.circular(15),
-                  //color: Theme.of(context).appBarTheme.foregroundColor,
+                 // color: Theme.of(context).appBarTheme.foregroundColor,
                 ),
                 child: Align(
                   alignment: Alignment.topLeft,

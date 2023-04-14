@@ -1,68 +1,37 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
-import 'groupParticipants.dart';
+import 'Theme/themeConstants.dart';
+import 'package:provider/provider.dart';
+import 'groupChat.dart';
+
 
 class Group extends StatefulWidget {
-  const Group(
-      {Key? key,
-      required this.groupName,
-      required this.picture,
-      //required this.group,
-      required this.appbar,
-    })
-      : super(key: key);
+  const Group({
+    Key? key,
+    required this.groupName,
+    required this.picture,
+    //required this.group,
+    required this.appbar,
+  }) : super(key: key);
 
   //final Group group;
   final String groupName;
   final String picture;
   final AppBar appbar;
 
-
   @override
   State<Group> createState() => _Group();
 }
 
 class _Group extends State<Group> {
-  final chatList = List.empty(growable: true);
-  final myController = TextEditingController();
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    myController.dispose();
-    super.dispose();
-  }
+  List<Widget> groupList = <Widget>[];
 
   AppBar appBar(context) {
     return AppBar(
       titleSpacing: 0,
       title: Row(
         children: <Widget>[
-          IconButton(
-            padding: const EdgeInsets.all(0),
-            icon: Column(
-              children: [
-                const Icon(Icons.group),
-                const Text(
-                  'Deltagare',
-                  style: TextStyle(fontSize: 10),
-                ),
-              ],
-            ),
-            iconSize: 30,
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      GroupParticipants(
-                        groupName: widget.groupName,
-                      ),
-                  transitionDuration: Duration.zero,
-                ),
-              );
-            },
-          ),
           Expanded(
             flex: 2,
             child: Center(
@@ -82,7 +51,7 @@ class _Group extends State<Group> {
               iconSize: 30,
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => ProfileWidget()));
+                    MaterialPageRoute(builder: (_) => const ProfileWidget()));
               },
             ),
           ),
@@ -94,69 +63,184 @@ class _Group extends State<Group> {
   @override
   Widget build(BuildContext context) {
     double baseWidth = 390;
+    double fem = MediaQuery.of(context).size.width / baseWidth;
+    double ffem = fem * 0.97;
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    final themeManager = Provider.of<ThemeManager>(context);
 
+    SizedBox profileBox(name, image) {
+      return SizedBox(
+        width: double.infinity,
+        height: width / 6,
+        child: Row(
+          children: [
+            Padding(
+              // wallstoeno8C (23:38)
+              padding: const EdgeInsets.only(left: 0),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundImage: AssetImage(image),
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Text(
+              name,
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                height: 1.2125 * ffem / fem,
+              ),
+            ),
+            Expanded(
+            child:Text(
+              "27/03",
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                height: 1.2125 * ffem / fem,
+            )
+            ),),
+          ],
+        ),
+      );
+    }
+
+    groupList.add(profileBox("Wallsten", 'images/wallsten.jpg'));
+
+    Expanded profiler() {
+      return Expanded(
+        child:SizedBox(
+          height:height,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: groupList.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: groupList[index],
+            );
+          },
+        ),
+        ),
+      );
+    }
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         groupNameAndExit(),
-        chatLog(),
-        chatBox(),
+        const Padding(
+            padding: EdgeInsets.only(left: 20, top: 20),
+            child: Text("Deltagare")),
+
+        Row(children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, top: 10),
+          child: TextButton.icon(
+            onPressed: () {
+              // Do something when the button is pressed
+            },
+            icon: Icon(Icons.add_circle_outline,
+                color: themeManager.isDarkMode ? Colors.white : Colors.black),
+            label: Text('Lägg till deltagare',
+                style: TextStyle(
+                  color: themeManager.isDarkMode ? Colors.white : Colors.black,
+                )),
+          ),
+        ),
+
+          const Expanded(child:
+          Padding(
+            padding: EdgeInsets.only(right: 10),
+          child:Text('Senaste\nuppdatering',textAlign: TextAlign.end,style: TextStyle(fontSize: 20)),),
+    )],),
+        const Divider(color: Colors.grey),
+        profiler(),
+        goToChat(context),
         sendAndSyncCalenders(),
       ],
     );
 
-    populateChatList();
     return Scaffold(
       appBar: appBar(context),
       body: body,
-      //bottomNavigationBar: widget.bottomNavigationBar,
-    ); // This trailing comma makes auto-formatting nicer for build methods.
+    );
+    // This trailing comma makes auto-formatting nicer for build methods.
+  }
+
+  Align goToChat(BuildContext context) {
+    return
+        Align(
+        alignment: Alignment.bottomRight,
+     child: Padding(
+       padding: const EdgeInsets.only(right:16),
+     child: FloatingActionButton.extended(
+      backgroundColor: Colors.lightBlue.shade300,
+        icon:const Icon(CupertinoIcons.chat_bubble_fill ,color: Colors.white,),
+        label:const Text('chat',style: TextStyle(color: Colors.white),),
+        onPressed: () {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  GroupChat(
+                groupName: widget.groupName,
+              ),
+              transitionDuration: Duration.zero,
+            ),
+          );
+        },
+     ),
+    ),
+      );
   }
 
   Stack groupNameAndExit() {
     return Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Center(
-              child: Text(
-                widget.groupName,
-                style: const TextStyle(
-                    fontSize: 24.0, decoration: TextDecoration.underline),
-              ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Center(
+            child: Text(
+              widget.groupName,
+              style: const TextStyle(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline),
             ),
           ),
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.exit_to_app_outlined,
-                size: 30.0,
-                color: Colors.red,
-              ),
+        ),
+        Align(
+          alignment: Alignment.topRight,
+          child: IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.exit_to_app_outlined,
+              size: 36.0,
+              color: Colors.red,
             ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 
-  Expanded sendAndSyncCalenders() {
-    return Expanded(
-      flex: 1,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16), // Adjust the value as needed
+  Container sendAndSyncCalenders() {
+    return  Container(
+        margin: const EdgeInsets.only(top:8,bottom: 16), // Adjust the value as needed
         child: Align(
           alignment: Alignment.bottomCenter,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              sendCalender(),
+              CreateEvent(),
               syncCalenders(),
             ],
           ),
-        ),
       ),
     );
   }
@@ -175,64 +259,17 @@ class _Group extends State<Group> {
     );
   }
 
-  ElevatedButton sendCalender() {
+  ElevatedButton CreateEvent() {
     return ElevatedButton.icon(
       onPressed: () {},
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.lightBlue.shade300,
       ),
       icon: const Icon(
-        Icons.send,
+        Icons.add,
         size: 24.0,
       ),
-      label: const Text('Send calender'),
+      label: const Text('Create Event'),
     );
-  }
-
-  Padding chatBox() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-      child: TextFormField(
-        controller: myController,
-        keyboardType: TextInputType.text,
-        textInputAction: TextInputAction.go,
-        decoration: const InputDecoration(
-          border: UnderlineInputBorder(),
-          labelText: 'Send a message',
-        ),
-        onFieldSubmitted: (_) async {
-          chatInput(myController.text);
-          myController.clear();
-        },
-      ),
-    );
-  }
-
-  Padding chatLog() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemBuilder: (_, index) {
-          if (index < chatList.length) {
-            return chatList[index];
-          }
-        },
-      ),
-    );
-  }
-
-  void populateChatList() {
-    //TODO: Servercall
-  }
-
-  chatInput(String input) {
-    setState(() {
-      chatList.add(Text(input));
-    });
-    //TODO: Sent message to others in group
   }
 }
-
-

@@ -8,12 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class AddEventPage extends StatefulWidget {
-  const AddEventPage(
-      {Key? key, required this.appbar})
-      : super(key: key);
+  const AddEventPage({Key? key, required this.appbar}) : super(key: key);
 
   final AppBar appbar;
-
 
   @override
   State<AddEventPage> createState() => _AddEventPageState();
@@ -41,8 +38,6 @@ class _AddEventPageState extends State<AddEventPage> {
   //the event info
   final TextEditingController _eventInfoController = TextEditingController();
 
-
-
   final user = FirebaseAuth.instance.currentUser!;
 
   Future<void> _getImage() async {
@@ -67,7 +62,6 @@ class _AddEventPageState extends State<AddEventPage> {
 
   @override
   Widget build(BuildContext context) {
-
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -82,8 +76,8 @@ class _AddEventPageState extends State<AddEventPage> {
       });
     };
 
-
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: widget.appbar,
       body: Center(
         child: Padding(
@@ -106,7 +100,7 @@ class _AddEventPageState extends State<AddEventPage> {
           ),
         ),
       ),
-    //  bottomNavigationBar: widget.bottomNavigationBar,
+      //  bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 
@@ -115,22 +109,23 @@ class _AddEventPageState extends State<AddEventPage> {
         _stopSelectedTime != null &&
         _startSelectedDate != null &&
         _stopSelectedDate != null &&
-        user.email != null
-        && _eventNameController.text != ''
-        && _eventInfoController.text != '') {
+        user.email != null &&
+        _eventNameController.text != '' &&
+        _eventInfoController.text != '') {
       final eventData = {
         'name': _eventNameController.text,
-        'info':_eventInfoController.text,
-        'startTime':_startSelectedTime.toString(),
-        'stopTime':_stopSelectedTime.toString(),
-        'startDate':_stopSelectedDate.toString(),
-        'stopDate':_startSelectedDate.toString(),
+        'info': _eventInfoController.text,
+        'startTime': _startSelectedTime.toString(),
+        'stopTime': _stopSelectedTime.toString(),
+        'startDate': _stopSelectedDate.toString(),
+        'stopDate': _startSelectedDate.toString(),
         'email': user.email,
       };
       const url = 'http://192.121.208.57:8080/save';
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode(eventData);
-      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      final response =
+          await http.post(Uri.parse(url), headers: headers, body: body);
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');
@@ -158,25 +153,24 @@ class _AddEventPageState extends State<AddEventPage> {
     }
   }
 
-
-
   Expanded addEventButton() {
-    return Expanded(child:  Align(
-      alignment: Alignment.bottomRight,
-      child: ElevatedButton.icon(
-        onPressed: () async {
-          _handleAddEventButtonPressed();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.lightBlue.shade300,
+    return Expanded(
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: ElevatedButton.icon(
+          onPressed: () async {
+            _handleAddEventButtonPressed();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.lightBlue.shade300,
+          ),
+          icon: const Icon(
+            Icons.add,
+            size: 24.0,
+          ),
+          label: const Text('Event'),
         ),
-        icon: const Icon(
-          Icons.add,
-          size: 24.0,
-        ),
-        label: const Text('Event'),
       ),
-    ),
     );
   }
 
@@ -237,25 +231,29 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: _startSelectedTime ?? TimeOfDay.now(),
+        initialEntryMode: TimePickerEntryMode.input);
+    if (pickedTime != null) {
+      final TimeOfDay? pickedStopTime = await showTimePicker(
+        context: context,
+        initialTime: _stopSelectedTime ?? pickedTime,
+      );
+      if (pickedStopTime != null) {
+        setState(() {
+          _startSelectedTime = pickedTime;
+          _stopSelectedTime = pickedStopTime;
+        });
+      }
+    }
+  }
+
   GestureDetector timePickerRow(BuildContext context, double width) {
     return GestureDetector(
       onTap: () async {
-        final TimeOfDay? startSelectedTime = await showTimePicker(
-          context: context,
-          initialTime: _startSelectedTime ?? TimeOfDay.now(),
-        );
-        if (startSelectedTime != null) {
-          final TimeOfDay? stopSelectedTime = await showTimePicker(
-            context: context,
-            initialTime: _stopSelectedTime ?? startSelectedTime,
-          );
-          if (stopSelectedTime != null) {
-            setState(() {
-              _startSelectedTime = startSelectedTime;
-              _stopSelectedTime = stopSelectedTime;
-            });
-          }
-        }
+        await _selectTime(context);
       },
       child: Material(
         elevation: 15.0,
@@ -357,13 +355,14 @@ class _AddEventPageState extends State<AddEventPage> {
   }
 
   GestureDetector addImage(double height, double width, File? imageFile) {
-    return GestureDetector(onTap: _getImage,
-    child:SizedBox(
+    return GestureDetector(
+      onTap: _getImage,
+      child: SizedBox(
         height: height / 4,
         child: Container(
           width: width,
           decoration: const BoxDecoration(
-           // border: Border(bottom: BorderSide(color: Color(0xff000000))),
+            // border: Border(bottom: BorderSide(color: Color(0xff000000))),
             color: Color(0x00000000),
           ),
           child: Image.file(imageFile!),

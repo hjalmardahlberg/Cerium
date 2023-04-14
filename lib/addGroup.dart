@@ -7,13 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
 class AddGroupPage extends StatefulWidget {
-  const AddGroupPage(
-      {Key? key, required this.appbar})
-      : super(key: key);
+  const AddGroupPage({Key? key, required this.appbar}) : super(key: key);
 
   final AppBar appbar;
-
-
 
   @override
   State<AddGroupPage> createState() => _AddGroupPageState();
@@ -50,7 +46,9 @@ class _AddGroupPageState extends State<AddGroupPage> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: widget.appbar,
+
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8),
@@ -68,21 +66,25 @@ class _AddGroupPageState extends State<AddGroupPage> {
           ),
         ),
       ),
-    //  bottomNavigationBar: widget.bottomNavigationBar,
+
+      //  bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 
   void _handleAddGroupButtonPressed() async {
-    if (user.email != null && _groupNameController.text != '' && _groupInfoController.text != '') {
+    if (user.email != null &&
+        _groupNameController.text != '' &&
+        _groupInfoController.text != '') {
       final eventData = {
         'name': _groupNameController.text,
-        'info':_groupInfoController.text,
+        'info': _groupInfoController.text,
         'email': user.email,
       };
       const url = 'http://192.121.208.57:8080/save';
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode(eventData);
-      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      final response =
+          await http.post(Uri.parse(url), headers: headers, body: body);
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');

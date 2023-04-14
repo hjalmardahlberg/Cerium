@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
       final themeManager = Provider.of<ThemeManager>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      useInheritedMediaQuery: false,
       title: title,
       themeMode: themeManager.themeMode,
       theme: lightTheme,
