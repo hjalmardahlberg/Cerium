@@ -1,13 +1,17 @@
 package com.tempus.serverAPI.DateSyncAlg;
 
+import com.tempus.serverAPI.Models.Events;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Datesync {
     final List<Event> listofdates = new ArrayList<>(); // Listan av alla events, kommer sedan bli sorterad
 
-    public List<String> possDates = new ArrayList<>(); // Listan som innehåller de tider utan konflikter
+    public List<Event> possDates = new ArrayList<>(); // Listan som innehåller de tider utan konflikter
+
 
     //lägger till alla event i listan
     public void setDateSyncLst(List<Event> Event)
@@ -31,10 +35,31 @@ public class Datesync {
         return this.listofdates.toString();
     }
 
-    public void pickPossDates()
+    public void isInInterval(Event event_to_add, LocalDateTime interval_start, LocalDateTime interval_end){
+
+        if (!event_to_add.getEndTime().isBefore(interval_start) || !event_to_add.getStartTime().isAfter(interval_start)){
+
+            if (event_to_add.getStartTime().isBefore(interval_start)){
+
+                event_to_add.setStartTime(interval_start);
+            }
+            if (event_to_add.getEndTime().isAfter(interval_end)){
+
+                event_to_add.setEndTime(interval_end);
+            }
+
+            possDates.add(event_to_add);
+        }
+    }
+
+    public void pickPossDates(String ItvStart, String ItvEnd)
     {
         LocalDateTime curr_latest_end_time = listofdates.get(0).getEndTime(); // sparar den nuvarande senaste endTime
         Long diff_form_latest = 0L;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+        LocalDateTime Itv_Date_s = LocalDateTime.parse(ItvStart, formatter);
+        LocalDateTime Itv_Date_e = LocalDateTime.parse(ItvEnd, formatter);
 
         for(int i = 0; i < listofdates.size() - 1; i++) // iterera över events
         {
@@ -52,12 +77,14 @@ public class Datesync {
                 if(diff_form_latest > 0) //om > 0 vet vi att det eventet vi kollar på är det senaste 
                 {
                     //curr_latest_end_time = e1.getEndTime();
-                    this.possDates.add(e1.getEndTime().toString() + " - " + e2.getStartTime().toString() + "  (" + duration.toMinutes() + " min)");
+                    Event eventToAdd = new Event(e1.getEndTime().format(formatter),e2.getStartTime().format(formatter));
+                    isInInterval(eventToAdd, Itv_Date_s, Itv_Date_e);
                 }
                 else // om < 0 vet vi att vi har ett event som slutar efter det vi kollar på och vi vill då lägga till tiden mellan att det senaste slutar och det andra startar
                 {
                     duration = Duration.between(curr_latest_end_time, e2.getStartTime());
-                    this.possDates.add(curr_latest_end_time.toString() + " - " + e2.getStartTime().toString() + "  (" + duration.toMinutes() + " min)");
+                    Event eventToAdd = new Event(curr_latest_end_time.format(formatter),e2.getStartTime().format(formatter));
+                    isInInterval(eventToAdd, Itv_Date_s, Itv_Date_e);
 
                 } // vi vill alltid ha det senaste slutdatumet
             }

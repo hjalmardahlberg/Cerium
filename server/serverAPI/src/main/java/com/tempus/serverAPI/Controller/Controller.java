@@ -11,10 +11,8 @@ import com.tempus.serverAPI.Repo.UserRepo;
 import com.tempus.serverAPI.Repo.EventRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 
-import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -264,13 +262,12 @@ public class Controller {
             toUpdate.setSentSchedule(true);
             return "Successfully imported user schedule";
         }
-
     }
 
 
     //FIXME: Sketchy code, fixa säkerhet och permissions
-     @GetMapping(value = "/event/sync/{g_name}&{a_email}")
-     public List<String> syncSchedules(@PathVariable String g_name, @PathVariable String a_email) {
+     @GetMapping(value = "/event/sync/{g_name}&{a_email}/{start_time}&{end_time}")
+     public List<Event> syncSchedules(@PathVariable String g_name, @PathVariable String a_email, @PathVariable String start_time, @PathVariable String end_time) {
         List<Groups> Query = groupRepo.findByNameAndAdmin(g_name, a_email);
         if (!Query.isEmpty()) {
             List<Event> events = new ArrayList<>();
@@ -287,7 +284,7 @@ public class Controller {
             }
             toProcess.setDateSyncLst(events);
             toProcess.sortDates();
-            toProcess.pickPossDates();
+            toProcess.pickPossDates(start_time,end_time);
             System.out.println(toProcess.possDates);
             return toProcess.possDates;
         }

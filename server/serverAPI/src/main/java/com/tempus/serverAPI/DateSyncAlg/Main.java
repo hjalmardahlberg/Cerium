@@ -74,7 +74,7 @@ public class Main {
 
         lesgo.sortDates(); //Sorterar listan
 
-        lesgo.pickPossDates(); // Väljer ut bästa tider
+        lesgo.pickPossDates(null,null); // Väljer ut bästa tider
 
 
         System.out.println("\n" + lesgo.listofdates+"\n");
