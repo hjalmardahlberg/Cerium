@@ -11,8 +11,10 @@ import com.tempus.serverAPI.Repo.UserRepo;
 import com.tempus.serverAPI.Repo.EventRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -104,6 +106,17 @@ public class Controller {
 
         }
 
+    }
+
+    @PutMapping(value = "/group/setpicture/{g_name}&{a_email}")
+    public String setpicture(@PathVariable String g_name, @PathVariable String a_email, @RequestBody String Image){
+        List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
+        byte[] imageData = Base64.getDecoder().decode(Image);
+        for (Groups currgroup : QueryResult) {
+            currgroup.setImage(imageData);
+            groupRepo.save(currgroup);
+        }
+        return "Group picture updated";
     }
 
     @PutMapping(value = "/group/join/{g_name}&{a_email}")

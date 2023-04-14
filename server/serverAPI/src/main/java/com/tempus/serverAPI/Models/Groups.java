@@ -36,6 +36,10 @@ public class Groups {
   @Column(name = "owner")
   private String admin;
 
+  @Lob
+  @Column(name = "image")
+  private byte[] image;
+
   /*
   @Transient
   private List<String> userID = new ArrayList<>(); */
