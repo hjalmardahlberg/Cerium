@@ -78,15 +78,18 @@ class _AddGroupPageState extends State<AddGroupPage> {
   }
   void _handleAddGroupButtonPressed() async {
     if (user.email != null && _groupNameController.text != '' && _groupInfoController.text != '') {
-      final eventData = {
+
+      final groupData = {
+        'id':user.uid,
         'name': _groupNameController.text,
-        'info':_groupInfoController.text,
         'email': user.email,
       };
-      const url = 'http://192.121.208.57:8080/save';
+
+
+      final url = 'http://192.121.208.57:8080/group/create/' + _groupNameController.text;
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode(eventData);
-      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      final body = jsonEncode(groupData);
+      final response = await http.put(Uri.parse(url), headers: headers, body: body);
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');
