@@ -8,8 +8,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'group.dart';
 import 'groupListProvider.dart';
 
-import 'package:http/http.dart' as http;
+import 'provider.dart';
 
+import 'package:http/http.dart' as http;
+import 'package:googleapis/calendar/v3.dart' show Event;
 
 class MyGroups extends StatefulWidget {
   const MyGroups(
@@ -146,18 +148,51 @@ class _MyGroups extends State<MyGroups> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: addToList("Cerium", "morganmixtape6@gmail.com",
-                    "images/edvard_inception.png", listProvider),
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              Expanded(
-                child: addToList("Katt Älskare", "catEater42069@gmail.com",
-                    "images/wallsten.jpg", listProvider),
-              ),
-              const SizedBox(
-                width: 5,
+                child: ElevatedButton(
+                    onPressed: () async {
+                      final provider =
+                      Provider.of<GoogleSignInProvider>(context, listen: false);
+
+                      // kommer fetcha första veckan i april (TEMP)
+                      final start = DateTime(2023, 4, 1);
+                      final end = DateTime(2023, 4, 7);
+                      final events =
+                      await provider.getCalendarEventsInterval(start, end);
+
+                      //print("BODY:");
+                      //print(events);
+                      //print("");
+
+                      List<Map<String, dynamic>> ev_lst = [];
+
+                      for (Event event in events) {
+
+                        final ev_data =
+                        {
+                          'start': event.start?.dateTime?.toIso8601String(),
+                          'end': event.end?.dateTime?.toIso8601String(),
+                        };
+
+                        ev_lst.add(ev_data);
+
+                      }
+
+                      final final_data_body =
+                      {
+                        'u_id' : user.uid,
+                        'schedules': ev_lst,
+                      };
+
+                      print(final_data_body);
+
+                      final url = 'http://192.121.208.57:8080/gEvent/import';
+                      final headers = {'Content-Type': 'application/json'};
+                      final body = jsonEncode(final_data_body);
+
+                      final response = http.post(Uri.parse(url), headers: headers, body: body);
+
+                    },
+                    child: const Text('Send Calendar')),
               ),
               Expanded(
                 child: ElevatedButton(
