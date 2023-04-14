@@ -1,16 +1,27 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:projecttest/profile_widget.dart';
+import 'eventParticipants.dart';
 
 class EventPage extends StatefulWidget {
   const EventPage(
       {Key? key,
       required this.picture,
       required this.appbar,
-      required this.bottomNavigationBar})
+      required this.theEventName,
+      required this.eventInfo,
+      required this.date,
+      required this.time})
       : super(key: key);
 
   final String picture;
   final AppBar appbar;
-  final BottomAppBar bottomNavigationBar;
+  final String theEventName;
+  final String eventInfo;
+  final String date;
+  final String time;
 
   @override
   State<EventPage> createState() => _EventPageState();
@@ -21,61 +32,159 @@ class _EventPageState extends State<EventPage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    String theEventName = 'Möte med Wallsten';
-    String date = '2023-03-23';
-    String time = '20:00-21:00';
-    String eventInfo = 'Möte med Wallsten';
 
     return Scaffold(
-      appBar: widget.appbar,
-      body: Center(
-        child: Column(
-          children: [
-            eventImage(height, width),
-            eventName(theEventName),
-            dateAndTime(date, time),
-            Expanded(child: eventInformation(eventInfo, height, width)),
-            Expanded(child: eventParticipants()),
-          ],
-        ),
+      appBar: appBar(context),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          eventImage(height, width),
+          eventName(widget.theEventName),
+          dateAndTime(widget.date, widget.time),
+          eventInformation(widget.eventInfo, height, width),
+        ],
       ),
-      bottomNavigationBar: widget.bottomNavigationBar,
+     //bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 
-  Row eventParticipants() {
-    return Row(
-      children: const [
-        Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Icon(Icons.group, size: 24),
-        ),
-        Text('deltagare', style: TextStyle(fontSize: 24)),
-      ],
+
+
+  void _handleschemasyncButtonPressed(schema) async {
+    if (schema != null && widget.date == null && widget.time == null) {
+      final schemaData = {
+        'schema': schema,
+      };
+      const url = 'http://192.121.208.57:8080/save';
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode(schemaData);
+      final response =
+          await http.post(Uri.parse(url), headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('User data sent successfully!');
+      } else {
+        print('Error sending user data: ${response.statusCode}');
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Här ska man skicka in sitt schema sen'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  IconButton schemaSyncButton() {
+    return IconButton(
+      onPressed: () async {
+        _handleschemasyncButtonPressed("mitt schema");
+      },
+      icon: const Icon(
+        Icons.send,
+        size: 24.0,
+      ),
     );
   }
 
-  SizedBox eventInformation(String eventInfo, double height, double width) {
-    return SizedBox(
-      height: height / 5,
-      width: width / 1.1,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: Colors.white,
-            border: Border.all(
-              color: Colors.black,
-              width: 2,
+  AppBar appBar(context) {
+    return AppBar(
+      titleSpacing: 0,
+      title: Row(
+        children: <Widget>[
+      IconButton(
+      padding: const EdgeInsets.all(0),
+      icon: Column(
+        children: [
+          const Icon(Icons.group),
+          const Text(
+            'Deltagare',
+            style: TextStyle(fontSize: 10),
+          ),
+        ],
+      ),
+            iconSize: 30,
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      EventParticipants(
+                    eventName: widget.theEventName,
+                  ),
+                  transitionDuration: Duration.zero,
+                ),
+              );
+            },
+          ),
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Image.asset(
+                "images/tempus_logo_tansp_horizontal.png",
+                height: 160,
+                width: 160,
+              ),
+              //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
             ),
           ),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(eventInfo, style: const TextStyle(fontSize: 20)),
+          Align(
+            alignment: Alignment.topRight,
+            child: IconButton(
+              padding: const EdgeInsets.all(10),
+              icon: const Icon(Icons.settings),
+              iconSize: 30,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => ProfileWidget()));
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Expanded eventInformation(String eventInfo, double height, double width) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: SizedBox(
+          height: height / 5,
+          width: width,
+          child: Material(
+            elevation: 5.0,
+            borderRadius: BorderRadius.circular(15),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade800,
+                  borderRadius: BorderRadius.circular(15),
+                  //color: Theme.of(context).appBarTheme.foregroundColor,
+                ),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10.0, left: 15),
+                    child:
+                        Text(eventInfo, style: const TextStyle(fontSize: 16)),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -85,46 +194,55 @@ class _EventPageState extends State<EventPage> {
 
   Row dateAndTime(String date, String time) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.only(left: 10, right: 5, top: 10, bottom: 10),
           child: Icon(Icons.calendar_month, size: 24),
         ),
         Text(date, style: const TextStyle(fontSize: 24)),
         const Padding(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.only(left: 10, right: 5, top: 10, bottom: 10),
           child: Icon(
             Icons.access_time,
             size: 24,
           ),
         ),
-        Text(time, style: const TextStyle(fontSize: 24))
+        Text(time, style: const TextStyle(fontSize: 24)),
+        Visibility(
+          visible: date != null || time == null,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 25, right: 25),
+            child: schemaSyncButton(),
+          ),
+        ),
       ],
     );
   }
 
   Padding eventName(String eventName) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10.0),
+      padding: const EdgeInsets.only(top: 10.0, left: 10),
       child: Text(eventName, style: const TextStyle(fontSize: 24)),
     );
   }
 
   SizedBox eventImage(double height, double width) {
     return SizedBox(
-      height: height / 4,
-      child: Container(
-        width: width,
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xff000000))),
-          color: Color(0xffffffff),
-        ),
-        child: FittedBox(
-          fit: BoxFit.fitHeight,
-          child: Image(
-            image: AssetImage(widget.picture),
-            fit: BoxFit.cover,
+      height: height / 3,
+      child: ClipRRect(
+        child: Container(
+          width: width,
+          decoration: const BoxDecoration(
+            //border: Border(bottom: BorderSide(color: Color(0xff000000))),
+            color: Color(0xffffffff),
+          ),
+          child: FittedBox(
+            fit: BoxFit.fill,
+            child: Image(
+              image: AssetImage(widget.picture),
+              fit: BoxFit.fill,
+            ),
           ),
         ),
       ),

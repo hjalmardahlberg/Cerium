@@ -1,6 +1,5 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
@@ -9,19 +8,24 @@ import 'provider.dart';
 import 'package:provider/provider.dart';
 import 'package:googleapis/calendar/v3.dart' show Event;
 
+import 'package:projecttest/profile_widget.dart';
+import 'groupParticipants.dart';
+
 class Group extends StatefulWidget {
   const Group(
       {Key? key,
       required this.groupName,
       required this.picture,
+      //required this.group,
       required this.appbar,
-      required this.bottomNavigationBar})
+    })
       : super(key: key);
 
+  //final Group group;
   final String groupName;
   final String picture;
   final AppBar appbar;
-  final BottomAppBar bottomNavigationBar;
+
 
   @override
   State<Group> createState() => _Group();
@@ -38,18 +42,73 @@ class _Group extends State<Group> {
     super.dispose();
   }
 
+  AppBar appBar(context) {
+    return AppBar(
+      titleSpacing: 0,
+      title: Row(
+        children: <Widget>[
+          IconButton(
+            padding: const EdgeInsets.all(0),
+            icon: Column(
+              children: [
+                const Icon(Icons.group),
+                const Text(
+                  'Deltagare',
+                  style: TextStyle(fontSize: 10),
+                ),
+              ],
+            ),
+            iconSize: 30,
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      GroupParticipants(
+                        groupName: widget.groupName,
+                      ),
+                  transitionDuration: Duration.zero,
+                ),
+              );
+            },
+          ),
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Image.asset(
+                "images/tempus_logo_tansp_horizontal.png",
+                height: 160,
+                width: 160,
+              ),
+              //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
+            ),
+          ),
+          Align(
+            alignment: Alignment.topRight,
+            child: IconButton(
+              padding: const EdgeInsets.all(10),
+              icon: const Icon(Icons.settings),
+              iconSize: 30,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => ProfileWidget()));
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double baseWidth = 390;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        grouppNameAndExit(),
+        groupNameAndExit(),
         chatLog(),
         chatBox(),
         sendAndSyncCalenders(),
@@ -58,15 +117,16 @@ class _Group extends State<Group> {
 
     populateChatList();
     return Scaffold(
-      appBar: widget.appbar,
+      appBar: appBar(context),
       body: body,
-      bottomNavigationBar: widget.bottomNavigationBar,
+      //bottomNavigationBar: widget.bottomNavigationBar,
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
-  Stack grouppNameAndExit() {
-    final user = FirebaseAuth.instance.currentUser!;
 
+
+  Stack groupNameAndExit() {
+    final user = FirebaseAuth.instance.currentUser!;
     return Stack(
         children: [
           Padding(
@@ -243,16 +303,4 @@ class _Group extends State<Group> {
   }
 }
 
-class NextPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.cyan.shade800,
-        title: const Text('Create'),
-      ),
-      body:
-          const Center(child: Image(image: AssetImage('images/wallsten.jpg'))),
-    );
-  }
-}
+

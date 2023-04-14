@@ -1,71 +1,98 @@
-
-
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'Theme/ChangeTheme.dart';
+import 'Theme/themeConstants.dart';
 import 'provider.dart';
-import 'googleSignIn.dart';
 
 import 'start_page.dart';
 
-class ProfileWidget extends StatelessWidget{
+class ProfileWidget extends StatelessWidget {
+  const ProfileWidget({super.key});
   //final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
+    final themeManager = Provider.of<ThemeManager>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Logged In'),
+        title:  Text('Settings', style: TextStyle(fontSize: 20,color:themeManager.isDarkMode?Colors.white:Colors.black,),),
         centerTitle: true,
-        actions: [
-          TextButton(
-            child: Text('Logout'),
-            style: TextButton.styleFrom(foregroundColor: Colors.white),
-            onPressed: () {
-              final provider =
-              Provider.of<GoogleSignInProvider>(context, listen: false);
-              provider.logout();
-              
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (_) => StartPage()));
-            },
-          )
-        ],
       ),
-      body: Container(
-        alignment: Alignment.center,
-        color: Colors.blueGrey.shade900,
+      body: Padding(
+        //alignment: Alignment.center,
+        //color: Colors.blueGrey.shade900,
+        padding: const EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Profile',
-              style: TextStyle(fontSize: 24, color: Colors.white),
-            ),
-            SizedBox(height: 32),
-            CircleAvatar(
-              radius: 40,
+            const SizedBox(height: 32),
+            Center(
+              child: CircleAvatar(
+                radius: 50,
                 backgroundImage: NetworkImage(user.photoURL!),
+              ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
+            Center(
+              child: Text(
+                user.displayName!,
+                style: const TextStyle(fontSize: 20),
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            const Text(
+              'Email:',
+              style: TextStyle(fontSize: 20),
+            ),
             Text(
-              'Name: ' + user.displayName!,
-              style: TextStyle(color: Colors.white, fontSize: 20),
+              user.email!,
+              style: const TextStyle(fontSize: 15),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+            const Divider(),
+            Row(
+              children: [
+                Text(
+                  themeManager.isDarkMode ? "Light mode:" : "Dark mode:",
+                  style: TextStyle(fontSize: 20),
+                ),
+                ChangeTheme()
+              ],
+            ),
+            const SizedBox(height: 10),
+            /*   const Text(
+              'USER ID:',
+              style: TextStyle(fontSize: 20),
+            ),
             Text(
-              'Email: ' + user.email!,
-              style: TextStyle(color: Colors.white, fontSize: 20),
+              user.uid!,
+              style: const TextStyle(fontSize: 15),
+            ),*/
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: TextButton(
+                    child: const Text('Logout'),
+                    onPressed: () {
+                      final provider = Provider.of<GoogleSignInProvider>(
+                          context,
+                          listen: false);
+                      provider.logout();
+                      Navigator.popUntil(
+                          context, ModalRoute.withName('/login'));
+                    },
+                  ),
+                ),
+              ),
             ),
-            SizedBox(height: 50),
-            Text(
-              '',//'''USER ID: ' + user.uid!,
-              style: TextStyle(color: Colors.white, fontSize: 19),
-            ),
-            SizedBox(height: 10),
           ],
         ),
       ),
