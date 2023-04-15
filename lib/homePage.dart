@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-import 'event.dart';
-import 'addEvent.dart';
-import 'myGroups.dart';
-import 'addGroup.dart';
+import 'Event/event.dart';
+import 'Event/addEvent.dart';
+import 'Groups/myGroups.dart';
+import 'Groups/addGroup.dart';
 import 'profile_widget.dart';
 
 

@@ -161,7 +161,7 @@ class _MyGroups extends State<MyGroups> {
                   onPressed: () {
                     _showJoinGroup(_joinGroupController,context);
                   },
-                  child: Text('Join event',style: TextStyle(color: Theme.of(context).brightness == Brightness.dark
+                  child: Text('Gå med i grupp',style: TextStyle(color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
                       : Colors.black,),),
                 ),
@@ -193,7 +193,6 @@ class _MyGroups extends State<MyGroups> {
               builder: (_) => Group(
                   groupName: groupName,
                   picture: groupImage,
-                  appbar: widget.appbar2,
                   )),
         );
       },

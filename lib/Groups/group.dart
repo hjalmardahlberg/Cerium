@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
-import 'Theme/themeConstants.dart';
+import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
 import 'groupChat.dart';
 
@@ -12,13 +12,13 @@ class Group extends StatefulWidget {
     required this.groupName,
     required this.picture,
     //required this.group,
-    required this.appbar,
+
   }) : super(key: key);
 
   //final Group group;
   final String groupName;
   final String picture;
-  final AppBar appbar;
+
 
   @override
   State<Group> createState() => _Group();
@@ -57,6 +57,29 @@ class _Group extends State<Group> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showLeaveGroup(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Är du säker på att du vill lämna gruppen?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Avbryt'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Lämna',style: TextStyle(color: Colors.red),),
+              onPressed: () {},
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -128,6 +151,8 @@ class _Group extends State<Group> {
         ),
       );
     }
+
+
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +242,9 @@ class _Group extends State<Group> {
         Align(
           alignment: Alignment.topRight,
           child: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              _showLeaveGroup(context);
+            },
             icon: const Icon(
               Icons.exit_to_app_outlined,
               size: 36.0,

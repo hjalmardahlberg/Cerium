@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
 import 'package:provider/provider.dart';
-import 'Theme/themeConstants.dart';
+import '../Theme/themeConstants.dart';
 
 class EventParticipants extends StatefulWidget {
   const EventParticipants({Key? key,

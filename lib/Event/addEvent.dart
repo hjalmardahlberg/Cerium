@@ -40,28 +40,10 @@ class _AddEventPageState extends State<AddEventPage> {
 
   final user = FirebaseAuth.instance.currentUser!;
 
-  Future<void> _getImage() async {
-    try {
-      final pickedFile =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (pickedFile != null) {
-        setState(() {
-          _imageFile = File(pickedFile.path);
-        });
-      }
-    } on PlatformException catch (e) {
-      if (e.code == 'permission-denied') {
-        print('Permission denied');
-      } else {
-        print('Error picking image: $e');
-      }
-    } catch (e) {
-      print('Error picking image: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData mediaQueryData = MediaQuery.of(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -77,12 +59,11 @@ class _AddEventPageState extends State<AddEventPage> {
     };
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: widget.appbar,
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
+          child: ListView(
+            padding:mediaQueryData.viewInsets,
             children: [
               if (_imageFile == null) pickImage(height, width),
               if (_imageFile != null) addImage(height, width, _imageFile),
@@ -99,9 +80,29 @@ class _AddEventPageState extends State<AddEventPage> {
             ],
           ),
         ),
-      ),
       //  bottomNavigationBar: widget.bottomNavigationBar,
     );
+  }
+
+
+  Future<void> _getImage() async {
+    try {
+      final pickedFile =
+      await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+        });
+      }
+    } on PlatformException catch (e) {
+      if (e.code == 'permission-denied') {
+        print('Permission denied');
+      } else {
+        print('Error picking image: $e');
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
   }
 
   void _handleAddEventButtonPressed() async {
@@ -153,9 +154,8 @@ class _AddEventPageState extends State<AddEventPage> {
     }
   }
 
-  Expanded addEventButton() {
-    return Expanded(
-      child: Align(
+  Align addEventButton() {
+    return  Align(
         alignment: Alignment.bottomRight,
         child: ElevatedButton.icon(
           onPressed: () async {
@@ -170,7 +170,7 @@ class _AddEventPageState extends State<AddEventPage> {
           ),
           label: const Text('Event'),
         ),
-      ),
+
     );
   }
 
@@ -233,13 +233,16 @@ class _AddEventPageState extends State<AddEventPage> {
 
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
+        helpText: 'Set a start time',
         context: context,
         initialTime: _startSelectedTime ?? TimeOfDay.now(),
         initialEntryMode: TimePickerEntryMode.input);
     if (pickedTime != null) {
       final TimeOfDay? pickedStopTime = await showTimePicker(
+        helpText: 'Set a end time',
         context: context,
         initialTime: _stopSelectedTime ?? pickedTime,
+          initialEntryMode: TimePickerEntryMode.input,
       );
       if (pickedStopTime != null) {
         setState(() {

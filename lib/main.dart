@@ -1,7 +1,7 @@
 import 'package:provider/provider.dart';
 
 import 'googleSignIn.dart';
-import 'groupListProvider.dart';
+import 'Groups/groupListProvider.dart';
 import 'provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
