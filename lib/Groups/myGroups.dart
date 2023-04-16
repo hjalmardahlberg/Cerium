@@ -12,20 +12,13 @@ import 'groupListProvider.dart';
 class MyGroups extends StatefulWidget {
   const MyGroups({
     super.key,
-    required this.title,
-    required this.appbar,
-    required this.appbar2,
   });
-
-  final String title;
-  final AppBar appbar;
-  final AppBar appbar2;
 
   @override
   State<MyGroups> createState() => _MyGroups();
 }
 
-class _MyGroups extends State<MyGroups> {
+class _MyGroups extends State<MyGroups>  {
   double baseWidth = 390;
   double fem = 0;
   double ffem = 0;
@@ -77,11 +70,7 @@ class _MyGroups extends State<MyGroups> {
           Expanded(
             child: FutureBuilder<List<GroupData>>(
                 future: groupData, builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator(semanticsLabel: 'Loading...',
-                  semanticsValue: 'Loading...',);
-              }
-              else if (snapshot.hasData) {
+               if (snapshot.hasData) {
                 final groupData = snapshot.data!;
                 return buildGroups(groupData);
               }
@@ -90,7 +79,6 @@ class _MyGroups extends State<MyGroups> {
               }
             }),
           ),
-          // Expanded(child: groupList(listProvider)),
           joinGroup(listProvider),
         ],
       ),
@@ -189,18 +177,33 @@ class _MyGroups extends State<MyGroups> {
         },
       );
 
+  void CallAddGroup(groupName,groupImage) async{
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (_) =>
+              Group(
+                groupName: groupName,
+                picture: groupImage,
+              )),
+    );
+    if (result == true) {
+      setState(() {
+        groupData = getGroupData();
+      });
+    }
+  }
+
   GestureDetector groupBox(String groupImage, String groupName) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            //TODO:Fix
-              builder: (_) =>
-                  Group(
-                    groupName: groupName,
-                    picture: groupImage,
-                  )),
+          MaterialPageRoute(//TODO:Fix
+              builder: (_) => Group(
+                  groupName: groupName,
+                  picture: groupImage,
+                 )),
         );
       },
       child: Padding(padding: EdgeInsets.only(top: 10, left: 10, right: 10),

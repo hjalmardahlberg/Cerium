@@ -10,10 +10,9 @@ import 'profile_widget.dart';
 
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key,required this.pageIndex});
 
-  final String title;
-
+  final int pageIndex;
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -51,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //bottomNavigationBar
 
-    PageController _pageController = PageController(initialPage: 0);
+    PageController _pageController = PageController(initialPage: widget.pageIndex);
     final _bottomNavigationBarItems = [
       const BottomNavigationBarItem(
           icon: Icon(Icons.event),
@@ -101,11 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             )
                 : null,
-            child: MyGroups(
-              title: 'Groups',
-              appbar: homeAppBar(),
-              appbar2: groupAppBar(context, 'addGroup'),
-            ),
+            child: MyGroups(),
           ),
         ],
       ),

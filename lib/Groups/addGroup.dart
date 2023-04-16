@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import '../homePage.dart';
+import 'myGroups.dart';
+
 
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage({Key? key, required this.appbar}) : super(key: key);
@@ -88,6 +91,11 @@ class _AddGroupPageState extends State<AddGroupPage> {
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => MyHomePage(pageIndex: 2,)),
+        );
       } else {
         print('Error sending user data: ${response.statusCode}');
       }
@@ -111,9 +119,9 @@ class _AddGroupPageState extends State<AddGroupPage> {
       );
     }
   }
-  Expanded addGroupButton() {
-    return Expanded(
-      child: Align(
+  Align addGroupButton() {
+    return
+       Align(
         alignment: Alignment.bottomRight,
         child: ElevatedButton.icon(
           onPressed: () {
@@ -128,7 +136,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
           ),
           label: const Text('Group'),
         ),
-      ),
+
     );
   }
 

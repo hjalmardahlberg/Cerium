@@ -18,7 +18,7 @@ class StartPage extends StatelessWidget{
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData){
           print("WE ARE LOGGED IN POG");
-          return const MyHomePage(title: "Tempus");
+          return const MyHomePage(pageIndex: 0);
         } else if (snapshot.hasError){
           return const Center(child: Text('Something Went Wrong!'));
         } else{
