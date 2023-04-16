@@ -131,8 +131,7 @@ public class ServerApiApplicationTests {
 		Users user = new Users();
 		user.setId("eatShit");
 		user.setEmail("kangussy@schözz.com");
-		user.setJoinFlag(false);
-		
+
 		String json = mapper.writeValueAsString(user);
     	Exception exception = assertThrows(NoSuchElementException.class, () -> {
         mockMvc.perform(put("/group/create/{Cerium}", "Cerium")

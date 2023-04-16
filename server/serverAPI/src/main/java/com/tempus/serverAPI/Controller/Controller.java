@@ -2,7 +2,10 @@ package com.tempus.serverAPI.Controller;
 
 import com.tempus.serverAPI.DateSyncAlg.Datesync;
 import com.tempus.serverAPI.DateSyncAlg.Event;
-import com.tempus.serverAPI.Exceptions.UserNotFoundException;
+import com.tempus.serverAPI.Exceptions.ApiException;
+import com.tempus.serverAPI.Exceptions.ApiForbiddenException;
+import com.tempus.serverAPI.Exceptions.ForbiddenException;
+import com.tempus.serverAPI.Exceptions.NotFoundException;
 import com.tempus.serverAPI.Models.*;
 
 import com.tempus.serverAPI.Repo.GoogleEventRepo;
@@ -42,15 +45,14 @@ public class Controller {
     }
 
 
-
-    @GetMapping(value = "/user/groups")
-    public List<Groups> getUserGroups(@RequestBody Users user) {
-        if (userRepo.findById(user.getId()).isPresent()) {
-            Users result = userRepo.findById(user.getId()).get();
+    @GetMapping(value = "/user/groups/{u_id}")
+    public List<Groups> getUserGroups(@PathVariable String u_id) {
+        if (userRepo.findById(u_id).isPresent()) {
+            Users result = userRepo.findById(u_id).get();
             return result.getGroups();
         }
         else {
-            throw new UserNotFoundException();
+            throw new ApiException("Error when processing the request, user does not exist");
         }
 
     }
@@ -72,7 +74,7 @@ public class Controller {
     @PostMapping(value = "/save")
     public String saveUser(@RequestBody Users user) {
         if(userRepo.findByEmail(user.getEmail()) != null){
-            throw new RuntimeException("Email already exists");
+            throw new ApiForbiddenException("Email already exists");
         }
         else{
             userRepo.save(user);
@@ -84,11 +86,11 @@ public class Controller {
     public String createGroup(@PathVariable String g_name, @RequestBody Users user) {
 
         if (!groupRepo.findByNameAndAdmin(g_name, user.getEmail()).isEmpty()) {
-            throw new RuntimeException("Cannot create a group with already existing name");
+            throw new ApiForbiddenException("Cannot create a group with already existing name");
         }
         else {
             if (userRepo.findById(user.getId()).isEmpty()) {
-                throw new UserNotFoundException();
+                throw new ApiException("Error when processing the request, user does not exist");
             }
             else {
                 Users updatedUser = userRepo.findById(user.getId()).get();
@@ -121,18 +123,18 @@ public class Controller {
     public String joinGroup(@PathVariable String g_name, @PathVariable String a_email, @RequestBody Users user) {
 
        if (userRepo.findById(user.getId()).isEmpty()) {
-           throw new UserNotFoundException();
+           throw new ApiException("Error when processing the request, user does not exist");
        }
         Users userJoin = userRepo.findById(user.getId()).get();
         List<Groups> Queries = groupRepo.findByNameAndAdmin(g_name, a_email);
 
         if(Queries.isEmpty()) {
-            throw new RuntimeException("Error joining group, this error should not occur");
+            throw new ApiForbiddenException("Error when user tried joining group, the user is not a member of the given group");
         }
         else {
             for (Groups currGroup : Queries) {
                 if (currGroup.getUser().getId().equals(userJoin.getId())) {
-                    throw new RuntimeException("Cannot join a group that user is already a member of!");
+                    throw new ApiForbiddenException("Cannot join a group that user is already a member of!");
                 }
             }
             Groups groupToJoin = new Groups();
@@ -151,13 +153,13 @@ public class Controller {
     @PutMapping(value = "/group/leave/{g_name}&{a_email}")
     public String leaveGroup(@PathVariable String g_name, @PathVariable String a_email, @RequestBody Users user) {
         if (userRepo.findById(user.getId()).isEmpty()) {
-            throw new UserNotFoundException();
+            throw new ApiException("Error when processing the request, user does not exist");
         }
         else {
             Users updateUser = userRepo.findById(user.getId()).get();
             List<Groups> groupToDelete = updateUser.getGroup(g_name);
             if (groupToDelete.isEmpty()) {
-                throw new RuntimeException("Error when trying leave group " + g_name + ", user is not a member of that group");
+                throw new ApiForbiddenException("Error when trying leave group " + g_name + ", user is not a member of that group");
             }
             for (int i = 0; i < groupToDelete.size(); i++) {
                 Groups curr = groupToDelete.get(i);
@@ -168,7 +170,7 @@ public class Controller {
                     return "User successfully left the group: " + curr.getName();
                 }
             }
-            throw new RuntimeException("Fatal error occured when user " + user.getEmail() + " tried to leave group: " + g_name);
+            throw new ApiForbiddenException("Fatal error occured when user " + user.getEmail() + " tried to leave group: " + g_name);
         }
 
     }
@@ -181,7 +183,7 @@ public class Controller {
         for(int i = 0; i < gEvents.size(); i++) {
             Events selEvent = gEvents.get(i);
             if(selEvent.getGroup().getName().equals(group.getName())) {
-                throw new RuntimeException("Event with given name already exists within that group");
+                throw new ApiForbiddenException("Event with given name already exists within that group");
             }
         }
         Events createdEvent = new Events();
@@ -207,7 +209,7 @@ public class Controller {
     @PutMapping(value = "/update")
     public String updateUser(@RequestBody Users user) {
         if (userRepo.findById(user.getId()).isEmpty()) {
-            throw new UserNotFoundException();
+            throw new ApiException("Error when processing the request, user does not exist");
         }
         else {
             Users updatedUser = userRepo.findById(user.getId()).get();
@@ -224,7 +226,7 @@ public class Controller {
     public String delGroup(@PathVariable String g_name, @RequestBody Users user) {
         List<Groups> selectedGroup = groupRepo.findByNameAndAdmin(g_name, user.getEmail());
         if (selectedGroup.isEmpty()) {
-            throw new RuntimeException("Cannot delete a group that does not exist");
+            throw new ApiException("Cannot delete a group that does not exist");
         }
         else if (selectedGroup.get(0).getAdmin().equals(user.getEmail())){
             for (int i = 0; i < selectedGroup.size(); i++) {
@@ -238,7 +240,7 @@ public class Controller {
             return "Successfully deleted " + selectedGroup.get(0).getName();
         }
         else {
-            throw new RuntimeException("User not admin");
+            throw new ApiForbiddenException("User not admin");
         }
 
     }
@@ -247,7 +249,7 @@ public class Controller {
     public String importEvents(@RequestBody GroupSchedule hmm) {
 
         if (googleEventRepo.findByUserid(hmm.getU_id()) != null) {
-            throw new RuntimeException("User schedule already exist");
+            throw new ApiForbiddenException("User schedule already exist");
         }
         else {
             for (int i = 0; i < hmm.getSchedules().size(); i++) {
@@ -274,7 +276,7 @@ public class Controller {
             Datesync toProcess = new Datesync();
             for (int i = 0; i < Query.size(); i++) {
                 if (!Query.get(i).getUser().getSentSchedule()) {
-                    throw new RuntimeException("User " + Query.get(i).getUser().getEmail() + " hasn't imported their schedule, this error should've been caught in the frontend");
+                    throw new ApiForbiddenException("User " + Query.get(i).getUser().getEmail() + " hasn't imported their schedule, this error should've been caught in the frontend");
                 } //TODO: Detta ska fångas i frontend
                 for (int j = 0; j < googleEventRepo.findByUserid(Query.get(i).getUser().getId()).size(); j++) {
                     GoogleEvent currGEv = googleEventRepo.findByUserid(Query.get(i).getUser().getId()).get(j);
@@ -289,7 +291,7 @@ public class Controller {
             return toProcess.possDates;
         }
         else {
-            throw new RuntimeException("User isn't admin"); //Extrem limitation
+            throw new ApiForbiddenException("User isn't admin"); //Extrem limitation
         }
      }
 
