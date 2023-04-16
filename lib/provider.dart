@@ -28,7 +28,6 @@ class GoogleSignInProvider extends ChangeNotifier{
   GoogleSignInAccount? _user;
 
   GoogleSignInAccount get user => _user!;
-
   Future googleLogin() async{
     try {
       final googleUser = await googleSignIn.signIn();
@@ -48,6 +47,27 @@ class GoogleSignInProvider extends ChangeNotifier{
       );
 
       await FirebaseAuth.instance.signInWithCredential(credential);
+      final fire_base_user = FirebaseAuth.instance.currentUser!;
+
+      //print(fire_base_user.uid);
+
+      final userData = {
+        'id': fire_base_user.uid,
+        'name' : fire_base_user.displayName,
+        'email' : fire_base_user.email,
+      };
+
+      final url = 'http://192.121.208.57:8080/save';
+      final headers = {'Content-Type': 'application/json'};
+      final body = jsonEncode(userData);
+      //print(body.toString());
+      final response = await http.post(Uri.parse(url),headers: headers, body: body);
+
+      if (response.statusCode == 200){
+        print('User data sent successfully!');
+      }else{
+        print('Error sending user data: ${response.statusCode}');
+      }
     } catch(e) {
       print(e.toString());
     }

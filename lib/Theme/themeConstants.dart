@@ -18,7 +18,7 @@ final lightTheme = ThemeData(
       color: Colors.black, // set the text color to black
     ),
     iconTheme:  IconThemeData(color: Colors.black),
-    backgroundColor: Colors.white,
+   // backgroundColor: Colors.white,
     // Set the AppBar background color for the light mode
   ),
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
