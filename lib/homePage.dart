@@ -1,12 +1,15 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'Event/EventData.dart';
 import 'Event/event.dart';
 import 'Event/addEvent.dart';
 import 'Groups/myGroups.dart';
 import 'Groups/addGroup.dart';
 import 'profile_widget.dart';
+import 'package:http/http.dart' as http;
 
 
 class MyHomePage extends StatefulWidget {
@@ -26,10 +29,25 @@ class _MyHomePageState extends State<MyHomePage> {
   double height = 0;
   int _currentIndex = 0;
 
+  Future<List<EventData>> eventData = getEventData();
+
+  static Future<List<EventData>> getEventData() async {
+    final user = FirebaseAuth.instance.currentUser!;
+
+    final url = 'http://192.121.208.57:8080/user/groups/' + user.uid;
+
+    final headers = {'Content-Type': 'application/json'};
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    final body = json.decode(response.body);
+
+    print(response.body);
+
+    return body.map<EventData>(EventData.fromJson).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    //Event list
-
     //Sizes
     fem = MediaQuery
         .of(context)
@@ -46,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .height;
 
     //appbar
-    final appbar = groupAppBar(context, '');
+    final appbar = homeAppBar();
 
     //bottomNavigationBar
 
@@ -145,93 +163,51 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget buildGroups(List<EventData> eventData) =>
+      ListView.builder(
+        itemCount: eventData.length,
+        itemBuilder: (context, index) {
+          final event = eventData[index];
+          return eventBox('images/wallsten.jpg','Info','TBD','TBD',event.eventName);
+        },
+      );
+
+
   Column MyEvents() {
     return Column(
       children: [
         eventText(),
         Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: eventList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: eventList[index],
-              );
-            },
-          ),
+          child: FutureBuilder<List<EventData>>(
+              future: eventData, builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final eventData = snapshot.data!;
+              return buildGroups(eventData);
+            }
+            else {
+              return const Padding(padding:EdgeInsets.only(top:10), child:Text('No Events'));
+            }
+          }),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            addToList(
-                'images/edvard_inception.png',
-                'Det ska tittas serier med frugan',
-                '2023-03-23',
-                '17:00',
-                'Möte med Frugan'),
-            const SizedBox(
-              width: 5,
-            ),
-            addToList(
-                'images/wallsten.jpg',
-                'Möte med Wallsten om viktiga saker.',
-                '2023-03-23',
-                '14:00',
-                'Möte ned Wallsten'),
-            const SizedBox(
-              width: 5,
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  setState(() {
-                    eventList = [];
-                  });
-                },
-                child: const Text('Rensa events')),
-
-          ],
-        ),
-      ],
+        TextButton( onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) =>
+                    EventPage(
+                      picture: 'images/wallsten.jpg',
+                      appbar: homeAppBar(),
+                      theEventName: 'EventName',
+                      eventInfo: 'eventInfo',
+                      date: 'TBD',
+                      time: 'TBD',
+                    )),
+          );
+        },child: Text('Event page'))
+    ]
     );
   }
 
-  ElevatedButton addToList(image, info, date, time, name) {
-    return ElevatedButton(
-        onPressed: () async {
-          final groupData = {
-            "image": image,
-            "info": info,
-            "date": date,
-            "time": time,
-            "name": name,
-          };
-          final body = jsonEncode(groupData);
-          jsonDecoder(body);
-        },
-        child: const Text('skicka event!'));
-  }
-
-  void jsonDecoder(String test) {
-    final result = jsonDecode(test);
-    print(
-      result['name'],
-    );
-    setState(() {
-      eventList.add(eventBox(
-          result['image'],
-          result['info'],
-          result['date'],
-          result['time'],
-          result['name'],
-          fem,
-          ffem,
-          width,
-          height,
-          homeAppBar(),
-          context));
-    });
-  }
 
   Center eventText() {
     return const Center(
@@ -244,67 +220,6 @@ class _MyHomePageState extends State<MyHomePage> {
             decoration: TextDecoration.underline,
           ),
         ),
-      ),
-    );
-  }
-
-  //AppBar that takes you back to group screen
-  AppBar groupAppBar(context, String page) {
-    return AppBar(
-      automaticallyImplyLeading: true,
-      titleSpacing: 0,
-      title: Row(
-        children: <Widget>[
-          /*  IconButton(
-            padding: const EdgeInsets.all(10),
-            icon: const Icon(Icons.group),
-            iconSize: 30,
-            onPressed: () {
-              if (page == 'addGroup') {
-                Navigator.pop(context);
-              } else {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        MyGroups(
-                      title: 'Groups',
-                      appbar: homeAppBar(),
-                      appbar2: groupAppBar(context, 'addGroup'),
-                      bottomNavigationBar:
-                          finalBottomAppBar(context, 'MyGroups'),
-                    ),
-                    transitionDuration: Duration.zero,
-                  ),
-                );
-              }
-            },
-          ),*/
-          Expanded(
-            flex: 1,
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Image.asset(
-                "images/tempus_logo_tansp_horizontal.png",
-                height: 160,
-                width: 160,
-              ),
-              //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
-            ),
-          ),
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              padding: const EdgeInsets.all(10),
-              icon: const Icon(Icons.settings),
-              iconSize: 30,
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => ProfileWidget()));
-              },
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -350,12 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {
       String eventDate,
       String eventTime,
       String eventName,
-      double fem,
-      double ffem,
-      double width,
-      double height,
-      appbar,
-      context) {
+      ) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -364,7 +274,7 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: (_) =>
                   EventPage(
                     picture: eventImage,
-                    appbar: appbar,
+                    appbar: homeAppBar(),
                     theEventName: eventName,
                     eventInfo: eventInfo,
                     date: eventDate,

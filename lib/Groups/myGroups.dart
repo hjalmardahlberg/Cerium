@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 import 'GroupData.dart';
 import 'group.dart';
-import 'groupListProvider.dart';
+
 
 class MyGroups extends StatefulWidget {
   const MyGroups({
@@ -46,7 +46,6 @@ class _MyGroups extends State<MyGroups>  {
 
   @override
   Widget build(BuildContext context) {
-    final listProvider = Provider.of<GroupProvider>(context);
     double baseWidth = 390;
     fem = MediaQuery
         .of(context)
@@ -75,11 +74,11 @@ class _MyGroups extends State<MyGroups>  {
                 return buildGroups(groupData);
               }
               else {
-                return const Text('No Groups');
+                return const Padding(padding:EdgeInsets.only(top:10), child:Text('No Groups'));
               }
             }),
           ),
-          joinGroup(listProvider),
+          joinGroup()
         ],
       ),
     ); // This trailing comma makes auto-formatting nicer for build methods.
@@ -134,9 +133,9 @@ class _MyGroups extends State<MyGroups>  {
     );
   }
 
-  Container joinGroup(listProvider) {
+  Container joinGroup() {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(10),
       // Adjust the value as needed
       child: Align(
           alignment: Alignment.bottomRight,
@@ -176,23 +175,6 @@ class _MyGroups extends State<MyGroups>  {
           return groupBox('images/wallsten.jpg', group.groupName);
         },
       );
-
-  void CallAddGroup(groupName,groupImage) async{
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (_) =>
-              Group(
-                groupName: groupName,
-                picture: groupImage,
-              )),
-    );
-    if (result == true) {
-      setState(() {
-        groupData = getGroupData();
-      });
-    }
-  }
 
   GestureDetector groupBox(String groupImage, String groupName) {
     return GestureDetector(
