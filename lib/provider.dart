@@ -163,18 +163,12 @@ class GoogleSignInProvider extends ChangeNotifier{
     }
   }
 
-/*
-Combine the events from both users into a single list.
-
-Sort the list of events by their start time.
-
-Iterate through the list of events and identify overlapping events.
-
-Identify the gaps between overlapping events as potential free time.
-
-Determine the common free time between both users based on their availability.
-
-Display the common free time to the users.
-*/
+  Future<List<Event>> GetEvents1month() async  {
+    final now = DateTime.now();
+    final start = now;
+    final end = now.add(Duration(days: 30));
+    final events = await getCalendarEventsInterval(start, end);
+    return events;
+  }
 
 }
