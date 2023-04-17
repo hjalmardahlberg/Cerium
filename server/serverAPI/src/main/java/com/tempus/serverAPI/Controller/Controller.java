@@ -248,7 +248,7 @@ public class Controller {
     @PostMapping(value = "/gEvent/import")
     public String importEvents(@RequestBody GroupSchedule hmm) {
 
-        if (googleEventRepo.findByUserid(hmm.getU_id()) != null) {
+        if (!googleEventRepo.findByUserid(hmm.getU_id()).isEmpty()) {
             throw new ApiForbiddenException("User schedule already exist");
         }
         else {
