@@ -111,6 +111,7 @@ public class Controller {
     @PutMapping(value = "/group/setpicture/{g_name}&{a_email}")
     public String setpicture(@PathVariable String g_name, @PathVariable String a_email, @RequestBody String Image){
         List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
+
         byte[] imageData = Base64.getDecoder().decode(Image);
         for (Groups currgroup : QueryResult) {
             currgroup.setImage(imageData);
@@ -248,22 +249,19 @@ public class Controller {
     @PostMapping(value = "/gEvent/import")
     public String importEvents(@RequestBody GroupSchedule hmm) {
 
-        if (!googleEventRepo.findByUserid(hmm.getU_id()).isEmpty()) {
-            throw new ApiForbiddenException("User schedule already exist");
+        googleEventRepo.deleteById(hmm.getU_id());
+        for (int i = 0; i < hmm.getSchedules().size(); i++) {
+            UserSchedule currSchedule = hmm.getSchedules().get(i);
+            GoogleEvent currEvent = new GoogleEvent();
+            currEvent.setStart(currSchedule.getStart());
+            currEvent.setEnd(currSchedule.getEnd());
+            currEvent.setUserid(hmm.getU_id());
+            googleEventRepo.save(currEvent);
         }
-        else {
-            for (int i = 0; i < hmm.getSchedules().size(); i++) {
-                UserSchedule currSchedule = hmm.getSchedules().get(i);
-                GoogleEvent currEvent = new GoogleEvent();
-                currEvent.setStart(currSchedule.getStart());
-                currEvent.setEnd(currSchedule.getEnd());
-                currEvent.setUserid(hmm.getU_id());
-                googleEventRepo.save(currEvent);
-            }
-            Users toUpdate = userRepo.findById(hmm.getU_id()).get();
-            toUpdate.setSentSchedule(true);
-            return "Successfully imported user schedule";
-        }
+        Users toUpdate = userRepo.findById(hmm.getU_id()).get();
+        toUpdate.setSentSchedule(true);
+        return "Successfully imported user schedule";
+
     }
 
 
@@ -275,7 +273,7 @@ public class Controller {
             List<Event> events = new ArrayList<>();
             Datesync toProcess = new Datesync();
             for (int i = 0; i < Query.size(); i++) {
-                if (!Query.get(i).getUser().getSentSchedule()) {
+                if (!googleEventRepo.findByUserid(Query.get(i).getUser().getId()).isEmpty()) {
                     throw new ApiForbiddenException("User " + Query.get(i).getUser().getEmail() + " hasn't imported their schedule, this error should've been caught in the frontend");
                 } //TODO: Detta ska fångas i frontend
                 for (int j = 0; j < googleEventRepo.findByUserid(Query.get(i).getUser().getId()).size(); j++) {
