@@ -1,6 +1,5 @@
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'Theme/ChangeTheme.dart';
 import 'Theme/themeConstants.dart';
@@ -21,6 +20,11 @@ class ProfileWidget extends StatelessWidget {
       appBar: AppBar(
         title:  Text('Settings', style: TextStyle(fontSize: 20,color:themeManager.isDarkMode?Colors.white:Colors.black,),),
         centerTitle: true,
+        backgroundColor:Theme
+            .of(context)
+            .brightness == Brightness.dark
+            ? Colors.grey.shade800
+            : Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

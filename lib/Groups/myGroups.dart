@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'GroupData.dart';
@@ -181,14 +180,14 @@ class _MyGroups extends State<MyGroups>  {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(//TODO:Fix
+          MaterialPageRoute(
               builder: (_) => Group(
                   groupName: groupName,
                   picture: groupImage,
                  )),
         );
       },
-      child: Padding(padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+      child: Padding(padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
         child: Material(
           elevation: 15.0,
           borderRadius: BorderRadius.circular(10),
@@ -226,7 +225,7 @@ class _MyGroups extends State<MyGroups>  {
                       children: [
                         // Expanded(
                         Padding(
-                          padding: EdgeInsets.only(top: 20),
+                          padding: const EdgeInsets.only(top: 20),
                           child: Text(
                             groupName,
                             style: TextStyle(

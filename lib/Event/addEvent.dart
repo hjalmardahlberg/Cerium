@@ -40,7 +40,6 @@ class _AddEventPageState extends State<AddEventPage> {
 
   final user = FirebaseAuth.instance.currentUser!;
 
-
   @override
   Widget build(BuildContext context) {
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
@@ -62,33 +61,33 @@ class _AddEventPageState extends State<AddEventPage> {
       resizeToAvoidBottomInset: true,
       appBar: widget.appbar,
       body: Center(
-          child: ListView(
-            padding:mediaQueryData.viewInsets,
-            children: [
-              if (_imageFile == null) pickImage(height, width),
-              if (_imageFile != null) addImage(height, width, _imageFile),
-              const SizedBox(height: 16),
-              addTextForm('Enter your events name', _eventNameController),
-              const SizedBox(height: 16),
-              datePickerRow(context, width, dateRange, onDatesSelected),
-              const SizedBox(height: 16),
-              timePickerRow(context, width),
-              const SizedBox(height: 16),
-              addTextForm('Enter your events info', _eventInfoController),
-              const SizedBox(height: 16),
-              addEventButton(),
-            ],
-          ),
+        child: ListView(
+          padding: mediaQueryData.viewInsets,
+          children: [
+            if (_imageFile == null) pickImage(height, width),
+            if (_imageFile != null) addImage(height, width, _imageFile),
+            const SizedBox(height: 16),
+            addTextForm('Enter your events name', _eventNameController),
+            const SizedBox(height: 16),
+            datePickerRow(context, width, dateRange, onDatesSelected),
+            const SizedBox(height: 16),
+            timePickerRow(context, width),
+            const SizedBox(height: 16),
+            addTextForm('Enter your events info', _eventInfoController),
+            const SizedBox(height: 16),
+            addEventButton(),
+            schemaSyncButton(),
+          ],
         ),
+      ),
       //  bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
 
-
   Future<void> _getImage() async {
     try {
       final pickedFile =
-      await ImagePicker().pickImage(source: ImageSource.gallery);
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         setState(() {
           _imageFile = File(pickedFile.path);
@@ -155,22 +154,21 @@ class _AddEventPageState extends State<AddEventPage> {
   }
 
   Align addEventButton() {
-    return  Align(
-        alignment: Alignment.bottomRight,
-        child: ElevatedButton.icon(
-          onPressed: () async {
-            _handleAddEventButtonPressed();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.lightBlue.shade300,
-          ),
-          icon: const Icon(
-            Icons.add,
-            size: 24.0,
-          ),
-          label: const Text('Event'),
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: ElevatedButton.icon(
+        onPressed: () async {
+          _handleAddEventButtonPressed();
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.lightBlue.shade300,
         ),
-
+        icon: const Icon(
+          Icons.add,
+          size: 24.0,
+        ),
+        label: const Text('Event'),
+      ),
     );
   }
 
@@ -242,7 +240,7 @@ class _AddEventPageState extends State<AddEventPage> {
         helpText: 'Set a end time',
         context: context,
         initialTime: _stopSelectedTime ?? pickedTime,
-          initialEntryMode: TimePickerEntryMode.input,
+        initialEntryMode: TimePickerEntryMode.input,
       );
       if (pickedStopTime != null) {
         setState(() {
@@ -316,7 +314,7 @@ class _AddEventPageState extends State<AddEventPage> {
                       color: Colors.red,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -369,6 +367,141 @@ class _AddEventPageState extends State<AddEventPage> {
             color: Color(0x00000000),
           ),
           child: Image.file(imageFile!),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> CreateList(setState, selectedValue) {
+    List<Widget> list = <
+        Widget>[]; /*
+  final user = FirebaseAuth.instance.currentUser!;
+
+  final url = 'http://192.121.208.57:8080/user/groups/' + user.uid;
+
+  final headers = {'Content-Type': 'application/json'};
+  final response = await http.get(Uri.parse(url), headers: headers);
+  final body = json.decode(response.body);
+  */
+    List<Map<String, String>> jsonObject = [
+      {
+        'startTime': '2023-04-01T12:00:00',
+        'endTime': '2023-04-01T23:30:00',
+      },
+      {
+        'startTime': '2023-04-02T14:30:00',
+        'endTime': '2023-04-01T23:30:00',
+      },
+      {
+        'startTime': '2023-04-03T17:00:00',
+        'endTime': '2023-04-01T23:30:00',
+      },
+      {
+        'startTime': '2023-04-04T12:00:00',
+        'endTime': '2023-04-01T23:30:00',
+      },
+      {
+        'startTime': '2023-04-05T23:30:00',
+        'endTime': '2023-04-01T23:30:00',
+      }
+    ];
+
+    String jsonString = jsonEncode(jsonObject);
+
+    List<dynamic> bodyDecoded = jsonDecode(jsonString);
+    print(bodyDecoded);
+    int counter = 0;
+    for (var time in bodyDecoded) {
+      list.add(timeBox(time["startTime"], time["endTime"], counter,
+          selectedValue, setState));
+      counter++;
+    }
+    print(list);
+    return list;
+  }
+
+  ListView timeList(List<Widget> list) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: list.length,
+      itemBuilder: (BuildContext context, int index) {
+        return list[index];
+      },
+    );
+  }
+
+  Row timeBox(
+      String startTime, String endTime, int value, selectedValue, setState) {
+    return Row(
+      children: [
+        Column(
+          children: [
+            Text(startTime),
+            Text(endTime),
+          ],
+        ),
+        Expanded(
+          child: Radio<int>(
+            value: value,
+            groupValue: selectedValue,
+            onChanged: setState
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleSchemaSyncButtonPressed() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        int selectedValue = 0;
+        return AlertDialog(
+          title: Text('Välj event datum.'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SizedBox(
+                width: 100,
+                height: 150,
+                child: timeList(CreateList((value) {
+                  setState(() {
+                    selectedValue = value;
+                  });
+                }, selectedValue)),
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  IconButton schemaSyncButton() {
+    return IconButton(
+      onPressed: () async {
+        _handleSchemaSyncButtonPressed();
+      },
+      icon: Padding(
+        padding: EdgeInsets.all(0),
+        child: Column(
+          children: const [
+            Icon(
+              Icons.sync,
+              size: 20.0,
+            ),
+            Text(
+              'Sync scheman',
+              style: TextStyle(fontSize: 10),
+            ),
+          ],
         ),
       ),
     );

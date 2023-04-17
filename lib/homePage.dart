@@ -21,7 +21,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Widget> eventList = <Widget>[];
   final double baseWidth = 390;
   double fem = 0;
   double ffem = 0;
@@ -118,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             )
                 : null,
-            child: MyGroups(),
+            child: const MyGroups(),
           ),
         ],
       ),
@@ -203,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       time: 'TBD',
                     )),
           );
-        },child: Text('Event page'))
+        },child: const Text('Event page'))
     ]
     );
   }
@@ -229,6 +228,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return AppBar(
       automaticallyImplyLeading: true,
       titleSpacing: 0,
+      backgroundColor:Theme
+          .of(context)
+          .brightness == Brightness.dark
+          ? Colors.grey.shade800
+          : Colors.white,
       title: Row(
         children: <Widget>[
           Expanded(
@@ -251,7 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
               iconSize: 30,
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => ProfileWidget()));
+                    MaterialPageRoute(builder: (_) => const ProfileWidget()));
               },
             ),
           ),
