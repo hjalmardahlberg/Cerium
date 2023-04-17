@@ -12,8 +12,8 @@ public class Event {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-;
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+
     public Event(String startTime, String endTime) {
         LocalDateTime s_time = LocalDateTime.parse(startTime, formatter);
         LocalDateTime e_time = LocalDateTime.parse(endTime, formatter);
