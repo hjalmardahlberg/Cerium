@@ -171,17 +171,18 @@ class _MyGroups extends State<MyGroups>  {
         itemCount: groupData.length,
         itemBuilder: (context, index) {
           final group = groupData[index];
-          return groupBox('images/wallsten.jpg', group.groupName);
+          return groupBox('images/wallsten.jpg', group.groupName,group.adminEmail);
         },
       );
 
-  GestureDetector groupBox(String groupImage, String groupName) {
+  GestureDetector groupBox(String groupImage, String groupName, String groupAdmin) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => Group(
+                  admin: groupAdmin,
                   groupName: groupName,
                   picture: groupImage,
                  )),

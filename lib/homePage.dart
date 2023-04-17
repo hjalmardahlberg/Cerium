@@ -33,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static Future<List<EventData>> getEventData() async {
     final user = FirebaseAuth.instance.currentUser!;
 
-    final url = 'http://192.121.208.57:8080/user/groups/' + user.uid;
+    final url = 'http://192.121.208.57:8080/user/events/' + user.uid;
 
     final headers = {'Content-Type': 'application/json'};
     final response = await http.get(Uri.parse(url), headers: headers);
@@ -286,6 +286,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   )),
         );
       },
+    child: Padding(padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
       child: Material(
         elevation: 15.0,
         borderRadius: BorderRadius.circular(10),
@@ -397,6 +398,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+    ),
     );
   }
 }

@@ -1,14 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
 import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
 import 'groupChat.dart';
+import 'package:http/http.dart' as http;
 
 
 class Group extends StatefulWidget {
   const Group({
     Key? key,
+    required this.admin,
     required this.groupName,
     required this.picture,
     //required this.group,
@@ -16,6 +20,7 @@ class Group extends StatefulWidget {
   }) : super(key: key);
 
   //final Group group;
+  final String admin;
   final String groupName;
   final String picture;
 
@@ -25,7 +30,35 @@ class Group extends StatefulWidget {
 }
 
 class _Group extends State<Group> {
-  List<Widget> groupList = <Widget>[];
+  late Future<List<Widget>> groupParticipants;
+
+  @override
+  void initState() {
+    super.initState();
+    groupParticipants = getGroupParticipants(widget.admin,widget.groupName);
+  }
+
+  static Future<List<Widget>> getGroupParticipants(admin,groupName) async {
+
+    final getGroupParticipants =
+    {
+      'admin' : admin,
+      'groupName':groupName,
+    };
+
+
+    final url = 'http://192.121.208.57:8080/user/groups/users';
+
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode(getGroupParticipants);
+    final response = await http.post(Uri.parse(url), headers: headers,body:body);
+
+    final participants = json.decode(response.body);
+
+    print(response.body);
+
+    return participants;
+  }
 
   AppBar appBar(context) {
     return AppBar(
@@ -83,63 +116,37 @@ class _Group extends State<Group> {
     );
   }
 
+  double baseWidth = 390;
+  double fem = 0;
+  double ffem = 0;
+  double width = 0;
+  double height = 0;
+
   @override
   Widget build(BuildContext context) {
-    double baseWidth = 390;
-    double fem = MediaQuery.of(context).size.width / baseWidth;
-    double ffem = fem * 0.97;
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+
+     fem = MediaQuery.of(context).size.width / baseWidth;
+     ffem = fem * 0.97;
+     width = MediaQuery.of(context).size.width;
+     height = MediaQuery.of(context).size.height;
     final themeManager = Provider.of<ThemeManager>(context);
-
-    SizedBox profileBox(name, image) {
-      return SizedBox(
-        width: double.infinity,
-        height: width / 6,
-        child: Row(
-          children: [
-            Padding(
-              // wallstoeno8C (23:38)
-              padding: const EdgeInsets.only(left: 0),
-              child: CircleAvatar(
-                radius: 30,
-                backgroundImage: AssetImage(image),
-              ),
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-            Text(
-              name,
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
-                height: 1.2125 * ffem / fem,
-              ),
-            ),
-            Expanded(
-            child:Text(
-              "27/03",
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                height: 1.2125 * ffem / fem,
-            )
-            ),),
-          ],
-        ),
-      );
-    }
-
-    groupList.add(profileBox("Wallsten", 'images/wallsten.jpg'));
 
     Expanded profiler() {
       return Expanded(
         child:SizedBox(
           height:height,
-        child: ListView.builder(
+            child: FutureBuilder<List<Widget>>(
+                future: groupParticipants, builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final groupParticipants = snapshot.data!;
+                return buildParticipantsList(groupParticipants);
+              }
+              else {
+                return const Padding(padding:EdgeInsets.only(left:10,top:10), child:Text('Error...'));
+              }
+            }),
+
+      /*  child: ListView.builder(
           shrinkWrap: true,
           itemCount: groupList.length,
           itemBuilder: (BuildContext context, int index) {
@@ -147,7 +154,7 @@ class _Group extends State<Group> {
               title: groupList[index],
             );
           },
-        ),
+        ),*/
         ),
       );
     }
@@ -299,4 +306,56 @@ class _Group extends State<Group> {
       label: const Text('Create Event'),
     );
   }
+
+
+  SizedBox profileBox(name, image) {
+    return SizedBox(
+      width: double.infinity,
+      height: width / 6,
+      child: Row(
+        children: [
+          Padding(
+            // wallstoeno8C (23:38)
+            padding: const EdgeInsets.only(left: 0),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: AssetImage(image),
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          Text(
+            name,
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              height: 1.2125 * ffem / fem,
+            ),
+          ),
+          Expanded(
+            child:Text(
+                "27/03",
+                textAlign: TextAlign.end,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  height: 1.2125 * ffem / fem,
+                )
+            ),),
+        ],
+      ),
+    );
+  }
+
+  Widget buildParticipantsList(List<Widget> participantData) =>
+      ListView.builder(
+        itemCount: participantData.length,
+        itemBuilder: (context, index) {
+          final participant = participantData[index];
+          return profileBox('participant.name', 'images/wallsten.jpg');
+        },
+      );
+
 }

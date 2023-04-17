@@ -1,10 +1,13 @@
+import 'dart:convert';
+
+import 'package:googleapis/calendar/v3.dart' show Event;
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'Theme/ChangeTheme.dart';
 import 'Theme/themeConstants.dart';
 import 'provider.dart';
-
+import 'package:http/http.dart' as http;
 
 class ProfileWidget extends StatelessWidget {
   const ProfileWidget({super.key});
@@ -18,11 +21,15 @@ class ProfileWidget extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title:  Text('Settings', style: TextStyle(fontSize: 20,color:themeManager.isDarkMode?Colors.white:Colors.black,),),
+        title: Text(
+          'Settings',
+          style: TextStyle(
+            fontSize: 20,
+            color: themeManager.isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
         centerTitle: true,
-        backgroundColor:Theme
-            .of(context)
-            .brightness == Brightness.dark
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey.shade800
             : Colors.white,
       ),
@@ -47,7 +54,6 @@ class ProfileWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
-
             const Text(
               'Email:',
               style: TextStyle(fontSize: 20),
@@ -58,38 +64,96 @@ class ProfileWidget extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Divider(),
-            Row(
-              children: [
-                Text(
-                  themeManager.isDarkMode ? "Light mode:" : "Dark mode:",
-                  style: TextStyle(fontSize: 20),
-                ),
-                ChangeTheme()
-              ],
-            ),
+            changeTheme(themeManager),
             const SizedBox(height: 10),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: TextButton(
-                    child: const Text('Logout'),
-                    onPressed: () {
-                      final provider = Provider.of<GoogleSignInProvider>(
-                          context,
-                          listen: false);
-                      provider.logout();
-                      Navigator.popUntil(
-                          context, ModalRoute.withName('/login'));
-                    },
-                  ),
-                ),
-              ),
-            ),
+            sendCalender(context, user,themeManager),
+            const SizedBox(height: 10),
+            logOut(context),
           ],
         ),
       ),
     );
+  }
+
+  Row changeTheme(ThemeManager themeManager) {
+    return Row(
+      children: [
+        Text(
+          themeManager.isDarkMode ? "Light mode:" : "Dark mode:",
+          style: const TextStyle(fontSize: 20),
+        ),
+        ChangeTheme()
+      ],
+    );
+  }
+
+  Expanded logOut(BuildContext context) {
+    return Expanded(
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: TextButton(
+            child: const Text('Logout'),
+            onPressed: () {
+              final provider =
+                  Provider.of<GoogleSignInProvider>(context, listen: false);
+              provider.logout();
+              Navigator.popUntil(context, ModalRoute.withName('/login'));
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  ElevatedButton sendCalender(BuildContext context, User user,themeManager) {
+    return ElevatedButton.icon(
+        onPressed: () async {
+          final provider =
+              Provider.of<GoogleSignInProvider>(context, listen: false);
+
+          // kommer fetcha första veckan i april (TEMP)
+          final start = DateTime(2023, 4, 1);
+          final end = DateTime(2023, 4, 7);
+          final events = await provider.getCalendarEventsInterval(start, end);
+
+          //print("BODY:");
+          //print(events);
+          //print("");
+
+          List<Map<String, dynamic>> ev_lst = [];
+
+          for (Event event in events) {
+            final ev_data = {
+              'start': event.start?.dateTime?.toLocal().toIso8601String(),
+              'end': event.end?.dateTime?.toLocal().toIso8601String(),
+            };
+
+            ev_lst.add(ev_data);
+          }
+
+          final final_data_body = {
+            'u_id': user.uid,
+            'schedules': ev_lst,
+          };
+
+          print(final_data_body);
+
+          const url = 'http://192.121.208.57:8080/gEvent/import';
+          final headers = {'Content-Type': 'application/json'};
+          final body = jsonEncode(final_data_body);
+
+          final response =
+              await http.post(Uri.parse(url), headers: headers, body: body);
+          print(response.body);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor:  Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: themeManager.isDarkMode ? Colors.white:Colors.black,
+          side: BorderSide(color: themeManager.isDarkMode ? Colors.white:Colors.black),
+        ),
+        icon: const Icon(Icons.send),
+        label: const Text('Send Calendar'));
   }
 }

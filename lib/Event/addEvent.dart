@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:duration_picker/duration_picker.dart';
 import 'package:http/http.dart' as http;
 
 class AddEventPage extends StatefulWidget {
@@ -32,6 +33,8 @@ class _AddEventPageState extends State<AddEventPage> {
   //the picked stop time
   TimeOfDay? _stopSelectedTime;
 
+  Duration? _durationResult = const Duration(hours: 0, minutes: 0);
+
   //the event name
   final TextEditingController _eventNameController = TextEditingController();
 
@@ -42,7 +45,6 @@ class _AddEventPageState extends State<AddEventPage> {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData mediaQueryData = MediaQuery.of(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -62,7 +64,8 @@ class _AddEventPageState extends State<AddEventPage> {
       appBar: widget.appbar,
       body: Center(
         child: ListView(
-          padding: mediaQueryData.viewInsets,
+          padding: EdgeInsets.only(left: 5, right: 5),
+          //mediaQueryData.viewInsets,
           children: [
             if (_imageFile == null) pickImage(height, width),
             if (_imageFile != null) addImage(height, width, _imageFile),
@@ -73,16 +76,37 @@ class _AddEventPageState extends State<AddEventPage> {
             const SizedBox(height: 16),
             timePickerRow(context, width),
             const SizedBox(height: 16),
+            durationPicker(context),
             addTextForm('Enter your events info', _eventInfoController),
             const SizedBox(height: 16),
-            addEventButton(),
             schemaSyncButton(),
+            const SizedBox(height: 16),
+            addEventButton(),
           ],
         ),
       ),
       //  bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
+
+  Row durationPicker(BuildContext context) => Row(
+        children: [
+          ElevatedButton.icon(
+              onPressed: () async {
+                _durationResult = await showDurationPicker(
+                    context: context, initialTime: const Duration(minutes: 30));
+                setState(() {});
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor:  Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+                foregroundColor: Theme.of(context).textTheme.titleMedium?.color,
+
+              ),
+              icon: Icon(Icons.timer),
+              label: const Text('Hur långt är eventet')),
+          Padding(padding: EdgeInsets.only(left:20),  child:Text('${_durationResult?.inHours}h ${_durationResult?.inMinutes.remainder(60)}m')),
+        ],
+      );
 
   Future<void> _getImage() async {
     try {
@@ -137,11 +161,11 @@ class _AddEventPageState extends State<AddEventPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill in all fields.'),
+            title: const Text('Error'),
+            content: const Text('Please fill in all fields.'),
             actions: [
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -177,6 +201,7 @@ class _AddEventPageState extends State<AddEventPage> {
     return GestureDetector(
       onTap: () async {
         final DateTimeRange? pickedDateRange = await showDateRangePicker(
+          initialEntryMode: DatePickerEntryMode.input,
           context: context,
           firstDate: DateTime.now(),
           lastDate: DateTime.now().add(const Duration(days: 365)),
@@ -269,9 +294,9 @@ class _AddEventPageState extends State<AddEventPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Padding(
+                const Padding(
                   padding: EdgeInsets.only(left: 10),
-                  child: const Icon(
+                  child: Icon(
                     Icons.access_time,
                     size: 30.0,
                   ),
@@ -442,10 +467,7 @@ class _AddEventPageState extends State<AddEventPage> {
         ),
         Expanded(
           child: Radio<int>(
-            value: value,
-            groupValue: selectedValue,
-            onChanged: setState
-          ),
+              value: value, groupValue: selectedValue, onChanged: setState),
         ),
       ],
     );
@@ -457,7 +479,7 @@ class _AddEventPageState extends State<AddEventPage> {
       builder: (BuildContext context) {
         int selectedValue = 0;
         return AlertDialog(
-          title: Text('Välj event datum.'),
+          title: const Text('Välj event datum.'),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
               return SizedBox(
@@ -473,7 +495,7 @@ class _AddEventPageState extends State<AddEventPage> {
           ),
           actions: [
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -484,26 +506,25 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  IconButton schemaSyncButton() {
-    return IconButton(
-      onPressed: () async {
-        _handleSchemaSyncButtonPressed();
-      },
-      icon: Padding(
-        padding: EdgeInsets.all(0),
-        child: Column(
-          children: const [
-            Icon(
-              Icons.sync,
-              size: 20.0,
-            ),
-            Text(
-              'Sync scheman',
-              style: TextStyle(fontSize: 10),
-            ),
-          ],
+  Row schemaSyncButton() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () async {
+            _handleSchemaSyncButtonPressed();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.lightBlue.shade300,
+          ),
+          icon: const Icon(Icons.sync),
+          label: const Text(
+            'Sync scheman',
+          ),
         ),
-      ),
+      ],
     );
   }
 }
