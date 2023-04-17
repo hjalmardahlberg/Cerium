@@ -4,8 +4,7 @@ import com.tempus.serverAPI.DateSyncAlg.Datesync;
 import com.tempus.serverAPI.DateSyncAlg.Event;
 import com.tempus.serverAPI.Exceptions.ApiException;
 import com.tempus.serverAPI.Exceptions.ApiForbiddenException;
-import com.tempus.serverAPI.Exceptions.ForbiddenException;
-import com.tempus.serverAPI.Exceptions.NotFoundException;
+
 import com.tempus.serverAPI.Models.*;
 
 import com.tempus.serverAPI.Repo.GoogleEventRepo;
@@ -249,7 +248,7 @@ public class Controller {
     @PostMapping(value = "/gEvent/import")
     public String importEvents(@RequestBody GroupSchedule hmm) {
 
-        googleEventRepo.deleteById(hmm.getU_id());
+        googleEventRepo.deleteAllByUserid(hmm.getU_id());
         for (int i = 0; i < hmm.getSchedules().size(); i++) {
             UserSchedule currSchedule = hmm.getSchedules().get(i);
             GoogleEvent currEvent = new GoogleEvent();
@@ -273,7 +272,7 @@ public class Controller {
             List<Event> events = new ArrayList<>();
             Datesync toProcess = new Datesync();
             for (int i = 0; i < Query.size(); i++) {
-                if (!googleEventRepo.findByUserid(Query.get(i).getUser().getId()).isEmpty()) {
+                if (googleEventRepo.findByUserid(Query.get(i).getUser().getId()).isEmpty()) {
                     throw new ApiForbiddenException("User " + Query.get(i).getUser().getEmail() + " hasn't imported their schedule, this error should've been caught in the frontend");
                 } //TODO: Detta ska fångas i frontend
                 for (int j = 0; j < googleEventRepo.findByUserid(Query.get(i).getUser().getId()).size(); j++) {

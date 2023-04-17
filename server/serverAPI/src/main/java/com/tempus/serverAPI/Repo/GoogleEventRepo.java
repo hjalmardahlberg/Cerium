@@ -7,4 +7,6 @@ import java.util.List;
 public interface GoogleEventRepo extends JpaRepository<GoogleEvent, String> {
 
     List<GoogleEvent> findByUserid(String userid);
+    GoogleEvent findByUseridAndStartAndEnd(String userid, String start, String end);
+    void deleteAllByUserid(String userid);
 }
