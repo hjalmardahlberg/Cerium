@@ -56,7 +56,7 @@ public class Datesync {
     {
         LocalDateTime curr_latest_end_time = listofdates.get(0).getEndTime(); // sparar den nuvarande senaste endTime
         Long diff_form_latest = 0L;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
         LocalDateTime Itv_Date_s = LocalDateTime.parse(ItvStart, formatter);
         LocalDateTime Itv_Date_e = LocalDateTime.parse(ItvEnd, formatter);
