@@ -169,8 +169,8 @@ class _MyGroups extends State<MyGroups> {
 
                         final ev_data =
                         {
-                          'start': event.start?.dateTime?.toIso8601String(),
-                          'end': event.end?.dateTime?.toIso8601String(),
+                          'start': event.start?.dateTime?.toLocal().toIso8601String(),
+                          'end': event.end?.dateTime?.toLocal().toIso8601String(),
                         };
 
                         ev_lst.add(ev_data);
