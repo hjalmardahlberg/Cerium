@@ -201,7 +201,24 @@ class _Group extends State<Group> {
 
   ElevatedButton syncCalenders() {
     return ElevatedButton.icon(
-      onPressed: () {},
+      onPressed: () async
+      {
+        final userData = {
+          'g_name': "Kings only",
+          'a_email': "viktorkangasniemi@gmail.com",
+          'start_time': "2023-04-01T03:30:00.000Z",
+          'end_time': "2023-04-010T23:30:00.000Z",
+        };
+
+        final url = "http://192.121.208.57:8080/event/sync/"+ userData["g_name"]! + '&' + userData["a_email"]! + '/' + userData["start_time"]! +'&' + userData["end_time"]!;
+        final headers = {'Content-Type': 'application/json'};
+        final response =
+            await http.get(Uri.parse(url), headers: headers);
+
+        print(response.body);
+        print("AND DECODE: :DDDDDDDD");
+        print(jsonDecode(response.body));
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.lightBlue.shade300,
       ),
