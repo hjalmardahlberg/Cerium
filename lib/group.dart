@@ -207,7 +207,7 @@ class _Group extends State<Group> {
           'g_name': "Kings only",
           'a_email': "viktorkangasniemi@gmail.com",
           'start_time': "2023-04-01T03:30:00.000Z",
-          'end_time': "2023-04-01T23:30:00.000Z",
+          'end_time': "2023-04-08T23:30:00.000Z",
         };
 
         final url = "http://192.121.208.57:8080/event/sync/"+ userData["g_name"]! + '&' + userData["a_email"]! + '/' + userData["start_time"]! +'&' + userData["end_time"]!;
