@@ -189,7 +189,8 @@ class _MyGroups extends State<MyGroups> {
                       final headers = {'Content-Type': 'application/json'};
                       final body = jsonEncode(final_data_body);
 
-                      final response = http.post(Uri.parse(url), headers: headers, body: body);
+                      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+                      print(response.body);
 
                     },
                     child: const Text('Send Calendar')),
@@ -197,6 +198,10 @@ class _MyGroups extends State<MyGroups> {
               Expanded(
                 child: ElevatedButton(
                     onPressed: () async {
+                      final provider = Provider.of<GoogleSignInProvider>(
+                          context,
+                          listen: false);
+                      provider.googleLogin();
                       setState(() {
                         listProvider.emptyItem();
                       });
