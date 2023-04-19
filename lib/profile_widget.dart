@@ -9,11 +9,14 @@ import 'Theme/themeConstants.dart';
 import 'provider.dart';
 import 'package:http/http.dart' as http;
 
-class ProfileWidget extends StatelessWidget {
+class ProfileWidget extends StatefulWidget {
   const ProfileWidget({super.key});
 
-  //final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  @override
+  ProfileWidgetState createState() => ProfileWidgetState();
+}
 
+class ProfileWidgetState extends State<ProfileWidget>  {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
@@ -32,6 +35,8 @@ class ProfileWidget extends StatelessWidget {
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey.shade800
             : Colors.white,
+        automaticallyImplyLeading: false,
+        leading: IconButton(onPressed: (){ Navigator.popUntil(context, ModalRoute.withName('/login'));}, icon: const Icon(Icons.arrow_back)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

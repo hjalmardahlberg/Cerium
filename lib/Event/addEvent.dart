@@ -52,19 +52,19 @@ class _AddEventPageState extends State<AddEventPage> {
         start: _startSelectedDate ?? DateTime.now(),
         end: _stopSelectedDate ?? DateTime.now());
 
-    Function(DateTimeRange)? onDatesSelected = (dateRange) {
+    onDatesSelected(dateRange) {
       setState(() {
         _startSelectedDate = dateRange.start;
         _stopSelectedDate = dateRange.end;
       });
-    };
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: widget.appbar,
       body: Center(
         child: ListView(
-          padding: EdgeInsets.only(left: 5, right: 5),
+          padding: const EdgeInsets.only(left: 5, right: 5),
           //mediaQueryData.viewInsets,
           children: [
             if (_imageFile == null) pickImage(height, width),
@@ -102,9 +102,9 @@ class _AddEventPageState extends State<AddEventPage> {
                 foregroundColor: Theme.of(context).textTheme.titleMedium?.color,
 
               ),
-              icon: Icon(Icons.timer),
+              icon: const Icon(Icons.timer),
               label: const Text('Hur långt är eventet')),
-          Padding(padding: EdgeInsets.only(left:20),  child:Text('${_durationResult?.inHours}h ${_durationResult?.inMinutes.remainder(60)}m')),
+          Padding(padding: const EdgeInsets.only(left:20),  child:Text('${_durationResult?.inHours}h ${_durationResult?.inMinutes.remainder(60)}m')),
         ],
       );
 
@@ -180,6 +180,7 @@ class _AddEventPageState extends State<AddEventPage> {
   Align addEventButton() {
     return Align(
       alignment: Alignment.bottomRight,
+      child:Expanded(
       child: ElevatedButton.icon(
         onPressed: () async {
           _handleAddEventButtonPressed();
@@ -193,6 +194,7 @@ class _AddEventPageState extends State<AddEventPage> {
         ),
         label: const Text('Event'),
       ),
+    ),
     );
   }
 
@@ -455,20 +457,22 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  Row timeBox(
-      String startTime, String endTime, int value, selectedValue, setState) {
-    return Row(
+  Row timeBox(String startTime, String endTime, int value, selectedValue, setState) {
+    String startTimeDate = startTime.split('T')[0];
+    String startTimeTime = startTime.characters.skipLast(3).toString().split('T')[1];
+    String endTimeDate = endTime.split('T')[0];
+    String endTimeTime = endTime.characters.skipLast(3).toString().split('T')[1];
+    return  Row(
       children: [
-        Column(
+        Expanded( child:Column(
           children: [
-            Text(startTime),
-            Text(endTime),
+            startTimeDate == endTimeDate ? Text(startTimeDate):Text(startTimeDate + ' - ' + endTimeDate),
+            Text(startTimeTime + ' - ' +endTimeTime),
           ],
         ),
-        Expanded(
-          child: Radio<int>(
-              value: value, groupValue: selectedValue, onChanged: setState),
         ),
+        Radio<int>(
+        value: value, groupValue: selectedValue, onChanged: setState),
       ],
     );
   }
@@ -484,7 +488,7 @@ class _AddEventPageState extends State<AddEventPage> {
             builder: (BuildContext context, StateSetter setState) {
               return SizedBox(
                 width: 100,
-                height: 150,
+                height: 160,
                 child: timeList(CreateList((value) {
                   setState(() {
                     selectedValue = value;

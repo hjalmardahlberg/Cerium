@@ -91,17 +91,6 @@ class _EventPageState extends State<EventPage> {
     }
   }
 
-  IconButton schemaSyncButton() {
-    return IconButton(
-      onPressed: () async {
-        _handleschemasyncButtonPressed("mitt schema");
-      },
-      icon: const Icon(
-        Icons.send,
-        size: 24.0,
-      ),
-    );
-  }
 
   AppBar appBar(context) {
     return AppBar(
@@ -212,13 +201,6 @@ class _EventPageState extends State<EventPage> {
           ),
         ),
         Text(time, style: const TextStyle(fontSize: 24)),
-        Visibility(
-          visible: date != null || time == null,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 25, right: 25),
-            child: schemaSyncButton(),
-          ),
-        ),
       ],
     );
   }

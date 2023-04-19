@@ -46,8 +46,7 @@ class _Group extends State<Group> {
       'groupName':groupName,
     };
 
-
-    final url = 'http://192.121.208.57:8080/user/groups/users';
+    const url = 'http://192.121.208.57:8080/user/groups/users';
 
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode(getGroupParticipants);
