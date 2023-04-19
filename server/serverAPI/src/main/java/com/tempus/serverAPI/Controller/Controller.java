@@ -58,9 +58,9 @@ public class Controller {
 
 
     //TODO: Förbättra detta med Lista av user ids i Groups.
-    @GetMapping(value = "/groups/users")
-    public List<Users> getUsersFromGroup(@RequestBody Groups group) {
-        List<Groups> QueryResult = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin());
+    @GetMapping(value = "/groups/users/{g_name}&{a_email}")
+    public List<Users> getUsersFromGroup(@PathVariable String g_name, @PathVariable String a_email) {
+        List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
         List<Users> toReturn = new ArrayList<>();
         for (Groups groups : QueryResult) {
             Users currUser = (groups.getUser());
