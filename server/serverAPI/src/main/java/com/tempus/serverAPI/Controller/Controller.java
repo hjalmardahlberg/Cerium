@@ -280,6 +280,7 @@ public class Controller {
                     Event evCreate = new Event(currGEv.getStart(), currGEv.getEnd());
                     events.add(evCreate);
                 }
+
             }
             toProcess.setDateSyncLst(events);
             toProcess.sortDates();

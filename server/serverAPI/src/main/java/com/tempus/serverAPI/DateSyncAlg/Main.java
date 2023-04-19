@@ -9,52 +9,55 @@ import java.time.format.DateTimeFormatter;
 
 public class Main {
     public static void main(String[] args) {
-        
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS'Z'");
-       
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+
+
         /* Vi kommer egentligen få in data i formatet "yyyy-MM-dd HH:mm:ss.SSS'Z'" från DB som vi sedan inom
          * Event classen kommer att konvertera till LocalDateTime
          * Därmed måste man komma ihåg att konvertera tillbaka till vårat format
          * när vi returnerar resultatet
          */
 
-        LocalDateTime date_7 = LocalDateTime.of(1999, 12, 24, 13, 8, 0);
-        LocalDateTime date_8 = LocalDateTime.of(1999, 12, 24, 13, 50, 0);
+        String date_8 = "2023-04-01T13:00:00.000";
+        String date_7 = "2023-04-01T14:00:00.000";
 
-        LocalDateTime date_5 = LocalDateTime.of(1999, 12, 24, 13, 13, 0);
-        LocalDateTime date_6 = LocalDateTime.of(1999, 12, 24, 19, 14, 0);
+        String date_5 = "2023-04-01T10:00:00.000";
+        String date_6 = "2023-04-01T12:00:00.000";
         
-        LocalDateTime date_1 = LocalDateTime.of(1999, 12, 24, 13, 15, 0);
-        LocalDateTime date_2 = LocalDateTime.of(1999, 12, 24, 14, 16, 0);
+        String date_1 = "2023-04-01T11:00:00.000";
+        String date_2 = "2023-04-01T13:30:00.000";
         
-        LocalDateTime date_3 = LocalDateTime.of(1999, 12, 24, 14, 15, 0);
-        LocalDateTime date_4 = LocalDateTime.of(1999, 12, 24, 17, 17, 0);
+        String date_3 = "2023-04-01T17:00:00.000";
+        String date_4 = "2023-04-01T19:00:00.000";
         
-        LocalDateTime date_17  = LocalDateTime.of(1999, 12, 25, 3, 50, 0);
-        LocalDateTime date_18 = LocalDateTime.of(1999, 12, 25, 6, 50, 0);
+        String date_17 = "2023-04-01T16:00:00.000";
+        String date_18 = "2023-04-01T18:00:00.000";
 
-        LocalDateTime date_9  = LocalDateTime.of(1999, 12, 25, 9, 50, 0);
-        LocalDateTime date_10 = LocalDateTime.of(1999, 12, 25, 10, 50, 0);
+        String date_9  ="2023-04-01T19:10:00.000";
+        String date_10 ="2023-04-01T20:00:00.000";
 
-        LocalDateTime date_11 = LocalDateTime.of(1999, 12, 25, 11, 50, 0);
-        LocalDateTime date_12 = LocalDateTime.of(1999, 12, 25, 13, 50, 0);
+        String date_11 ="2023-04-02T13:00:00.000";
+        String date_12 ="2023-04-02T14:00:00.000";
 
-        LocalDateTime date_13 = LocalDateTime.of(1999, 12, 25, 13, 51, 0);
-        LocalDateTime date_14 = LocalDateTime.of(1999, 12, 25, 13, 59, 0);
+        String date_13 ="2023-04-02T13:30:00.000";
+        String date_14 ="2023-04-02T15:00:00.000";
 
-        LocalDateTime date_15 = LocalDateTime.of(1999, 12, 26, 13, 50, 0);
-        LocalDateTime date_16 = LocalDateTime.of(1999, 12, 26, 14, 50, 0);
+        String date_15 ="2023-04-02T16:00:00.000";
+        String date_16 ="2023-04-02T17:00:00.000";
+
+
 
         //Skapar alla event med de skapade datumen och konverterar om till vårat format
-        Event e_1 = new Event(date_1.format(formatter), date_2.format(formatter));
-        Event e_2 = new Event( date_3.format(formatter), date_4.format(formatter));
-        Event e_3 = new Event(date_5.format(formatter), date_6.format(formatter));
-        Event e_4 = new Event(date_7.format(formatter), date_8.format(formatter));
-        Event e_5 = new Event(date_9.format(formatter), date_10.format(formatter));
-        Event e_6 = new Event(date_11.format(formatter), date_12.format(formatter));
-        Event e_7 = new Event(date_13.format(formatter), date_14.format(formatter));
-        Event e_8 = new Event(date_15.format(formatter), date_16.format(formatter));
-        Event e_9 = new Event(date_17.format(formatter), date_18.format(formatter));
+        Event e_1 = new Event(date_1, date_2);
+        Event e_2 = new Event( date_3, date_4);
+        Event e_3 = new Event(date_5, date_6);
+        Event e_4 = new Event(date_8, date_7);
+        Event e_5 = new Event(date_9, date_10);
+        Event e_6 = new Event(date_11, date_12);
+        Event e_7 = new Event(date_13, date_14);
+        Event e_8 = new Event(date_15, date_16);
+        Event e_9 = new Event(date_17, date_18);
 
 
         List<Event> lst = new ArrayList<>();
@@ -71,10 +74,22 @@ public class Main {
 
         Datesync lesgo = new Datesync();
         lesgo.setDateSyncLst(lst);
+        String haha1 = "2023-04-01T03:00:00.000";
+        String haha2 = "2023-04-03T04:00:00.000";
+
+        Event haha_event = new Event(haha1, haha2);
+
+        //LocalDateTime D1 = LocalDateTime.parse(haha1,formatter);
+        //LocalDateTime D2 = LocalDateTime.parse(haha2,formatter);
+
+        System.out.print("here?" + "\n");
+
+
+        lesgo.addDateBuffer("2023-04-01T08:00:00.000", "2023-04-03T18:00:00.000");
 
         lesgo.sortDates(); //Sorterar listan
 
-        lesgo.pickPossDates(null,null); // Väljer ut bästa tider
+        lesgo.pickPossDates("2023-04-01T08:00:00.000","2023-04-03T18:00:00.000"); // Väljer ut bästa tider
 
 
         System.out.println("\n" + lesgo.listofdates+"\n");

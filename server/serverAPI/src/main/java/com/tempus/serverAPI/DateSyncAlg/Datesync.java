@@ -3,14 +3,19 @@ package com.tempus.serverAPI.DateSyncAlg;
 import com.tempus.serverAPI.Models.Events;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Datesync {
     final List<Event> listofdates = new ArrayList<>(); // Listan av alla events, kommer sedan bli sorterad
 
     public List<Event> possDates = new ArrayList<>(); // Listan som innehåller de tider utan konflikter
+
+    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
 
     //lägger till alla event i listan
@@ -30,12 +35,54 @@ public class Datesync {
         });
     }
 
+
+    public void addDateBuffer(String Start_dateTime, String End_DateTime){
+
+        LocalDateTime D1 = LocalDateTime.parse(Start_dateTime, formatter);
+        LocalDateTime D2 = LocalDateTime.parse(End_DateTime, formatter);
+
+        System.out.println(D1);
+
+        long Diff = ChronoUnit.DAYS.between(D1,D2);
+
+        System.out.print(Diff);
+
+        if (Diff > 0){ // om de inte är på samma dag
+
+            LocalDate Start_date = D1.toLocalDate(); // datum av första dagen
+            LocalTime Start_time = D2.toLocalTime(); // tiden när buffer eventet ska börja
+
+            LocalDateTime StartToAdd = Start_date.atTime(Start_time).plusSeconds(0).plusNanos(000);
+
+
+            LocalDate End_date = D1.toLocalDate(); // datum sista dagen
+            LocalTime End_time = D1.toLocalTime(); // tiden när de ska sluta;
+
+            LocalDateTime EndToAdd = End_date.atTime(End_time).plusDays(1).plusSeconds(0).plusNanos(000);
+
+            System.out.println("END DATE:\n" + End_date);
+            System.out.println(End_time);
+            System.out.println("to add:\n" + StartToAdd);
+
+            for (int i = 0; i < Diff; i++){
+                LocalDateTime E_s = StartToAdd.plusDays(i);
+                LocalDateTime E_e = EndToAdd.plusDays(i);
+
+                Event E = new Event(E_s.toString() + ":00.000", E_e.toString() + ":00.000");
+                listofdates.add(E); // innan man sorterat listan
+                System.out.println("HÄR ÄR E: " + E);
+            }
+        }
+    }
+
     public String printList()
     {
         return this.listofdates.toString();
     }
 
     public void isInInterval(Event event_to_add, LocalDateTime interval_start, LocalDateTime interval_end){
+
+        //event_to_add.TheSuperReasonableIntervalChecker(ItvHourStart, ItvHourEnd);
 
         if (!event_to_add.getEndTime().isBefore(interval_start) || !event_to_add.getStartTime().isAfter(interval_start)){
 
@@ -48,18 +95,19 @@ public class Datesync {
                 event_to_add.setEndTime(interval_end);
             }
 
+
             possDates.add(event_to_add);
         }
     }
 
-    public void pickPossDates(String ItvStart, String ItvEnd)
+    public void pickPossDates(String ItvDateStart, String ItvDateEnd)
     {
         LocalDateTime curr_latest_end_time = listofdates.get(0).getEndTime(); // sparar den nuvarande senaste endTime
         Long diff_form_latest = 0L;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
-        LocalDateTime Itv_Date_s = LocalDateTime.parse(ItvStart, formatter);
-        LocalDateTime Itv_Date_e = LocalDateTime.parse(ItvEnd, formatter);
+        LocalDateTime Itv_Date_s = LocalDateTime.parse(ItvDateStart, formatter);
+        LocalDateTime Itv_Date_e = LocalDateTime.parse(ItvDateEnd, formatter);
 
         for(int i = 0; i < listofdates.size() - 1; i++) // iterera över events
         {
