@@ -85,7 +85,7 @@ public class Main {
         System.out.print("here?" + "\n");
 
 
-        lesgo.addDateBuffer("2023-04-01T08:00:00.000", "2023-04-03T18:00:00.000");
+        lesgo.addDateBuffer("2023-04-01T03:00:00.000", "2023-04-03T04:00:00.000");
 
         lesgo.sortDates(); //Sorterar listan
 

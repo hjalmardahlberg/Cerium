@@ -56,15 +56,13 @@ public class Controller {
 
     }
 
-
     //TODO: Förbättra detta med Lista av user ids i Groups.
     @GetMapping(value = "/groups/users/{g_name}&{a_email}")
-    public List<Users> getUsersFromGroup(@PathVariable String g_name, @PathVariable String a_email) {
+    public List<String> getUsersFromGroup(@PathVariable String g_name, @PathVariable String a_email) {
         List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
-        List<Users> toReturn = new ArrayList<>();
-        for (Groups groups : QueryResult) {
-            Users currUser = (groups.getUser());
-            toReturn.add(currUser);
+        List<String> toReturn = new ArrayList<>();
+        for (int i = 0; i < QueryResult.size(); i++) {
+            toReturn.add(QueryResult.get(i).getUser().getName());
         }
         return toReturn;
     }
@@ -149,7 +147,7 @@ public class Controller {
 
     }
 
-
+    //FIXME: Bugg när vi lämnar grupp som admin
     @PutMapping(value = "/group/leave/{g_name}&{a_email}")
     public String leaveGroup(@PathVariable String g_name, @PathVariable String a_email, @RequestBody Users user) {
         if (userRepo.findById(user.getId()).isEmpty()) {
@@ -171,6 +169,29 @@ public class Controller {
                 }
             }
             throw new ApiForbiddenException("Fatal error occured when user " + user.getEmail() + " tried to leave group: " + g_name);
+        }
+
+    }
+
+    @DeleteMapping(value = "/group/delete/{g_name}")
+    public String delGroup(@PathVariable String g_name, @RequestBody Users user) {
+        List<Groups> selectedGroup = groupRepo.findByNameAndAdmin(g_name, user.getEmail());
+        if (selectedGroup.isEmpty()) {
+            throw new ApiException("Cannot delete a group that does not exist");
+        }
+        else if (selectedGroup.get(0).getAdmin().equals(user.getEmail())){
+            for (int i = 0; i < selectedGroup.size(); i++) {
+                Groups currGroup = selectedGroup.get(i);
+                Users currUser = selectedGroup.get(i).getUser();
+                int hmm = currUser.getGroups().indexOf(currGroup);
+                currUser.getGroups().remove(hmm);
+                groupRepo.delete(currGroup);
+
+            }
+            return "Successfully deleted " + selectedGroup.get(0).getName();
+        }
+        else {
+            throw new ApiForbiddenException("User not admin");
         }
 
     }
@@ -222,28 +243,7 @@ public class Controller {
     }
 
 
-    @DeleteMapping(value = "/group/delete/{g_name}")
-    public String delGroup(@PathVariable String g_name, @RequestBody Users user) {
-        List<Groups> selectedGroup = groupRepo.findByNameAndAdmin(g_name, user.getEmail());
-        if (selectedGroup.isEmpty()) {
-            throw new ApiException("Cannot delete a group that does not exist");
-        }
-        else if (selectedGroup.get(0).getAdmin().equals(user.getEmail())){
-            for (int i = 0; i < selectedGroup.size(); i++) {
-                Groups currGroup = selectedGroup.get(i);
-                Users currUser = selectedGroup.get(i).getUser();
-                int hmm = currUser.getGroups().indexOf(currGroup);
-                currUser.getGroups().remove(hmm);
-                groupRepo.delete(currGroup);
 
-            }
-            return "Successfully deleted " + selectedGroup.get(0).getName();
-        }
-        else {
-            throw new ApiForbiddenException("User not admin");
-        }
-
-    }
 
     @PostMapping(value = "/gEvent/import")
     public String importEvents(@RequestBody GroupSchedule hmm) {
