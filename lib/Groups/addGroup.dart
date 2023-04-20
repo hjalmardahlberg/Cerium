@@ -91,7 +91,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');
-
+        Navigator.pop(context);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (BuildContext context) => MyHomePage(pageIndex: 2,)),

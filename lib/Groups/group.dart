@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:projecttest/Event/addEvent.dart';
 import 'package:projecttest/profile_widget.dart';
 import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
@@ -159,7 +160,7 @@ class _Group extends State<Group> {
                 print(response.body);
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
-                  Navigator.pop(context);
+                  Navigator.popUntil(context, ModalRoute.withName('/login'));
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (BuildContext context) => MyHomePage(pageIndex: 2,)),
@@ -214,6 +215,38 @@ class _Group extends State<Group> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         groupNameAndExit(),
+        Expanded(
+     child: Padding(
+       padding: EdgeInsets.only(top:10,bottom: 10,left:20,right:20),
+       child: SizedBox(
+         width: width,
+         child: Material(
+           elevation: 5.0,
+           borderRadius: BorderRadius.circular(15),
+           child: ClipRRect(
+             borderRadius: BorderRadius.circular(15),
+             child: Container(
+               decoration: BoxDecoration(
+                 color: themeManager.isDarkMode
+                     ? Colors.grey.shade800
+                     : Colors.white,
+                 borderRadius: BorderRadius.circular(15),
+                 // color: Theme.of(context).appBarTheme.foregroundColor,
+               ),
+               child: Align(
+                 alignment: Alignment.topLeft,
+                 child: Padding(
+                   padding: const EdgeInsets.only(top: 10.0, left: 15),
+                   child:
+                   Text('grupp information hamnar här', style: const TextStyle(fontSize: 16)),
+                 ),
+               ),
+             ),
+           ),
+         ),
+       ),
+     ),
+     ),
         const Padding(
             padding: EdgeInsets.only(left: 20, top: 20),
             child: Text("Deltagare")),
@@ -241,8 +274,7 @@ class _Group extends State<Group> {
     )],),
         const Divider(color: Colors.grey),
         profiler(),
-        goToChat(context),
-        sendAndSyncCalenders(),
+        createEventAndChat(),
       ],
     );
 
@@ -253,31 +285,26 @@ class _Group extends State<Group> {
     // This trailing comma makes auto-formatting nicer for build methods.
   }
 
-  Align goToChat(BuildContext context) {
-    return
-        Align(
-        alignment: Alignment.bottomRight,
-     child: Padding(
-       padding: const EdgeInsets.only(right:16),
-     child: FloatingActionButton.extended(
-      backgroundColor: Colors.lightBlue.shade300,
-        icon:const Icon(CupertinoIcons.chat_bubble_fill ,color: Colors.white,),
-        label:const Text('chat',style: TextStyle(color: Colors.white),),
-        onPressed: () {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  GroupChat(
-                groupName: widget.groupName,
-              ),
-              transitionDuration: Duration.zero,
-            ),
-          );
-        },
-     ),
-    ),
-      );
+  ElevatedButton goToChat() {
+    return  ElevatedButton.icon(
+      onPressed: () {
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                GroupChat(
+                  groupName: widget.groupName,
+                ),
+            transitionDuration: Duration.zero,
+          ),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.lightBlue.shade300,
+      ),
+      icon:const Icon(CupertinoIcons.chat_bubble_fill ,color: Colors.white,),
+      label:const Text('chattrum ',style: TextStyle(color: Colors.white),),
+    );
   }
 
   Stack groupNameAndExit() {
@@ -312,7 +339,7 @@ class _Group extends State<Group> {
     );
   }
 
-  Container sendAndSyncCalenders() {
+  Container createEventAndChat() {
     return  Container(
         margin: const EdgeInsets.only(top:8,bottom: 16), // Adjust the value as needed
         child: Align(
@@ -320,8 +347,8 @@ class _Group extends State<Group> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              CreateEvent(),
-              syncCalenders(),
+              createEvent(),
+              goToChat(),
             ],
           ),
       ),
@@ -342,9 +369,14 @@ class _Group extends State<Group> {
     );
   }
 
-  ElevatedButton CreateEvent() {
+  ElevatedButton createEvent() {
     return ElevatedButton.icon(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => AddEventPage(appbar: AppBar(),)),
+        );
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.lightBlue.shade300,
       ),

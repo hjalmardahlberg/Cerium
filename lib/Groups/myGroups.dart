@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../homePage.dart';
 import 'GroupData.dart';
 import 'group.dart';
-
 
 class MyGroups extends StatefulWidget {
   const MyGroups({
@@ -17,13 +17,15 @@ class MyGroups extends StatefulWidget {
   State<MyGroups> createState() => _MyGroups();
 }
 
-class _MyGroups extends State<MyGroups>  {
+class _MyGroups extends State<MyGroups> {
   double baseWidth = 390;
   double fem = 0;
   double ffem = 0;
   double width = 0;
   double height = 0;
-  final TextEditingController _joinGroupController = TextEditingController();
+  final TextEditingController joinGroupController = TextEditingController();
+  final TextEditingController joinGroupAdminController =
+      TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
   Future<List<GroupData>> groupData = getGroupData();
@@ -46,19 +48,10 @@ class _MyGroups extends State<MyGroups>  {
   @override
   Widget build(BuildContext context) {
     double baseWidth = 390;
-    fem = MediaQuery
-        .of(context)
-        .size
-        .width / baseWidth;
+    fem = MediaQuery.of(context).size.width / baseWidth;
     ffem = fem * 0.97;
-    width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    height = MediaQuery
-        .of(context)
-        .size
-        .height;
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       //appBar: widget.appbar,
@@ -67,22 +60,23 @@ class _MyGroups extends State<MyGroups>  {
           groupText(),
           Expanded(
             child: FutureBuilder<List<GroupData>>(
-                future: groupData, builder: (context, snapshot) {
-               if (snapshot.hasData) {
-                final groupData = snapshot.data!;
-                return buildGroups(groupData);
-              }
-              else {
-                return const Padding(padding:EdgeInsets.only(top:10), child:Text('No Groups'));
-              }
-            }),
+                future: groupData,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final groupData = snapshot.data!;
+                    return buildGroups(groupData);
+                  } else {
+                    return const Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Text('No Groups'));
+                  }
+                }),
           ),
           joinGroup()
         ],
       ),
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
-
 
   Center groupText() {
     return const Center(
@@ -99,31 +93,87 @@ class _MyGroups extends State<MyGroups>  {
     );
   }
 
-
-  void _showJoinGroup(TextEditingController joinGroupController, context) {
+  void showJoinGroupFaild(){
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Enter The Group Name'),
-          content: TextFormField(
-            controller: joinGroupController,
-            decoration: const InputDecoration(hintText: 'Group name...'),
-          ),
+          title: const Text('Kunde inte joina gruppen'),
           actions: <Widget>[
             TextButton(
-              child: const Text('CANCEL'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showJoinGroup(TextEditingController joinGroupNameController,
+      TextEditingController joinGroupAdminController, context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Gå med i grupp'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: joinGroupNameController,
+                decoration: const InputDecoration(hintText: 'Grupp namn...'),
+              ),
+              TextFormField(
+                controller: joinGroupAdminController,
+                decoration: const InputDecoration(hintText: 'Grupp admins mail...'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
             TextButton(
-              child: const Text('JOIN'),
+              child: const Text('Avbryt'),
               onPressed: () {
-                // do something with the text entered in the TextFormField
-                String enteredText = joinGroupController.text;
-                print('Entered Text: $enteredText');
                 Navigator.of(context).pop();
+              },
+            ),
+              TextButton(
+              child: const Text('JOIN'),
+              onPressed: () async {
+                // do something with the text entered in the TextFormField
+                String groupName = joinGroupNameController.text;
+                print('Entered Text: $groupName');
+                String groupAdmin = joinGroupAdminController.text;
+                print('Entered Text: $groupAdmin');
+                Navigator.pop(context);
+
+                final user = FirebaseAuth.instance.currentUser!;
+
+                final url = 'http://192.121.208.57:8080/group/join/$groupName&$groupAdmin';
+                final userData = {
+                  'id': user.uid,
+                  'name': user.displayName,
+                  'email': user.email,
+                };
+                final userBody = jsonEncode(userData);
+                final headers = {'Content-Type': 'application/json'};
+                final response = await http.put(Uri.parse(url),headers: headers,body: userBody);
+                print(response.body);
+                if (response.statusCode == 200) {
+                  print('User data sent successfully!');
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (BuildContext context) => const MyHomePage(pageIndex: 2,)),
+                  );
+                }
+                else {
+                  print('Error sending user data: ${response.statusCode}');
+
+                  showJoinGroupFaild();
+                }
               },
             ),
           ],
@@ -146,14 +196,13 @@ class _MyGroups extends State<MyGroups>  {
                 flex: 1,
                 child: TextButton(
                   onPressed: () {
-                    _showJoinGroup(_joinGroupController, context);
+                    _showJoinGroup(
+                        joinGroupController, joinGroupAdminController, context);
                   },
                   child: Text(
                     'Gå med i grupp',
                     style: TextStyle(
-                      color: Theme
-                          .of(context)
-                          .brightness == Brightness.dark
+                      color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.white
                           : Colors.black,
                     ),
@@ -165,36 +214,35 @@ class _MyGroups extends State<MyGroups>  {
     );
   }
 
-
-  Widget buildGroups(List<GroupData> groupData) =>
-      ListView.builder(
+  Widget buildGroups(List<GroupData> groupData) => ListView.builder(
         itemCount: groupData.length,
         itemBuilder: (context, index) {
           final group = groupData[index];
-          return groupBox('images/wallsten.jpg', group.groupName,group.adminEmail);
+          return groupBox(
+              'images/wallsten.jpg', group.groupName, group.adminEmail);
         },
       );
 
-  GestureDetector groupBox(String groupImage, String groupName, String groupAdmin) {
+  GestureDetector groupBox(
+      String groupImage, String groupName, String groupAdmin) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => Group(
-                  admin: groupAdmin,
-                  groupName: groupName,
-                  picture: groupImage,
-                 )),
+                    admin: groupAdmin,
+                    groupName: groupName,
+                    picture: groupImage,
+                  )),
         );
       },
-      child: Padding(padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
         child: Material(
           elevation: 15.0,
           borderRadius: BorderRadius.circular(10),
-          color: Theme
-              .of(context)
-              .brightness == Brightness.dark
+          color: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey.shade800
               : Colors.white,
           child: SizedBox(
