@@ -16,7 +16,7 @@ class ProfileWidget extends StatefulWidget {
   ProfileWidgetState createState() => ProfileWidgetState();
 }
 
-class ProfileWidgetState extends State<ProfileWidget>  {
+class ProfileWidgetState extends State<ProfileWidget> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
@@ -36,7 +36,11 @@ class ProfileWidgetState extends State<ProfileWidget>  {
             ? Colors.grey.shade800
             : Colors.white,
         automaticallyImplyLeading: false,
-        leading: IconButton(onPressed: (){ Navigator.popUntil(context, ModalRoute.withName('/login'));}, icon: const Icon(Icons.arrow_back)),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.popUntil(context, ModalRoute.withName('/login'));
+            },
+            icon: const Icon(Icons.arrow_back)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -69,9 +73,9 @@ class ProfileWidgetState extends State<ProfileWidget>  {
             ),
             const SizedBox(height: 10),
             const Divider(),
-            changeTheme(themeManager),
+            theme(themeManager),
             const SizedBox(height: 10),
-            sendCalender(context, user,themeManager),
+            sendCalender(context, user, themeManager),
             const SizedBox(height: 10),
             logOut(context),
           ],
@@ -80,15 +84,28 @@ class ProfileWidgetState extends State<ProfileWidget>  {
     );
   }
 
-  Row changeTheme(ThemeManager themeManager) {
-    return Row(
-      children: [
-        Text(
-          themeManager.isDarkMode ? "Light mode:" : "Dark mode:",
-          style: const TextStyle(fontSize: 20),
-        ),
-        ChangeTheme()
-      ],
+  SizedBox theme(themeManager) {
+    return SizedBox( width: 175,child:ElevatedButton.icon(
+      onPressed: () async {
+        final provider = Provider.of<ThemeManager>(context, listen: false);
+        provider.toggleTheme(!themeManager.isDarkMode);
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: themeManager.isDarkMode ? Colors.white : Colors.black,
+        side: BorderSide(
+            color: themeManager.isDarkMode ? Colors.white : Colors.black),
+      ),
+      icon: Padding(
+      padding: EdgeInsets.only(right: 5.0), child:themeManager.isDarkMode
+          ? Icon(Icons.wb_sunny_outlined)
+          : Icon(Icons.nightlight_round),),
+      label:Center (child:Text(
+        themeManager.isDarkMode ? "Light mode" : "Dark mode",
+        style: const TextStyle(fontSize: 15),
+      ),
+      ),
+    ),
     );
   }
 
@@ -112,8 +129,8 @@ class ProfileWidgetState extends State<ProfileWidget>  {
     );
   }
 
-  ElevatedButton sendCalender(BuildContext context, User user,themeManager) {
-    return ElevatedButton.icon(
+  SizedBox sendCalender(BuildContext context, User user, themeManager) {
+    return SizedBox( width: 175, child:ElevatedButton.icon(
         onPressed: () async {
           final provider =
               Provider.of<GoogleSignInProvider>(context, listen: false);
@@ -154,11 +171,15 @@ class ProfileWidgetState extends State<ProfileWidget>  {
           print(response.body);
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor:  Theme.of(context).scaffoldBackgroundColor,
-          foregroundColor: themeManager.isDarkMode ? Colors.white:Colors.black,
-          side: BorderSide(color: themeManager.isDarkMode ? Colors.white:Colors.black),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor:
+              themeManager.isDarkMode ? Colors.white : Colors.black,
+          side: BorderSide(
+              color: themeManager.isDarkMode ? Colors.white : Colors.black),
         ),
-        icon: const Icon(Icons.send),
-        label: const Text('Send Calendar'));
+
+        icon: Padding(
+        padding: EdgeInsets.only(right: 5.0), child:Icon(Icons.send),),
+        label: Center (child:Text('Send Calendar',style: TextStyle(fontSize: 15),),),),);
   }
 }

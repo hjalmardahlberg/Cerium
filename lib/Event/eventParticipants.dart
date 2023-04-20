@@ -1,6 +1,4 @@
 
-
-
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +13,7 @@ class EventParticipants extends StatefulWidget {
   final String eventName;
 
 
+
   @override
   State<EventParticipants> createState() => _EventParticipants();
 }
@@ -24,6 +23,11 @@ class _EventParticipants extends State<EventParticipants> {
 
   AppBar appBar(context) {
     return AppBar(
+      backgroundColor: Theme
+          .of(context)
+          .brightness == Brightness.dark
+          ? Colors.grey.shade800
+          : Colors.white,
       titleSpacing: 0,
       title: Row(
         children: <Widget>[

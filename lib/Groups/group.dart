@@ -1,12 +1,17 @@
 import 'dart:convert';
+import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
 import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
+import '../homePage.dart';
 import 'groupChat.dart';
 import 'package:http/http.dart' as http;
+
+import 'groupParticipnats.dart';
 
 
 class Group extends StatefulWidget {
@@ -15,7 +20,6 @@ class Group extends StatefulWidget {
     required this.admin,
     required this.groupName,
     required this.picture,
-    //required this.group,
 
   }) : super(key: key);
 
@@ -30,7 +34,7 @@ class Group extends StatefulWidget {
 }
 
 class _Group extends State<Group> {
-  late Future<List<Widget>> groupParticipants;
+  late Future<List<GroupParticipants>> groupParticipants;
 
   @override
   void initState() {
@@ -38,30 +42,28 @@ class _Group extends State<Group> {
     groupParticipants = getGroupParticipants(widget.admin,widget.groupName);
   }
 
-  static Future<List<Widget>> getGroupParticipants(admin,groupName) async {
+  static Future<List<GroupParticipants>> getGroupParticipants(admin,groupName) async {
 
-    final getGroupParticipants =
-    {
-      'admin' : admin,
-      'groupName':groupName,
-    };
-
-    const url = 'http://192.121.208.57:8080/user/groups/users';
+    final url = 'http://192.121.208.57:8080/groups/users/'+groupName+'&'+admin;
 
     final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode(getGroupParticipants);
-    final response = await http.post(Uri.parse(url), headers: headers,body:body);
+    final response = await http.get(Uri.parse(url), headers: headers);
 
-    final participants = json.decode(response.body);
+    final body = json.decode(response.body);
 
     print(response.body);
 
-    return participants;
+    return body.map<GroupParticipants>(GroupParticipants.fromJson).toList();
   }
 
   AppBar appBar(context) {
     return AppBar(
       titleSpacing: 0,
+      backgroundColor:Theme
+        .of(context)
+        .brightness == Brightness.dark
+        ? Colors.grey.shade800
+        : Colors.white,
       title: Row(
         children: <Widget>[
           Expanded(
@@ -72,7 +74,6 @@ class _Group extends State<Group> {
                 height: 160,
                 width: 160,
               ),
-              //child: Text(widget.title, style: const TextStyle(fontSize: 28)),
             ),
           ),
           Align(
@@ -92,6 +93,42 @@ class _Group extends State<Group> {
     );
   }
 
+  void showDeleteGroup(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Du är ägare av gruppen om du lämnar kommer den att försvinna. \n Är du fortfarande säker på att du vill lämna gruppen?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Avbryt'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Lämna',style: TextStyle(color: Colors.red),),
+              onPressed: () async {
+                final url = 'http://192.121.208.57:8080/group/delete/'+widget.groupName;
+
+                final headers = {'Content-Type': 'application/json'};
+                final response = await http.delete(Uri.parse(url), headers: headers);
+                print(response.body);
+                if (response.statusCode == 200) {
+                  print('User data sent successfully!');
+                  Navigator.of(context).pop();
+                }
+                else {
+                  print('Error sending user data: ${response.statusCode}');
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showLeaveGroup(context) {
     showDialog(
       context: context,
@@ -107,7 +144,30 @@ class _Group extends State<Group> {
             ),
             TextButton(
               child: const Text('Lämna',style: TextStyle(color: Colors.red),),
-              onPressed: () {},
+              onPressed: () async {
+                final user = FirebaseAuth.instance.currentUser!;
+                print(widget.groupName);
+                final url = 'http://192.121.208.57:8080/group/leave/'+widget.groupName+'&'+widget.admin;
+                final userData = {
+                  'id': user.uid,
+                  'name': user.displayName,
+                  'email': user.email,
+                };
+                final userBody = jsonEncode(userData);
+                final headers = {'Content-Type': 'application/json'};
+                final response = await http.put(Uri.parse(url), headers: headers,body: userBody);
+                print(response.body);
+                if (response.statusCode == 200) {
+                  print('User data sent successfully!');
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (BuildContext context) => MyHomePage(pageIndex: 2,)),
+                  );}
+                else {
+                  print('Error sending user data: ${response.statusCode}');
+                }
+              },
             ),
           ],
         );
@@ -134,7 +194,7 @@ class _Group extends State<Group> {
       return Expanded(
         child:SizedBox(
           height:height,
-            child: FutureBuilder<List<Widget>>(
+            child: FutureBuilder<List<GroupParticipants>>(
                 future: groupParticipants, builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final groupParticipants = snapshot.data!;
@@ -144,16 +204,6 @@ class _Group extends State<Group> {
                 return const Padding(padding:EdgeInsets.only(left:10,top:10), child:Text('Error...'));
               }
             }),
-
-      /*  child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: groupList.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: groupList[index],
-            );
-          },
-        ),*/
         ),
       );
     }
@@ -234,12 +284,12 @@ class _Group extends State<Group> {
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.only(top: 8,right:5),
           child: Center(
             child: Text(
               widget.groupName,
               style: const TextStyle(
-                  fontSize: 32.0,
+                  fontSize: 30.0,
                   fontWeight: FontWeight.bold,
                   decoration: TextDecoration.underline),
             ),
@@ -253,7 +303,7 @@ class _Group extends State<Group> {
             },
             icon: const Icon(
               Icons.exit_to_app_outlined,
-              size: 36.0,
+              size: 30.0,
               color: Colors.red,
             ),
           ),
@@ -306,15 +356,14 @@ class _Group extends State<Group> {
     );
   }
 
-
   SizedBox profileBox(name, image) {
     return SizedBox(
       width: double.infinity,
       height: width / 6,
+      child:Padding(padding: const EdgeInsets.only(left:15,right:15,bottom: 10),
       child: Row(
         children: [
           Padding(
-            // wallstoeno8C (23:38)
             padding: const EdgeInsets.only(left: 0),
             child: CircleAvatar(
               radius: 30,
@@ -342,18 +391,20 @@ class _Group extends State<Group> {
                   fontWeight: FontWeight.w400,
                   height: 1.2125 * ffem / fem,
                 )
-            ),),
+            ),
+          ),
         ],
+      ),
       ),
     );
   }
 
-  Widget buildParticipantsList(List<Widget> participantData) =>
+  Widget buildParticipantsList(List<GroupParticipants> participantData) =>
       ListView.builder(
         itemCount: participantData.length,
         itemBuilder: (context, index) {
           final participant = participantData[index];
-          return profileBox('participant.name', 'images/wallsten.jpg');
+          return profileBox(participant.participantName, 'images/wallsten.jpg');
         },
       );
 

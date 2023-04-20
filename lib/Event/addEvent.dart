@@ -76,7 +76,8 @@ class _AddEventPageState extends State<AddEventPage> {
             const SizedBox(height: 16),
             timePickerRow(context, width),
             const SizedBox(height: 16),
-            durationPicker(context),
+            durationRow(context),
+            const SizedBox(height: 16),
             addTextForm('Enter your events info', _eventInfoController),
             const SizedBox(height: 16),
             schemaSyncButton(),
@@ -98,15 +99,58 @@ class _AddEventPageState extends State<AddEventPage> {
                 setState(() {});
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor:  Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+                backgroundColor:
+                    Theme.of(context).bottomNavigationBarTheme.backgroundColor,
                 foregroundColor: Theme.of(context).textTheme.titleMedium?.color,
-
               ),
               icon: const Icon(Icons.timer),
               label: const Text('Hur långt är eventet')),
-          Padding(padding: const EdgeInsets.only(left:20),  child:Text('${_durationResult?.inHours}h ${_durationResult?.inMinutes.remainder(60)}m')),
+          Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text(
+                  '${_durationResult?.inHours}h ${_durationResult?.inMinutes.remainder(60)}m')),
         ],
       );
+
+  GestureDetector durationRow(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        _durationResult = await showDurationPicker(
+            context: context, initialTime: const Duration(minutes: 30));
+        setState(() {});
+      },
+      child: Material(
+        elevation: 15.0,
+        borderRadius: BorderRadius.circular(10),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey.shade800
+            : Colors.white,
+        child: Center(
+          child: SizedBox(
+            width: double.infinity,
+            height: 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: const Icon(Icons.timer),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Hur långt är eventet:',
+                ),
+                const SizedBox(width: 16),
+                Text(
+                    '${_durationResult?.inHours}h ${_durationResult?.inMinutes.remainder(60)}m'),
+                const SizedBox(width: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   Future<void> _getImage() async {
     try {
@@ -180,21 +224,21 @@ class _AddEventPageState extends State<AddEventPage> {
   Align addEventButton() {
     return Align(
       alignment: Alignment.bottomRight,
-      child:Expanded(
-      child: ElevatedButton.icon(
-        onPressed: () async {
-          _handleAddEventButtonPressed();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.lightBlue.shade300,
+      child: Expanded(
+        child: ElevatedButton.icon(
+          onPressed: () async {
+            _handleAddEventButtonPressed();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.lightBlue.shade300,
+          ),
+          icon: const Icon(
+            Icons.add,
+            size: 24.0,
+          ),
+          label: const Text('Event'),
         ),
-        icon: const Icon(
-          Icons.add,
-          size: 24.0,
-        ),
-        label: const Text('Event'),
       ),
-    ),
     );
   }
 
@@ -238,14 +282,8 @@ class _AddEventPageState extends State<AddEventPage> {
                 const SizedBox(width: 16),
                 Text(
                   _startSelectedDate != null
-                      ? DateFormat('EEE, M/d/y').format(_startSelectedDate!)
-                      : 'Select start date',
-                ),
-                const Text(' to '),
-                Text(
-                  _startSelectedDate != null
-                      ? DateFormat('EEE, M/d/y').format(_stopSelectedDate!)
-                      : 'Select stop date',
+                      ? DateFormat('EEE, M/d/y').format(_startSelectedDate!) + ' till ' +DateFormat('EEE, M/d/y').format(_stopSelectedDate!)
+                      : 'Mellan vilka datum kan eventet inträffa?',
                 ),
                 const SizedBox(width: 16),
               ],
@@ -306,14 +344,8 @@ class _AddEventPageState extends State<AddEventPage> {
                 const SizedBox(width: 16),
                 Text(
                   _startSelectedTime != null
-                      ? _startSelectedTime!.format(context)
-                      : 'Select start time',
-                ),
-                const Text(' - '),
-                Text(
-                  _stopSelectedTime != null
-                      ? _stopSelectedTime!.format(context)
-                      : 'Select stop time',
+                      ? _startSelectedTime!.format(context) + ' - ' + _stopSelectedTime!.format(context)
+                      : 'Mellan vilka tider kan eventet inträffa?',
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -457,22 +489,28 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  Row timeBox(String startTime, String endTime, int value, selectedValue, setState) {
+  Row timeBox(
+      String startTime, String endTime, int value, selectedValue, setState) {
     String startTimeDate = startTime.split('T')[0];
-    String startTimeTime = startTime.characters.skipLast(3).toString().split('T')[1];
+    String startTimeTime =
+        startTime.characters.skipLast(3).toString().split('T')[1];
     String endTimeDate = endTime.split('T')[0];
-    String endTimeTime = endTime.characters.skipLast(3).toString().split('T')[1];
-    return  Row(
+    String endTimeTime =
+        endTime.characters.skipLast(3).toString().split('T')[1];
+    return Row(
       children: [
-        Expanded( child:Column(
-          children: [
-            startTimeDate == endTimeDate ? Text(startTimeDate):Text(startTimeDate + ' - ' + endTimeDate),
-            Text(startTimeTime + ' - ' +endTimeTime),
-          ],
-        ),
+        Expanded(
+          child: Column(
+            children: [
+              startTimeDate == endTimeDate
+                  ? Text(startTimeDate)
+                  : Text(startTimeDate + ' - ' + endTimeDate),
+              Text(startTimeTime + ' - ' + endTimeTime),
+            ],
+          ),
         ),
         Radio<int>(
-        value: value, groupValue: selectedValue, onChanged: setState),
+            value: value, groupValue: selectedValue, onChanged: setState),
       ],
     );
   }

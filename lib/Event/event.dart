@@ -30,11 +30,14 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
+  double sidePadding = 15;
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     final themeManager = Provider.of<ThemeManager>(context);
+
 
     return Scaffold(
       appBar: appBar(context),
@@ -45,14 +48,12 @@ class _EventPageState extends State<EventPage> {
           eventImage(height, width),
           eventName(widget.theEventName),
           dateAndTime(widget.date, widget.time),
-          eventInformation(widget.eventInfo, height, width,themeManager),
+          eventInformation(widget.eventInfo, height, width, themeManager),
         ],
       ),
-     //bottomNavigationBar: widget.bottomNavigationBar,
+      //bottomNavigationBar: widget.bottomNavigationBar,
     );
   }
-
-
 
   void _handleschemasyncButtonPressed(schema) async {
     if (schema != null && widget.date == null && widget.time == null) {
@@ -91,37 +92,14 @@ class _EventPageState extends State<EventPage> {
     }
   }
 
-
   AppBar appBar(context) {
     return AppBar(
       titleSpacing: 0,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey.shade800
+          : Colors.white,
       title: Row(
         children: <Widget>[
-      IconButton(
-      padding: const EdgeInsets.all(0),
-      icon: Column(
-        children: [
-          const Icon(Icons.group),
-          const Text(
-            'Deltagare',
-            style: TextStyle(fontSize: 10),
-          ),
-        ],
-      ),
-            iconSize: 30,
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      EventParticipants(
-                    eventName: widget.theEventName,
-                  ),
-                  transitionDuration: Duration.zero,
-                ),
-              );
-            },
-          ),
           Expanded(
             flex: 2,
             child: Center(
@@ -136,7 +114,7 @@ class _EventPageState extends State<EventPage> {
           Align(
             alignment: Alignment.topRight,
             child: IconButton(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.only(top:10,bottom: 10,left:sidePadding,right:sidePadding),
               icon: const Icon(Icons.settings),
               iconSize: 30,
               onPressed: () {
@@ -150,10 +128,11 @@ class _EventPageState extends State<EventPage> {
     );
   }
 
-  Expanded eventInformation(String eventInfo, double height, double width,themeManager) {
+  Expanded eventInformation(
+      String eventInfo, double height, double width, themeManager) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.only(top:10,bottom: 10,left:sidePadding,right:sidePadding),
         child: SizedBox(
           height: height / 5,
           width: width,
@@ -164,9 +143,11 @@ class _EventPageState extends State<EventPage> {
               borderRadius: BorderRadius.circular(15),
               child: Container(
                 decoration: BoxDecoration(
-                  color: themeManager.isDarkMode ? Colors.grey.shade800 : Colors.white,
+                  color: themeManager.isDarkMode
+                      ? Colors.grey.shade800
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(15),
-                 // color: Theme.of(context).appBarTheme.foregroundColor,
+                  // color: Theme.of(context).appBarTheme.foregroundColor,
                 ),
                 child: Align(
                   alignment: Alignment.topLeft,
@@ -184,30 +165,56 @@ class _EventPageState extends State<EventPage> {
     );
   }
 
-  Row dateAndTime(String date, String time) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 10, right: 5, top: 10, bottom: 10),
-          child: Icon(Icons.calendar_month, size: 24),
-        ),
-        Text(date, style: const TextStyle(fontSize: 24)),
-        const Padding(
-          padding: EdgeInsets.only(left: 10, right: 5, top: 10, bottom: 10),
-          child: Icon(
+  Padding dateAndTime(String date, String time) {
+    return Padding(
+      padding: EdgeInsets.only(top:10,left:sidePadding,right:sidePadding),
+      child: Row(
+        children: [
+          Icon(Icons.calendar_month, size: 24),
+          Text(date, style: const TextStyle(fontSize: 24)),
+          Icon(
             Icons.access_time,
             size: 24,
           ),
-        ),
-        Text(time, style: const TextStyle(fontSize: 24)),
-      ],
+          Text(time, style: const TextStyle(fontSize: 24)),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                padding: const EdgeInsets.all(0),
+                icon: Column(
+                  children: const [
+                    Icon(Icons.group),
+                    Text(
+                      'Deltagare',
+                      style: TextStyle(fontSize: 10),
+                    ),
+                  ],
+                ),
+                iconSize: 30,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          EventParticipants(
+                        eventName: widget.theEventName,
+                      ),
+                      transitionDuration: Duration.zero,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Padding eventName(String eventName) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10.0, left: 10),
+      padding: EdgeInsets.only(top:5,left:sidePadding,right:sidePadding),
       child: Text(eventName, style: const TextStyle(fontSize: 24)),
     );
   }
