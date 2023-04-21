@@ -12,6 +12,8 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>NSPhotoLibraryUsageDescription</key> 
+	<string>Photo Library Access Warning</string>
 	<key>CFBundleName</key>
 	<string>cerium</string>
 	<key>CFBundlePackageType</key>
