@@ -39,7 +39,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Hey There,\nWelcome back!',
+              'Hej,\nVälkommen tillbaka!',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -50,7 +50,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Login to your account to continue',
+              'Logga in i dit konto för att fortsätta',
               style: TextStyle(fontSize: 16),
             ),
           ),

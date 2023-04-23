@@ -9,6 +9,7 @@ import 'package:projecttest/profile_widget.dart';
 import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
 import '../homePage.dart';
+import 'GroupData.dart';
 import 'groupChat.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,16 +19,14 @@ import 'groupParticipnats.dart';
 class Group extends StatefulWidget {
   const Group({
     Key? key,
-    required this.admin,
-    required this.groupName,
-    required this.picture,
+    required this.group,
 
   }) : super(key: key);
 
-  //final Group group;
-  final String admin;
-  final String groupName;
-  final String picture;
+  final GroupData group;
+  //final String admin;
+  //final String groupName;
+  //final String picture;
 
 
   @override
@@ -40,7 +39,7 @@ class _Group extends State<Group> {
   @override
   void initState() {
     super.initState();
-    groupParticipants = getGroupParticipants(widget.admin,widget.groupName);
+    groupParticipants = getGroupParticipants(widget.group.adminEmail,widget.group.groupName);
   }
 
   static Future<List<GroupParticipants>> getGroupParticipants(admin,groupName) async {
@@ -57,7 +56,7 @@ class _Group extends State<Group> {
     return body.map<GroupParticipants>(GroupParticipants.fromJson).toList();
   }
 
-  AppBar appBar(context) {
+  AppBar appBar() {
     return AppBar(
       titleSpacing: 0,
       backgroundColor:Theme
@@ -94,7 +93,7 @@ class _Group extends State<Group> {
     );
   }
 
-  void showDeleteGroup(context) {
+  void showDeleteGroup() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -110,7 +109,7 @@ class _Group extends State<Group> {
             TextButton(
               child: const Text('Lämna',style: TextStyle(color: Colors.red),),
               onPressed: () async {
-                final url = 'http://192.121.208.57:8080/group/delete/'+widget.groupName;
+                final url = 'http://192.121.208.57:8080/group/delete/'+widget.group.groupName;
 
                 final headers = {'Content-Type': 'application/json'};
                 final response = await http.delete(Uri.parse(url), headers: headers);
@@ -130,8 +129,9 @@ class _Group extends State<Group> {
     );
   }
 
-  void _showLeaveGroup(context) {
-    showDialog(
+  Future<bool> _showLeaveGroup(context) async {
+    bool success = true;
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -146,9 +146,10 @@ class _Group extends State<Group> {
             TextButton(
               child: const Text('Lämna',style: TextStyle(color: Colors.red),),
               onPressed: () async {
+                Navigator.pop(context);
                 final user = FirebaseAuth.instance.currentUser!;
-                print(widget.groupName);
-                final url = 'http://192.121.208.57:8080/group/leave/'+widget.groupName+'&'+widget.admin;
+                print(widget.group.groupName);
+                final url = 'http://192.121.208.57:8080/group/leave/'+widget.group.groupName+'&'+widget.group.adminEmail;
                 final userData = {
                   'id': user.uid,
                   'name': user.displayName,
@@ -160,13 +161,10 @@ class _Group extends State<Group> {
                 print(response.body);
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
-                  Navigator.popUntil(context, ModalRoute.withName('/login'));
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (BuildContext context) => MyHomePage(pageIndex: 2,)),
-                  );}
+              }
                 else {
                   print('Error sending user data: ${response.statusCode}');
+                  success = false;
                 }
               },
             ),
@@ -174,6 +172,7 @@ class _Group extends State<Group> {
         );
       },
     );
+     return success;
   }
 
   double baseWidth = 390;
@@ -247,7 +246,7 @@ class _Group extends State<Group> {
     );
 
     return Scaffold(
-      appBar: appBar(context),
+      appBar: appBar(),
       body: body,
     );
     // This trailing comma makes auto-formatting nicer for build methods.
@@ -261,7 +260,7 @@ class _Group extends State<Group> {
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 GroupChat(
-                  groupName: widget.groupName,
+                  groupName: widget.group.groupName,
                 ),
             transitionDuration: Duration.zero,
           ),
@@ -282,7 +281,7 @@ class _Group extends State<Group> {
           padding: const EdgeInsets.only(top: 8,right:5),
           child: Center(
             child: Text(
-              widget.groupName,
+              widget.group.groupName,
               style: const TextStyle(
                   fontSize: 30.0,
                   fontWeight: FontWeight.bold,
@@ -293,8 +292,16 @@ class _Group extends State<Group> {
         Align(
           alignment: Alignment.topRight,
           child: IconButton(
-            onPressed: () {
-              _showLeaveGroup(context);
+            onPressed: () async {
+                bool success = await _showLeaveGroup(context);
+                print(success);
+               if(success){
+                 Navigator.pop(context);
+                 Navigator.pushReplacement(
+                   context,
+                   MaterialPageRoute(builder: (BuildContext context) => MyHomePage(pageIndex: 2,)),
+                 );
+               }
             },
             icon: const Icon(
               Icons.exit_to_app_outlined,
@@ -333,7 +340,7 @@ class _Group extends State<Group> {
         Icons.sync,
         size: 24.0,
       ),
-      label: const Text('sync calenders'),
+      label: const Text('Synchronisera kalender'),
     );
   }
 
@@ -342,7 +349,7 @@ class _Group extends State<Group> {
       onPressed: () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => AddEventPage(appbar: AppBar(),)),
+          MaterialPageRoute(builder: (BuildContext context) => AddEventPage(appbar: appBar() ,)),
         );
       },
       style: ElevatedButton.styleFrom(
@@ -352,7 +359,7 @@ class _Group extends State<Group> {
         Icons.add,
         size: 24.0,
       ),
-      label: const Text('Create Event'),
+      label: const Text('Skapa Event'),
     );
   }
 

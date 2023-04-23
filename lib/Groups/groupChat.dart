@@ -97,7 +97,7 @@ class _GroupChat extends State<GroupChat> {
         textInputAction: TextInputAction.go,
         decoration: const InputDecoration(
           border: UnderlineInputBorder(),
-          labelText: 'Send a message',
+          labelText: 'Skicka ett meddelande',
         ),
         onFieldSubmitted: (_) async {
           chatInput(myController.text);

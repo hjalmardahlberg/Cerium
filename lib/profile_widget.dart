@@ -25,7 +25,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Settings',
+          'Inställningar',
           style: TextStyle(
             fontSize: 20,
             color: themeManager.isDarkMode ? Colors.white : Colors.black,
@@ -116,7 +116,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: TextButton(
-            child: const Text('Logout'),
+            child: const Text('Logga ut'),
             onPressed: () {
               final provider =
                   Provider.of<GoogleSignInProvider>(context, listen: false);
@@ -180,6 +180,6 @@ class ProfileWidgetState extends State<ProfileWidget> {
 
         icon: Padding(
         padding: EdgeInsets.only(right: 5.0), child:Icon(Icons.send),),
-        label: Center (child:Text('Send Calendar',style: TextStyle(fontSize: 15),),),),);
+        label: Center (child:Text('Skicka Kalender',style: TextStyle(fontSize: 15),),),),);
   }
 }

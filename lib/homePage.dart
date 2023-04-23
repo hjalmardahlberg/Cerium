@@ -2,10 +2,12 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:projecttest/refresh.dart';
 
 import 'Event/EventData.dart';
 import 'Event/event.dart';
 import 'Event/addEvent.dart';
+import 'Groups/GroupData.dart';
 import 'Groups/myGroups.dart';
 import 'Groups/addGroup.dart';
 import 'profile_widget.dart';
@@ -30,20 +32,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List<EventData>> eventData = getEventData();
 
-  static Future<List<EventData>> getEventData() async {
-    final user = FirebaseAuth.instance.currentUser!;
 
-    final url = 'http://192.121.208.57:8080/user/events/' + user.uid;
 
-    final headers = {'Content-Type': 'application/json'};
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    final body = json.decode(response.body);
-
-    print(response.body);
-
-    return body.map<EventData>(EventData.fromJson).toList();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             )
                 : null,
-            child: const MyGroups(),
+            child: MyGroups(),
           ),
         ],
       ),
@@ -184,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return buildGroups(eventData);
             }
             else {
-              return const Padding(padding:EdgeInsets.only(top:10), child:Text('No Events'));
+              return const Padding(padding:EdgeInsets.only(top:10), child:Text(''));
             }
           }),
         ),

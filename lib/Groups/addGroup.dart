@@ -21,7 +21,6 @@ class AddGroupPage extends StatefulWidget {
 class _AddGroupPageState extends State<AddGroupPage> {
   File? _imageFile;
   TextEditingController _groupNameController = TextEditingController();
-  TextEditingController _groupInfoController = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
   Future<void> _getImage() async {
@@ -60,9 +59,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
               if (_imageFile == null) pickImage(height, width, _imageFile),
               if (_imageFile != null) addImage(height, width, _imageFile),
               const SizedBox(height: 16),
-              addTextForm('Enter your Group name', _groupNameController),
-              const SizedBox(height: 16),
-              addTextForm('Enter your group info', _groupInfoController),
+              addTextForm('Ange grupp namn', _groupNameController),
               const SizedBox(height: 16),
               addGroupButton(),
             ],
@@ -75,7 +72,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
   }
 
   void _handleAddGroupButtonPressed() async {
-    if (user.email != null && _groupNameController.text != '' && _groupInfoController.text != '') {
+    if (user.email != null && _groupNameController.text != '') {
 
       final groupData = {
         'id':user.uid,
@@ -104,8 +101,8 @@ class _AddGroupPageState extends State<AddGroupPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill in all fields.'),
+            title: Text('Fel'),
+            content: Text('Fyll i alla fällt.'),
             actions: [
               TextButton(
                 child: Text('OK'),
@@ -134,7 +131,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
             Icons.add,
             size: 24.0,
           ),
-          label: const Text('Group'),
+          label: const Text('Grupp'),
         ),
 
     );
@@ -149,7 +146,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
       ),
       validator: (value) {
         if (value!.isEmpty) {
-          return 'Enter last Name';
+          return 'Ange efternamn';
         }
         return null;
       },

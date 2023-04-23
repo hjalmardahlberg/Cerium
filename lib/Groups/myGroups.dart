@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../homePage.dart';
+import '../refresh.dart';
 import 'GroupData.dart';
 import 'group.dart';
 
@@ -18,6 +19,15 @@ class MyGroups extends StatefulWidget {
 }
 
 class _MyGroups extends State<MyGroups> {
+  final Future<List<GroupData>> groupData = getGroupData();
+  late Future<List<GroupData>> displayedGroupData;
+
+  @override
+  void initState() {
+    super.initState();
+    displayedGroupData = groupData;
+  }
+
   double baseWidth = 390;
   double fem = 0;
   double ffem = 0;
@@ -27,23 +37,6 @@ class _MyGroups extends State<MyGroups> {
   final TextEditingController joinGroupAdminController =
       TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
-
-  Future<List<GroupData>> groupData = getGroupData();
-
-  static Future<List<GroupData>> getGroupData() async {
-    final user = FirebaseAuth.instance.currentUser!;
-
-    final url = 'http://192.121.208.57:8080/user/groups/' + user.uid;
-
-    final headers = {'Content-Type': 'application/json'};
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    final body = json.decode(response.body);
-
-    print(response.body);
-
-    return body.map<GroupData>(GroupData.fromJson).toList();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +50,20 @@ class _MyGroups extends State<MyGroups> {
       //appBar: widget.appbar,
       body: Column(
         children: [
-          groupText(),
+          Padding(
+            padding: EdgeInsets.only(top: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  groupText(),
+                 // refreshButton(),
+                ],
+              ),
+            ),
           Expanded(
             child: FutureBuilder<List<GroupData>>(
-                future: groupData,
+                future: displayedGroupData,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     final groupData = snapshot.data!;
@@ -68,37 +71,43 @@ class _MyGroups extends State<MyGroups> {
                   } else {
                     return const Padding(
                         padding: EdgeInsets.only(top: 10),
-                        child: Text('No Groups'));
+                        child: Text(''));
                   }
                 }),
           ),
-          joinGroup()
+          joinGroup(),
         ],
       ),
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
-  Center groupText() {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.only(top: 10.0),
-        child: Text(
-          'Grupper',
-          style: TextStyle(
-            fontSize: 24.0, // Set the font size to 24
-            decoration: TextDecoration.underline, // Underline the text
-          ),
-        ),
+  IconButton refreshButton() {
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          displayedGroupData = getGroupData();
+        });
+      },
+      icon: const Icon(Icons.refresh),
+    );
+  }
+
+  Text groupText() {
+    return const Text(
+      'Grupper',
+      style: TextStyle(
+        fontSize: 24.0, // Set the font size to 24
+        decoration: TextDecoration.underline, // Underline the text
       ),
     );
   }
 
-  void showJoinGroupFaild(){
+  void showJoinGroupFaild() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Kunde inte joina gruppen'),
+          title: const Text('Kunde inte gå med gruppen'),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
@@ -128,7 +137,8 @@ class _MyGroups extends State<MyGroups> {
               ),
               TextFormField(
                 controller: joinGroupAdminController,
-                decoration: const InputDecoration(hintText: 'Grupp admins mail...'),
+                decoration:
+                    const InputDecoration(hintText: 'Grupp admins mail...'),
               ),
             ],
           ),
@@ -139,8 +149,8 @@ class _MyGroups extends State<MyGroups> {
                 Navigator.of(context).pop();
               },
             ),
-              TextButton(
-              child: const Text('JOIN'),
+            TextButton(
+              child: const Text('Gå med'),
               onPressed: () async {
                 // do something with the text entered in the TextFormField
                 String groupName = joinGroupNameController.text;
@@ -151,7 +161,8 @@ class _MyGroups extends State<MyGroups> {
 
                 final user = FirebaseAuth.instance.currentUser!;
 
-                final url = 'http://192.121.208.57:8080/group/join/$groupName&$groupAdmin';
+                final url =
+                    'http://192.121.208.57:8080/group/join/$groupName&$groupAdmin';
                 final userData = {
                   'id': user.uid,
                   'name': user.displayName,
@@ -159,17 +170,15 @@ class _MyGroups extends State<MyGroups> {
                 };
                 final userBody = jsonEncode(userData);
                 final headers = {'Content-Type': 'application/json'};
-                final response = await http.put(Uri.parse(url),headers: headers,body: userBody);
+                final response = await http.put(Uri.parse(url),
+                    headers: headers, body: userBody);
                 print(response.body);
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (BuildContext context) => const MyHomePage(pageIndex: 2,)),
-                  );
-                }
-                else {
+                  setState(() {
+                    displayedGroupData = getGroupData();
+                  });
+                } else {
                   print('Error sending user data: ${response.statusCode}');
 
                   showJoinGroupFaild();
@@ -218,22 +227,32 @@ class _MyGroups extends State<MyGroups> {
         itemCount: groupData.length,
         itemBuilder: (context, index) {
           final group = groupData[index];
-          return groupBox(
-              'images/wallsten.jpg', group.groupName, group.adminEmail);
+          return groupBox('images/wallsten.jpg', group);
         },
       );
 
-  GestureDetector groupBox(
-      String groupImage, String groupName, String groupAdmin) {
+  Future<String> getOwnerName(group) async {
+    print(group.adminEmail);
+    final url = 'http://192.121.208.57:8080/user/' + group.adminEmail;
+
+    final headers = {'Content-Type': 'application/json'};
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    final body = json.decode(response.body);
+    print(body);
+    final ownerName = body['name'];
+    return ownerName;
+  }
+
+  GestureDetector groupBox(String groupImage, GroupData group) {
+    //  late Future<String> owner = getOwnerName(group);
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => Group(
-                    admin: groupAdmin,
-                    groupName: groupName,
-                    picture: groupImage,
+                    group: group,
                   )),
         );
       },
@@ -276,7 +295,7 @@ class _MyGroups extends State<MyGroups> {
                         Padding(
                           padding: const EdgeInsets.only(top: 20),
                           child: Text(
-                            groupName,
+                            group.groupName,
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
@@ -285,8 +304,11 @@ class _MyGroups extends State<MyGroups> {
                           ),
                           //  ),
                         ),
+                        //TODO: Fix to be the right owner
                         Text(
-                          'Ägare: Wallsten',
+                          'Ägare: Inte fixat än',
+
+                          //'Ägare: $owner',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w400,

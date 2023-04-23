@@ -134,10 +134,10 @@ class _AddEventPageState extends State<AddEventPage> {
               children: [
                 const Padding(
                   padding: EdgeInsets.only(left: 10),
-                  child: const Icon(Icons.timer),
+                  child: Icon(Icons.timer),
                 ),
                 const SizedBox(width: 16),
-                Text(
+                const Text(
                   'Hur långt är eventet:',
                 ),
                 const SizedBox(width: 16),
@@ -224,7 +224,6 @@ class _AddEventPageState extends State<AddEventPage> {
   Align addEventButton() {
     return Align(
       alignment: Alignment.bottomRight,
-      child: Expanded(
         child: ElevatedButton.icon(
           onPressed: () async {
             _handleAddEventButtonPressed();
@@ -238,7 +237,6 @@ class _AddEventPageState extends State<AddEventPage> {
           ),
           label: const Text('Event'),
         ),
-      ),
     );
   }
 
