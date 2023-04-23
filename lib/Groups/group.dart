@@ -215,38 +215,6 @@ class _Group extends State<Group> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         groupNameAndExit(),
-        Expanded(
-     child: Padding(
-       padding: EdgeInsets.only(top:10,bottom: 10,left:20,right:20),
-       child: SizedBox(
-         width: width,
-         child: Material(
-           elevation: 5.0,
-           borderRadius: BorderRadius.circular(15),
-           child: ClipRRect(
-             borderRadius: BorderRadius.circular(15),
-             child: Container(
-               decoration: BoxDecoration(
-                 color: themeManager.isDarkMode
-                     ? Colors.grey.shade800
-                     : Colors.white,
-                 borderRadius: BorderRadius.circular(15),
-                 // color: Theme.of(context).appBarTheme.foregroundColor,
-               ),
-               child: Align(
-                 alignment: Alignment.topLeft,
-                 child: Padding(
-                   padding: const EdgeInsets.only(top: 10.0, left: 15),
-                   child:
-                   Text('grupp information hamnar här', style: const TextStyle(fontSize: 16)),
-                 ),
-               ),
-             ),
-           ),
-         ),
-       ),
-     ),
-     ),
         const Padding(
             padding: EdgeInsets.only(left: 20, top: 20),
             child: Text("Deltagare")),
