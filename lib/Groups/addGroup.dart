@@ -20,7 +20,7 @@ class AddGroupPage extends StatefulWidget {
 
 class _AddGroupPageState extends State<AddGroupPage> {
   File? _imageFile;
-  TextEditingController _groupNameController = TextEditingController();
+  final TextEditingController _groupNameController = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
   Future<void> _getImage() async {
@@ -72,6 +72,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
   }
 
   void _handleAddGroupButtonPressed() async {
+    print('http://192.121.208.57:8080/group/create/' + _groupNameController.text);
     if (user.email != null && _groupNameController.text != '') {
 
       final groupData = {

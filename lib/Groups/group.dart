@@ -349,7 +349,7 @@ class _Group extends State<Group> {
       onPressed: () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => AddEventPage(appbar: appBar() ,)),
+          MaterialPageRoute(builder: (BuildContext context) => AddEventPage(appbar: appBar() ,group: widget.group,)),
         );
       },
       style: ElevatedButton.styleFrom(

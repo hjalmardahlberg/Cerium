@@ -7,12 +7,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:duration_picker/duration_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:projecttest/Groups/GroupData.dart';
 
 class AddEventPage extends StatefulWidget {
-  const AddEventPage({Key? key, required this.appbar}) : super(key: key);
+  const AddEventPage({Key? key, required this.appbar,  this.group}) : super(key: key);
 
   final AppBar appbar;
-
+  final GroupData? group;
   @override
   State<AddEventPage> createState() => _AddEventPageState();
 }
@@ -58,7 +59,7 @@ class _AddEventPageState extends State<AddEventPage> {
         _stopSelectedDate = dateRange.end;
       });
     }
-
+    String? gupp = widget.group?.groupName;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: widget.appbar,
@@ -79,6 +80,8 @@ class _AddEventPageState extends State<AddEventPage> {
             durationRow(context),
             const SizedBox(height: 16),
             addTextForm('Enter your events info', _eventInfoController),
+            const SizedBox(height: 16),
+            widget.group == null?IconButton(onPressed: (){ }, icon: const Icon(Icons.group_add),iconSize: 40,):Center(child:Text(gupp!,style: const TextStyle(fontSize: 24),)),//ListView(scrollDirection: Axis.horizontal,)
             const SizedBox(height: 16),
             schemaSyncButton(),
             const SizedBox(height: 16),
@@ -173,6 +176,7 @@ class _AddEventPageState extends State<AddEventPage> {
   }
 
   void _handleAddEventButtonPressed() async {
+    print(widget.group);
     if (_startSelectedTime != null &&
         _stopSelectedTime != null &&
         _startSelectedDate != null &&
@@ -180,6 +184,8 @@ class _AddEventPageState extends State<AddEventPage> {
         user.email != null &&
         _eventNameController.text != '' &&
         _eventInfoController.text != '') {
+
+
       final eventData = {
         'name': _eventNameController.text,
         'info': _eventInfoController.text,
@@ -189,17 +195,26 @@ class _AddEventPageState extends State<AddEventPage> {
         'stopDate': _startSelectedDate.toString(),
         'email': user.email,
       };
-      const url = 'http://192.121.208.57:8080/save';
+      final url = 'http://192.121.208.57:8080/event/create/${_eventNameController.text}';
       final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode(eventData);
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
+      if(widget.group != null){
+        final groupBody = {
+          'g_id': widget.group?.g_id,
+          'owner': widget.group?.adminEmail,
+          'image': widget.group?.image,
+          'name': widget.group?.groupName,
+          'u_id': widget.group?.u_id,
+        };
+       final body = jsonEncode(groupBody);
+        final response = await http.put(Uri.parse(url), headers: headers, body: body);
+
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');
       } else {
         print('Error sending user data: ${response.statusCode}');
-      }
+      }  }
+
     } else {
       showDialog(
         context: context,
