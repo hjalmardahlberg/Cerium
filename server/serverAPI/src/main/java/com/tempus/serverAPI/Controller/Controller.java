@@ -43,6 +43,17 @@ public class Controller {
         return userRepo.findAll();
     }
 
+    @GetMapping(value = "/user/{u_email}")
+    public Users getUser(@PathVariable String u_email) {
+        Users toReturn = userRepo.findByEmail(u_email);
+        if (toReturn == null) {
+            throw new ApiException("User is not found");
+        }
+        else {
+            return toReturn;
+        }
+    }
+
 
     @GetMapping(value = "/user/groups/{u_id}")
     public List<Groups> getUserGroups(@PathVariable String u_id) {
@@ -162,7 +173,7 @@ public class Controller {
             for (int i = 0; i < groupToDelete.size(); i++) {
                 Groups curr = groupToDelete.get(i);
 
-                if (curr.getAdmin().equals(a_email)) {
+                if (curr.getAdmin().equals(a_email) && curr.getName().equals(g_name)) {
                     updateUser.getGroups().remove(i);
                     groupRepo.delete(curr);
                     return "User successfully left the group: " + curr.getName();
