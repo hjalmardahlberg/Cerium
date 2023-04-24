@@ -164,6 +164,9 @@ public class Controller {
         if (userRepo.findById(user.getId()).isEmpty()) {
             throw new ApiException("Error when processing the request, user does not exist");
         }
+        else if (user.getEmail().equals(a_email)) {
+            throw new ApiForbiddenException("Cannot leave a group if owner");
+        }
         else {
             Users updateUser = userRepo.findById(user.getId()).get();
             List<Groups> groupToDelete = updateUser.getGroup(g_name);
