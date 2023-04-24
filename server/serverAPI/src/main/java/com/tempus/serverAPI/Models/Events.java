@@ -36,6 +36,9 @@ public class Events {
     @Column(name = "end")
     private String end_time;
 
+    @Column (name = "description")
+    private String description;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "g_id")

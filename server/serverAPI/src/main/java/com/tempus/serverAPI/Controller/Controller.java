@@ -214,7 +214,7 @@ public class Controller {
 
     //FIXME
     @PutMapping(value = "/event/create/{e_name}")
-    public String createEvent(@RequestBody Groups group, @PathVariable String e_name) {
+    public String createEvent(@RequestBody Groups group, @RequestBody event_description event_description, @PathVariable String e_name) {
         Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
         List<Events> gEvents = eventRepo.findByName(e_name);
         for(int i = 0; i < gEvents.size(); i++) {
@@ -226,6 +226,7 @@ public class Controller {
         Events createdEvent = new Events();
         createdEvent.setName(e_name);
         createdEvent.setGroup(selectedGroup);
+        createdEvent.setDescription(event_description.getEvent_description());
         gEvents.add(createdEvent);
         eventRepo.save(createdEvent);
         groupRepo.save(selectedGroup);
