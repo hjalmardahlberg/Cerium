@@ -34,7 +34,7 @@ public class Datesync {
                 }
 
                 // om inga överlappar lägg till
-                if (!overlap && currentDateTime.isAfter(start) && nextDateTime.isBefore(end)) {
+                if (!overlap && currentDateTime.isAfter(start) && nextDateTime.isBefore(end) && nextDateTime.toLocalTime().isBefore(ItvHoursEnd)) {
                     freeSpots.add(new Event(currentDateTime, nextDateTime));
                 }
 
