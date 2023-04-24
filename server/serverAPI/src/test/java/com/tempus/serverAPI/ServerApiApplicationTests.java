@@ -41,7 +41,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 //@ExtendWith(SpringExtension.class)
 @WebMvcTest
 public class ServerApiApplicationTests {
+<<<<<<< Updated upstream
 	/*
+=======
+/*
+>>>>>>> Stashed changes
 	@MockBean
 	private GroupRepo groupRepo;
 	@MockBean //skapar "fake" så vi nte använder riktiga databasen
@@ -154,6 +158,11 @@ public class ServerApiApplicationTests {
 	public void test_join_group_no_user() throws Exception {
 
 	}
+<<<<<<< Updated upstream
 	*/
 	//TODO: Fixa tester
+=======
+*/
+
+>>>>>>> Stashed changes
 }

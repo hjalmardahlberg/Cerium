@@ -1,5 +1,7 @@
 package com.tempus.serverAPI.DateSyncAlg;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,6 +11,8 @@ import java.time.format.DateTimeFormatter;
 
 public class Main {
     public static void main(String[] args) {
+
+
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
@@ -24,13 +28,13 @@ public class Main {
 
         String date_5 = "2023-04-01T10:00:00.000";
         String date_6 = "2023-04-01T12:00:00.000";
-        
+
         String date_1 = "2023-04-01T11:00:00.000";
         String date_2 = "2023-04-01T13:30:00.000";
-        
+
         String date_3 = "2023-04-01T17:00:00.000";
         String date_4 = "2023-04-01T19:00:00.000";
-        
+
         String date_17 = "2023-04-01T16:00:00.000";
         String date_18 = "2023-04-01T18:00:00.000";
 
@@ -46,18 +50,22 @@ public class Main {
         String date_15 ="2023-04-02T16:00:00.000";
         String date_16 ="2023-04-02T17:00:00.000";
 
+        String date_20 = "2023-04-01T03:01:00.000";
+        String date_21 = "2023-04-03T03:59:00.000";
+
 
 
         //Skapar alla event med de skapade datumen och konverterar om till vårat format
-        Event e_1 = new Event(date_1, date_2);
-        Event e_2 = new Event( date_3, date_4);
-        Event e_3 = new Event(date_5, date_6);
-        Event e_4 = new Event(date_8, date_7);
-        Event e_5 = new Event(date_9, date_10);
-        Event e_6 = new Event(date_11, date_12);
-        Event e_7 = new Event(date_13, date_14);
-        Event e_8 = new Event(date_15, date_16);
-        Event e_9 = new Event(date_17, date_18);
+        Event e_1 = new Event(LocalDateTime.parse(date_1, formatter), LocalDateTime.parse(date_2,formatter));
+        Event e_2 = new Event(LocalDateTime.parse(date_3,formatter), LocalDateTime.parse(date_4, formatter));
+        Event e_3 = new Event(LocalDateTime.parse(date_5,formatter), LocalDateTime.parse(date_6, formatter));
+        Event e_4 = new Event(LocalDateTime.parse(date_8,formatter), LocalDateTime.parse(date_7, formatter));
+        Event e_5 = new Event(LocalDateTime.parse(date_9,formatter), LocalDateTime.parse(date_10, formatter));
+        Event e_6 = new Event(LocalDateTime.parse(date_11, formatter), LocalDateTime.parse(date_12, formatter));
+        Event e_7 = new Event(LocalDateTime.parse(date_13, formatter), LocalDateTime.parse(date_14, formatter));
+        Event e_8 = new Event(LocalDateTime.parse(date_15, formatter), LocalDateTime.parse(date_16, formatter));
+        Event e_9 = new Event(LocalDateTime.parse(date_17, formatter), LocalDateTime.parse(date_18, formatter));
+        //Event e_10 = new Event(LocalDateTime.parse(date_20, formatter), LocalDateTime.parse(date_21, formatter));
 
 
         List<Event> lst = new ArrayList<>();
@@ -70,30 +78,24 @@ public class Main {
         lst.add(e_7);
         lst.add(e_6);
         lst.add(e_9);
+        //lst.add(e_10);
 
 
-        Datesync lesgo = new Datesync();
-        lesgo.setDateSyncLst(lst);
         String haha1 = "2023-04-01T03:00:00.000";
         String haha2 = "2023-04-03T04:00:00.000";
 
-        Event haha_event = new Event(haha1, haha2);
 
-        //LocalDateTime D1 = LocalDateTime.parse(haha1,formatter);
-        //LocalDateTime D2 = LocalDateTime.parse(haha2,formatter);
+        LocalDateTime D1 = LocalDateTime.parse(haha1,formatter);
+        LocalDateTime D2 = LocalDateTime.parse(haha2,formatter);
+        Duration minDuration = Duration.ofMinutes(60);
+        LocalTime workingHoursStart = LocalTime.of(9, 0);
+        LocalTime workingHoursEnd = LocalTime.of(17, 0);
 
-        System.out.print("here?" + "\n");
+        Datesync lesgo = new Datesync();
 
+        List<Event> test = lesgo.findFreeSpots(lst, D1, D2, minDuration, workingHoursStart, workingHoursEnd);
 
-        lesgo.addDateBuffer("2023-04-01T03:00:00.000", "2023-04-03T04:00:00.000");
-
-        lesgo.sortDates(); //Sorterar listan
-
-        lesgo.pickPossDates("2023-04-01T08:00:00.000","2023-04-03T18:00:00.000"); // Väljer ut bästa tider
-
-
-        System.out.println("\n" + lesgo.listofdates+"\n");
-        System.out.println(lesgo.possDates);
+        System.out.println(test);
 
         // System.out.println(lesgo.listofdates);
 

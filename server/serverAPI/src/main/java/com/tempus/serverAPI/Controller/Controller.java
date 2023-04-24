@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -279,28 +281,27 @@ public class Controller {
 
 
     //FIXME: Sketchy code, fixa säkerhet och permissions
-     @GetMapping(value = "/event/sync/{g_name}&{a_email}/{start_time}&{end_time}")
-     public List<Event> syncSchedules(@PathVariable String g_name, @PathVariable String a_email, @PathVariable String start_time, @PathVariable String end_time) {
+     @PutMapping(value = "/event/sync/{g_name}&{a_email}/{start_time}&{end_time}")
+     public List<Event> syncSchedules(@PathVariable String g_name, @PathVariable String a_email, @RequestBody SetDate setDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
         List<Groups> Query = groupRepo.findByNameAndAdmin(g_name, a_email);
         if (!Query.isEmpty()) {
             List<Event> events = new ArrayList<>();
-            Datesync toProcess = new Datesync();
+
             for (int i = 0; i < Query.size(); i++) {
                 if (googleEventRepo.findByUserid(Query.get(i).getUser().getId()).isEmpty()) {
                     throw new ApiForbiddenException("User " + Query.get(i).getUser().getEmail() + " hasn't imported their schedule, this error should've been caught in the frontend");
                 } //TODO: Detta ska fångas i frontend
                 for (int j = 0; j < googleEventRepo.findByUserid(Query.get(i).getUser().getId()).size(); j++) {
                     GoogleEvent currGEv = googleEventRepo.findByUserid(Query.get(i).getUser().getId()).get(j);
-                    Event evCreate = new Event(currGEv.getStart(), currGEv.getEnd());
+                    Event evCreate = new Event(LocalDateTime.parse(currGEv.getStart(),formatter), LocalDateTime.parse(currGEv.getEnd(), formatter));
                     events.add(evCreate);
                 }
-
             }
-            toProcess.setDateSyncLst(events);
-            toProcess.sortDates();
-            toProcess.pickPossDates(start_time,end_time);
-            System.out.println(toProcess.possDates);
-            return toProcess.possDates;
+
+            Datesync freespots = new Datesync();
+            return freespots.findFreeSpots(events, setDate.getStart_Date(), setDate.getEnd_Date(), setDate.getDuration(), setDate.getStart_Hour(), setDate.getEnd_hour());
+
         }
         else {
             throw new ApiForbiddenException("User isn't admin"); //Extrem limitation
