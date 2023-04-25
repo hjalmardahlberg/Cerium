@@ -15,12 +15,10 @@ import 'package:http/http.dart' as http;
 
 import 'groupParticipnats.dart';
 
-
 class Group extends StatefulWidget {
   const Group({
     Key? key,
     required this.group,
-
   }) : super(key: key);
 
   final GroupData group;
@@ -28,23 +26,25 @@ class Group extends StatefulWidget {
   //final String groupName;
   //final String picture;
 
-
   @override
   State<Group> createState() => _Group();
 }
 
 class _Group extends State<Group> {
+  final user = FirebaseAuth.instance.currentUser!;
   late Future<List<GroupParticipants>> groupParticipants;
 
   @override
   void initState() {
     super.initState();
-    groupParticipants = getGroupParticipants(widget.group.adminEmail,widget.group.groupName);
+    groupParticipants =
+        getGroupParticipants(widget.group.adminEmail, widget.group.groupName);
   }
 
-  static Future<List<GroupParticipants>> getGroupParticipants(admin,groupName) async {
-
-    final url = 'http://192.121.208.57:8080/groups/users/'+groupName+'&'+admin;
+  static Future<List<GroupParticipants>> getGroupParticipants(
+      admin, groupName) async {
+    final url =
+        'http://192.121.208.57:8080/groups/users/' + groupName + '&' + admin;
 
     final headers = {'Content-Type': 'application/json'};
     final response = await http.get(Uri.parse(url), headers: headers);
@@ -59,11 +59,9 @@ class _Group extends State<Group> {
   AppBar appBar() {
     return AppBar(
       titleSpacing: 0,
-      backgroundColor:Theme
-        .of(context)
-        .brightness == Brightness.dark
-        ? Colors.grey.shade800
-        : Colors.white,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey.shade800
+          : Colors.white,
       title: Row(
         children: <Widget>[
           Expanded(
@@ -93,12 +91,14 @@ class _Group extends State<Group> {
     );
   }
 
-  void showDeleteGroup() {
-    showDialog(
+  Future<bool> showDeleteGroup() async {
+    bool success = true;
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Du är ägare av gruppen om du lämnar kommer den att försvinna. \n Är du fortfarande säker på att du vill lämna gruppen?'),
+          title: const Text(
+              'Du är ägare av gruppen om du lämnar kommer den att försvinna. \n Är du fortfarande säker på att du vill lämna gruppen?'),
           actions: <Widget>[
             TextButton(
               child: const Text('Avbryt'),
@@ -107,19 +107,31 @@ class _Group extends State<Group> {
               },
             ),
             TextButton(
-              child: const Text('Lämna',style: TextStyle(color: Colors.red),),
+              child: const Text(
+                'Lämna',
+                style: TextStyle(color: Colors.red),
+              ),
               onPressed: () async {
-                final url = 'http://192.121.208.57:8080/group/delete/'+widget.group.groupName;
+                final url = 'http://192.121.208.57:8080/group/delete/' +
+                    widget.group.groupName;
 
                 final headers = {'Content-Type': 'application/json'};
-                final response = await http.delete(Uri.parse(url), headers: headers);
+                final userData = {
+                  'id': user.uid,
+                  'name': user.displayName,
+                  'email': user.email,
+                };
+                final userBody = jsonEncode(userData);
+
+                final response = await http.delete(Uri.parse(url),
+                    headers: headers, body: userBody);
                 print(response.body);
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
                   Navigator.of(context).pop();
-                }
-                else {
+                } else {
                   print('Error sending user data: ${response.statusCode}');
+                  success = false;
                 }
               },
             ),
@@ -127,6 +139,7 @@ class _Group extends State<Group> {
         );
       },
     );
+    return success;
   }
 
   Future<bool> _showLeaveGroup(context) async {
@@ -144,12 +157,18 @@ class _Group extends State<Group> {
               },
             ),
             TextButton(
-              child: const Text('Lämna',style: TextStyle(color: Colors.red),),
+              child: const Text(
+                'Lämna',
+                style: TextStyle(color: Colors.red),
+              ),
               onPressed: () async {
                 Navigator.pop(context);
                 final user = FirebaseAuth.instance.currentUser!;
                 print(widget.group.groupName);
-                final url = 'http://192.121.208.57:8080/group/leave/'+widget.group.groupName+'&'+widget.group.adminEmail;
+                final url = 'http://192.121.208.57:8080/group/leave/' +
+                    widget.group.groupName +
+                    '&' +
+                    widget.group.adminEmail;
                 final userData = {
                   'id': user.uid,
                   'name': user.displayName,
@@ -157,12 +176,12 @@ class _Group extends State<Group> {
                 };
                 final userBody = jsonEncode(userData);
                 final headers = {'Content-Type': 'application/json'};
-                final response = await http.put(Uri.parse(url), headers: headers,body: userBody);
+                final response = await http.put(Uri.parse(url),
+                    headers: headers, body: userBody);
                 print(response.body);
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
-              }
-                else {
+                } else {
                   print('Error sending user data: ${response.statusCode}');
                   success = false;
                 }
@@ -172,7 +191,7 @@ class _Group extends State<Group> {
         );
       },
     );
-     return success;
+    return success;
   }
 
   double baseWidth = 390;
@@ -183,32 +202,31 @@ class _Group extends State<Group> {
 
   @override
   Widget build(BuildContext context) {
-
-     fem = MediaQuery.of(context).size.width / baseWidth;
-     ffem = fem * 0.97;
-     width = MediaQuery.of(context).size.width;
-     height = MediaQuery.of(context).size.height;
+    fem = MediaQuery.of(context).size.width / baseWidth;
+    ffem = fem * 0.97;
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
     final themeManager = Provider.of<ThemeManager>(context);
 
     Expanded profiler() {
       return Expanded(
-        child:SizedBox(
-          height:height,
-            child: FutureBuilder<List<GroupParticipants>>(
-                future: groupParticipants, builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final groupParticipants = snapshot.data!;
-                return buildParticipantsList(groupParticipants);
-              }
-              else {
-                return const Padding(padding:EdgeInsets.only(left:10,top:10), child:Text('Error...'));
-              }
-            }),
+        child: SizedBox(
+          height: height,
+          child: FutureBuilder<List<GroupParticipants>>(
+              future: groupParticipants,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final groupParticipants = snapshot.data!;
+                  return buildParticipantsList(groupParticipants);
+                } else {
+                  return const Padding(
+                      padding: EdgeInsets.only(left: 10, top: 10),
+                      child: Text('Error...'));
+                }
+              }),
         ),
       );
     }
-
-
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,28 +235,33 @@ class _Group extends State<Group> {
         const Padding(
             padding: EdgeInsets.only(left: 20, top: 20),
             child: Text("Deltagare")),
-
-        Row(children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 20, top: 10),
-          child: TextButton.icon(
-            onPressed: () {
-              // Do something when the button is pressed
-            },
-            icon: Icon(Icons.add_circle_outline,
-                color: themeManager.isDarkMode ? Colors.white : Colors.black),
-            label: Text('Lägg till deltagare',
-                style: TextStyle(
-                  color: themeManager.isDarkMode ? Colors.white : Colors.black,
-                )),
-          ),
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20, top: 10),
+              child: TextButton.icon(
+                onPressed: () {
+                  // Do something when the button is pressed
+                },
+                icon: Icon(Icons.add_circle_outline,
+                    color:
+                        themeManager.isDarkMode ? Colors.white : Colors.black),
+                label: Text('Lägg till deltagare',
+                    style: TextStyle(
+                      color:
+                          themeManager.isDarkMode ? Colors.white : Colors.black,
+                    )),
+              ),
+            ),
+            const Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: Text('Senaste\nuppdatering',
+                    textAlign: TextAlign.end, style: TextStyle(fontSize: 20)),
+              ),
+            )
+          ],
         ),
-
-          const Expanded(child:
-          Padding(
-            padding: EdgeInsets.only(right: 10),
-          child:Text('Senaste\nuppdatering',textAlign: TextAlign.end,style: TextStyle(fontSize: 20)),),
-    )],),
         const Divider(color: Colors.grey),
         profiler(),
         createEventAndChat(),
@@ -253,15 +276,14 @@ class _Group extends State<Group> {
   }
 
   ElevatedButton goToChat() {
-    return  ElevatedButton.icon(
+    return ElevatedButton.icon(
       onPressed: () {
         Navigator.push(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                GroupChat(
-                  groupName: widget.group.groupName,
-                ),
+            pageBuilder: (context, animation, secondaryAnimation) => GroupChat(
+              groupName: widget.group.groupName,
+            ),
             transitionDuration: Duration.zero,
           ),
         );
@@ -269,8 +291,14 @@ class _Group extends State<Group> {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.lightBlue.shade300,
       ),
-      icon:const Icon(CupertinoIcons.chat_bubble_fill ,color: Colors.white,),
-      label:const Text('chattrum ',style: TextStyle(color: Colors.white),),
+      icon: const Icon(
+        CupertinoIcons.chat_bubble_fill,
+        color: Colors.white,
+      ),
+      label: const Text(
+        'chattrum ',
+        style: TextStyle(color: Colors.white),
+      ),
     );
   }
 
@@ -278,7 +306,7 @@ class _Group extends State<Group> {
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 8,right:5),
+          padding: const EdgeInsets.only(top: 8, right: 5),
           child: Center(
             child: Text(
               widget.group.groupName,
@@ -293,15 +321,25 @@ class _Group extends State<Group> {
           alignment: Alignment.topRight,
           child: IconButton(
             onPressed: () async {
-                bool success = await _showLeaveGroup(context);
-                print(success);
-               if(success){
-                 Navigator.pop(context);
-                 Navigator.pushReplacement(
-                   context,
-                   MaterialPageRoute(builder: (BuildContext context) => MyHomePage(pageIndex: 2,)),
-                 );
-               }
+              bool success = false;
+              print(widget.group.adminEmail);
+              print(user.email);
+              if (widget.group.adminEmail == user.email) {
+                success = await showDeleteGroup();
+              } else {
+                success = await _showLeaveGroup(context);
+              }
+              print(success);
+              if (success) {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => MyHomePage(
+                            pageIndex: 2,
+                          )),
+                );
+              }
             },
             icon: const Icon(
               Icons.exit_to_app_outlined,
@@ -315,17 +353,18 @@ class _Group extends State<Group> {
   }
 
   Container createEventAndChat() {
-    return  Container(
-        margin: const EdgeInsets.only(top:8,bottom: 16), // Adjust the value as needed
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              createEvent(),
-              goToChat(),
-            ],
-          ),
+    return Container(
+      margin: const EdgeInsets.only(
+          top: 8, bottom: 16), // Adjust the value as needed
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            createEvent(),
+            goToChat(),
+          ],
+        ),
       ),
     );
   }
@@ -349,7 +388,11 @@ class _Group extends State<Group> {
       onPressed: () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (BuildContext context) => AddEventPage(appbar: appBar() ,group: widget.group,)),
+          MaterialPageRoute(
+              builder: (BuildContext context) => AddEventPage(
+                    appbar: appBar(),
+                    group: widget.group,
+                  )),
         );
       },
       style: ElevatedButton.styleFrom(
@@ -367,41 +410,40 @@ class _Group extends State<Group> {
     return SizedBox(
       width: double.infinity,
       height: width / 6,
-      child:Padding(padding: const EdgeInsets.only(left:15,right:15,bottom: 10),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 0),
-            child: CircleAvatar(
-              radius: 30,
-              backgroundImage: AssetImage(image),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 0),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundImage: AssetImage(image),
+              ),
             ),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
-          Text(
-            name,
-            textAlign: TextAlign.start,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              height: 1.2125 * ffem / fem,
+            const SizedBox(
+              width: 20,
             ),
-          ),
-          Expanded(
-            child:Text(
-                "27/03",
-                textAlign: TextAlign.end,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  height: 1.2125 * ffem / fem,
-                )
+            Text(
+              name,
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                height: 1.2125 * ffem / fem,
+              ),
             ),
-          ),
-        ],
-      ),
+            Expanded(
+              child: Text("27/03",
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.2125 * ffem / fem,
+                  )),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -414,5 +456,4 @@ class _Group extends State<Group> {
           return profileBox(participant.participantName, 'images/wallsten.jpg');
         },
       );
-
 }

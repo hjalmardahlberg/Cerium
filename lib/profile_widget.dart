@@ -85,27 +85,33 @@ class ProfileWidgetState extends State<ProfileWidget> {
   }
 
   SizedBox theme(themeManager) {
-    return SizedBox( width: 175,child:ElevatedButton.icon(
-      onPressed: () async {
-        final provider = Provider.of<ThemeManager>(context, listen: false);
-        provider.toggleTheme(!themeManager.isDarkMode);
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        foregroundColor: themeManager.isDarkMode ? Colors.white : Colors.black,
-        side: BorderSide(
-            color: themeManager.isDarkMode ? Colors.white : Colors.black),
+    return SizedBox(
+      width: 175,
+      child: ElevatedButton.icon(
+        onPressed: () async {
+          final provider = Provider.of<ThemeManager>(context, listen: false);
+          provider.toggleTheme(!themeManager.isDarkMode);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor:
+              themeManager.isDarkMode ? Colors.white : Colors.black,
+          side: BorderSide(
+              color: themeManager.isDarkMode ? Colors.white : Colors.black),
+        ),
+        icon: Padding(
+          padding: EdgeInsets.only(right: 5.0),
+          child: themeManager.isDarkMode
+              ? Icon(Icons.wb_sunny_outlined)
+              : Icon(Icons.nightlight_round),
+        ),
+        label: Center(
+          child: Text(
+            themeManager.isDarkMode ? "Light mode" : "Dark mode",
+            style: const TextStyle(fontSize: 15),
+          ),
+        ),
       ),
-      icon: Padding(
-      padding: EdgeInsets.only(right: 5.0), child:themeManager.isDarkMode
-          ? Icon(Icons.wb_sunny_outlined)
-          : Icon(Icons.nightlight_round),),
-      label:Center (child:Text(
-        themeManager.isDarkMode ? "Light mode" : "Dark mode",
-        style: const TextStyle(fontSize: 15),
-      ),
-      ),
-    ),
     );
   }
 
@@ -130,14 +136,15 @@ class ProfileWidgetState extends State<ProfileWidget> {
   }
 
   SizedBox sendCalender(BuildContext context, User user, themeManager) {
-    return SizedBox( width: 175, child:ElevatedButton.icon(
+    return SizedBox(
+      width: 175,
+      child: ElevatedButton.icon(
         onPressed: () async {
           final provider =
               Provider.of<GoogleSignInProvider>(context, listen: false);
 
           // Hämta kalender-data från idag o 1 mån framåt
           final events = await provider.GetEvents1month();
-
 
           //print("BODY:");
           //print(events);
@@ -176,9 +183,17 @@ class ProfileWidgetState extends State<ProfileWidget> {
           side: BorderSide(
               color: themeManager.isDarkMode ? Colors.white : Colors.black),
         ),
-
         icon: Padding(
-        padding: EdgeInsets.only(right: 5.0), child:Icon(Icons.send),),
-        label: Center (child:Text('Skicka Kalender',style: TextStyle(fontSize: 15),),),),);
+          padding: EdgeInsets.only(right: 5.0),
+          child: Icon(Icons.send),
+        ),
+        label: Center(
+          child: Text(
+            'Skicka Kalender',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+    );
   }
 }
