@@ -465,40 +465,40 @@ class _AddEventPageState extends State<AddEventPage> {
   }
 
   Future<List<Widget>> fetchData(selectedValue) async {
-    print('här1');
     List<Widget> list = [];
-    print(_stopSelectedDate.toString());
-    print(_startSelectedDate.toString());
-    print(_startSelectedTime.toString());
-    print(_stopSelectedTime.toString());
-    print(_durationResult.toString());
+    print(_stopSelectedDate?.toIso8601String());
+    print(_startSelectedDate?.toIso8601String());
+
+    final formattedStartTime = '${_startSelectedTime?.hour.toString().padLeft(2, '0')}:${_startSelectedTime?.minute.toString().padLeft(2, '0')}' + ":00";
+    final formattedEndTime = '${_stopSelectedTime?.hour.toString().padLeft(2, '0')}:${_stopSelectedTime?.minute.toString().padLeft(2, '0')}' + ":00";
+
+    print(formattedStartTime);
+
+    //print(_stopSelectedTime.toString());
+    print(formattedEndTime);
+    print(_durationResult?.inMinutes);
+
     final setDate = {
-      'Start_Date': _stopSelectedDate.toString(),
-      'End_Date': _startSelectedDate.toString(),
-      'Start_Hour': _startSelectedTime.toString(),
-      'End_Hour': _stopSelectedTime.toString(),
-      'MeetDuration': _durationResult.toString(),
+      'start_Date': _startSelectedDate?.toIso8601String(),
+      'end_Date': _stopSelectedDate?.toIso8601String(),
+      'meetDuration': _durationResult?.inMinutes,
+      'start_Hour': formattedStartTime,
+      'end_Hour': formattedEndTime,
     };
+
+    print(setDate);
     final body = jsonEncode(setDate);
-    print('här2');
     String? groupName = widget.group?.groupName;
     String? adminEmail = widget.group?.adminEmail;
-    print('här3');
-    final url = 'http://192.121.208.57:8080/event/sync/' +
-        groupName! +
-        '&' +
-        adminEmail! +
-        '/' +
-        _startSelectedTime.toString() +
-        '&' +
-        _stopSelectedTime.toString();
-    print('här4');
+    final url = 'http://192.121.208.57:8080/event/sync/' + groupName! + '&' + adminEmail!;
+
     final headers = {'Content-Type': 'application/json'};
-    print('här5');
+    print(body.toString());
     final response =
         await http.put(Uri.parse(url), headers: headers, body: body);
+
     print(response.body);
-    print('här6');
+
     List<dynamic> responseBody = json.decode(response.body);
 
     for (var time in responseBody) {
