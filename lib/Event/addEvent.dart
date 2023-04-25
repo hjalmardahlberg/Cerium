@@ -466,6 +466,10 @@ class _AddEventPageState extends State<AddEventPage> {
 
   Future<List<Widget>> fetchData(selectedValue) async {
     List<Widget> list = [];
+
+    _startSelectedDate = _startSelectedDate?.add(Duration(hours: 00, minutes: 01));
+    _stopSelectedDate = _stopSelectedDate?.add(Duration(hours: 23, minutes: 59));
+
     print(_stopSelectedDate?.toIso8601String());
     print(_startSelectedDate?.toIso8601String());
 
