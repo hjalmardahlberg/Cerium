@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+//import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 
@@ -26,6 +27,7 @@ class GoogleSignInProvider extends ChangeNotifier{
 
 
   GoogleSignInAccount? _user;
+  //final storage = FlutterSecureStorage();
 
   GoogleSignInAccount get user => _user!;
 
@@ -49,6 +51,12 @@ class GoogleSignInProvider extends ChangeNotifier{
 
       await FirebaseAuth.instance.signInWithCredential(credential);
       final fire_base_user = FirebaseAuth.instance.currentUser!;
+
+      // SAVE ACCESS TOKEN FOR LATER USE
+      //final storedAccessToken = googleAuth.accessToken;
+      //await storage.write(key: 'google_auth', value: json.encode({
+      //  'access_token': storedAccessToken,
+      //}));
 
       //print(fire_base_user.uid);
 
@@ -75,6 +83,12 @@ class GoogleSignInProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  // Checks if user is signed in
+  Future<bool> isSignedIn() async {
+    final currentUser = await googleSignIn.signInSilently();
+    return currentUser != null;
+  }
+
   Future logout() async{
     try {
       await googleSignIn.disconnect();
@@ -83,6 +97,42 @@ class GoogleSignInProvider extends ChangeNotifier{
       print("Error logging out: $e");
     }
   }
+/*
+  Future<String?> getAccessToken() async {
+
+    final jsonString = await storage.read(key: 'google_auth');
+    if (jsonString != null) {
+      final jsonMap = json.decode(jsonString);
+      final accessToken = jsonMap['access_token'];
+      if (accessToken != null) {
+        final jwt = jsonDecode(accessToken);
+        final expiry = jwt.claims['exp'];
+        if (expiry != null) {
+          final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+          if (now < expiry) {
+            return accessToken;
+          } else {
+            final googleUser = await googleSignIn.signIn();
+            final googleAuth = await googleUser!.authentication;
+            final newAccessToken = googleAuth.accessToken;
+            await storage.write(
+              key: 'google_auth',
+              value: json.encode({
+                'access_token': newAccessToken,
+              }),
+            );
+            return newAccessToken;
+          }
+        }
+      }
+    }
+    return null;
+  }
+*/
+
+
+
+
 
   Future<String?> getAccessToken() async {
     final GoogleSignInAccount? googleUser = _user;
@@ -92,6 +142,7 @@ class GoogleSignInProvider extends ChangeNotifier{
     print("ACCESS TOKEN: " + googleAuth.accessToken.toString());
     return googleAuth.accessToken;
   }
+
 
 
   Future<List<Event>> getPrimaryCalendarEvents() async {
