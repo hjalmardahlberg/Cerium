@@ -34,8 +34,7 @@ class _MyGroups extends State<MyGroups> {
   double width = 0;
   double height = 0;
   final TextEditingController joinGroupController = TextEditingController();
-  final TextEditingController joinGroupAdminController =
-      TextEditingController();
+  final TextEditingController joinGroupAdminController =      TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
   @override

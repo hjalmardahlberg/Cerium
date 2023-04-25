@@ -135,10 +135,9 @@ class ProfileWidgetState extends State<ProfileWidget> {
           final provider =
               Provider.of<GoogleSignInProvider>(context, listen: false);
 
-          // kommer fetcha första veckan i april (TEMP)
-          final start = DateTime(2023, 4, 1);
-          final end = DateTime(2023, 4, 7);
-          final events = await provider.getCalendarEventsInterval(start, end);
+          // Hämta kalender-data från idag o 1 mån framåt
+          final events = await provider.GetEvents1month();
+
 
           //print("BODY:");
           //print(events);

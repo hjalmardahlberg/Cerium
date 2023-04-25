@@ -8,12 +8,15 @@ import 'package:intl/intl.dart';
 import 'package:duration_picker/duration_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:projecttest/Groups/GroupData.dart';
+import '../refresh.dart';
+import 'setDate.dart';
 
 class AddEventPage extends StatefulWidget {
-  const AddEventPage({Key? key, required this.appbar,  this.group}) : super(key: key);
+  AddEventPage({Key? key, required this.appbar, this.group}) : super(key: key);
 
   final AppBar appbar;
-  final GroupData? group;
+  GroupData? group;
+
   @override
   State<AddEventPage> createState() => _AddEventPageState();
 }
@@ -59,6 +62,7 @@ class _AddEventPageState extends State<AddEventPage> {
         _stopSelectedDate = dateRange.end;
       });
     }
+
     String? gupp = widget.group?.groupName;
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -81,7 +85,20 @@ class _AddEventPageState extends State<AddEventPage> {
             const SizedBox(height: 16),
             addTextForm('Enter your events info', _eventInfoController),
             const SizedBox(height: 16),
-            widget.group == null?IconButton(onPressed: (){ }, icon: const Icon(Icons.group_add),iconSize: 40,):Center(child:Text(gupp!,style: const TextStyle(fontSize: 24),)),//ListView(scrollDirection: Axis.horizontal,)
+            widget.group == null
+                ? IconButton(
+                    onPressed: () {
+                      _handleAddGroupButtonPressed();
+                    },
+                    icon: const Icon(Icons.group_add),
+                    iconSize: 40,
+                  )
+                : Center(
+                    child: Text(
+                    gupp!,
+                    style: const TextStyle(fontSize: 24),
+                  )),
+            //ListView(scrollDirection: Axis.horizontal,)
             const SizedBox(height: 16),
             schemaSyncButton(),
             const SizedBox(height: 16),
@@ -184,8 +201,6 @@ class _AddEventPageState extends State<AddEventPage> {
         user.email != null &&
         _eventNameController.text != '' &&
         _eventInfoController.text != '') {
-
-
       final eventData = {
         'name': _eventNameController.text,
         'info': _eventInfoController.text,
@@ -195,9 +210,10 @@ class _AddEventPageState extends State<AddEventPage> {
         'stopDate': _startSelectedDate.toString(),
         'email': user.email,
       };
-      final url = 'http://192.121.208.57:8080/event/create/${_eventNameController.text}';
+      final url =
+          'http://192.121.208.57:8080/event/create/${_eventNameController.text}';
       final headers = {'Content-Type': 'application/json'};
-      if(widget.group != null){
+      if (widget.group != null) {
         final groupBody = {
           'g_id': widget.group?.g_id,
           'owner': widget.group?.adminEmail,
@@ -205,16 +221,16 @@ class _AddEventPageState extends State<AddEventPage> {
           'name': widget.group?.groupName,
           'u_id': widget.group?.u_id,
         };
-       final body = jsonEncode(groupBody);
-        final response = await http.put(Uri.parse(url), headers: headers, body: body);
+        final body = jsonEncode(groupBody);
+        final response =
+            await http.put(Uri.parse(url), headers: headers, body: body);
 
-
-      if (response.statusCode == 200) {
-        print('User data sent successfully!');
-      } else {
-        print('Error sending user data: ${response.statusCode}');
-      }  }
-
+        if (response.statusCode == 200) {
+          print('User data sent successfully!');
+        } else {
+          print('Error sending user data: ${response.statusCode}');
+        }
+      }
     } else {
       showDialog(
         context: context,
@@ -239,19 +255,19 @@ class _AddEventPageState extends State<AddEventPage> {
   Align addEventButton() {
     return Align(
       alignment: Alignment.bottomRight,
-        child: ElevatedButton.icon(
-          onPressed: () async {
-            _handleAddEventButtonPressed();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.lightBlue.shade300,
-          ),
-          icon: const Icon(
-            Icons.add,
-            size: 24.0,
-          ),
-          label: const Text('Event'),
+      child: ElevatedButton.icon(
+        onPressed: () async {
+          _handleAddEventButtonPressed();
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.lightBlue.shade300,
         ),
+        icon: const Icon(
+          Icons.add,
+          size: 24.0,
+        ),
+        label: const Text('Event'),
+      ),
     );
   }
 
@@ -295,7 +311,9 @@ class _AddEventPageState extends State<AddEventPage> {
                 const SizedBox(width: 16),
                 Text(
                   _startSelectedDate != null
-                      ? DateFormat('EEE, M/d/y').format(_startSelectedDate!) + ' till ' +DateFormat('EEE, M/d/y').format(_stopSelectedDate!)
+                      ? DateFormat('EEE, M/d/y').format(_startSelectedDate!) +
+                          ' till ' +
+                          DateFormat('EEE, M/d/y').format(_stopSelectedDate!)
                       : 'Mellan vilka datum kan eventet inträffa?',
                 ),
                 const SizedBox(width: 16),
@@ -357,7 +375,9 @@ class _AddEventPageState extends State<AddEventPage> {
                 const SizedBox(width: 16),
                 Text(
                   _startSelectedTime != null
-                      ? _startSelectedTime!.format(context) + ' - ' + _stopSelectedTime!.format(context)
+                      ? _startSelectedTime!.format(context) +
+                          ' - ' +
+                          _stopSelectedTime!.format(context)
                       : 'Mellan vilka tider kan eventet inträffa?',
                 ),
                 const SizedBox(width: 16),
@@ -444,55 +464,77 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  List<Widget> CreateList(setState, selectedValue) {
-    List<Widget> list = <
-        Widget>[]; /*
-  final user = FirebaseAuth.instance.currentUser!;
+  Future<List<Widget>> fetchData(selectedValue) async {
+    print('här1');
+    List<Widget> list = [];
+    print(_stopSelectedDate.toString());
+    print(_startSelectedDate.toString());
+    print(_startSelectedTime.toString());
+    print(_stopSelectedTime.toString());
+    print(_durationResult.toString());
+    final setDate = {
+      'Start_Date': _stopSelectedDate.toString(),
+      'End_Date': _startSelectedDate.toString(),
+      'Start_Hour': _startSelectedTime.toString(),
+      'End_Hour': _stopSelectedTime.toString(),
+      'MeetDuration': _durationResult.toString(),
+    };
+    final body = jsonEncode(setDate);
+    print('här2');
+    String? groupName = widget.group?.groupName;
+    String? adminEmail = widget.group?.adminEmail;
+    print('här3');
+    final url = 'http://192.121.208.57:8080/event/sync/' +
+        groupName! +
+        '&' +
+        adminEmail! +
+        '/' +
+        _startSelectedTime.toString() +
+        '&' +
+        _stopSelectedTime.toString();
+    print('här4');
+    final headers = {'Content-Type': 'application/json'};
+    print('här5');
+    final response =
+        await http.put(Uri.parse(url), headers: headers, body: body);
+    print(response.body);
+    print('här6');
+    List<dynamic> responseBody = json.decode(response.body);
 
-  final url = 'http://192.121.208.57:8080/user/groups/' + user.uid;
-
-  final headers = {'Content-Type': 'application/json'};
-  final response = await http.get(Uri.parse(url), headers: headers);
-  final body = json.decode(response.body);
-  */
-    List<Map<String, String>> jsonObject = [
-      {
-        'startTime': '2023-04-01T12:00:00',
-        'endTime': '2023-04-01T23:30:00',
-      },
-      {
-        'startTime': '2023-04-02T14:30:00',
-        'endTime': '2023-04-01T23:30:00',
-      },
-      {
-        'startTime': '2023-04-03T17:00:00',
-        'endTime': '2023-04-01T23:30:00',
-      },
-      {
-        'startTime': '2023-04-04T12:00:00',
-        'endTime': '2023-04-01T23:30:00',
-      },
-      {
-        'startTime': '2023-04-05T23:30:00',
-        'endTime': '2023-04-01T23:30:00',
-      }
-    ];
-
-    String jsonString = jsonEncode(jsonObject);
-
-    List<dynamic> bodyDecoded = jsonDecode(jsonString);
-    print(bodyDecoded);
-    int counter = 0;
-    for (var time in bodyDecoded) {
-      list.add(timeBox(time["startTime"], time["endTime"], counter,
-          selectedValue, setState));
-      counter++;
+    for (var time in responseBody) {
+      SetDate temp = SetDate(
+          startTimeDate: time["startTime"], endTimeDate: time["endTime"]);
+      list.add(timeBox(
+          time["startTime"], time["endTime"], temp, selectedValue, setState));
     }
+
+    return list;
+  }
+
+  Future<List<Widget>> createList(setState, selectedValue) async {
+    List<Widget> list = await fetchData(selectedValue);
     print(list);
     return list;
   }
 
-  ListView timeList(List<Widget> list) {
+  Widget timeList(Future<List<Widget>> list) {
+    return FutureBuilder<List<Widget>>(
+      future: list, // wrap the list in a Future using Future.value
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final timeData = snapshot.data!;
+          return listViewBuilder(timeData);
+        } else {
+          return const Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Text('Error..'),
+          );
+        }
+      },
+    );
+  }
+
+  ListView listViewBuilder(List<Widget> list) {
     return ListView.builder(
       shrinkWrap: true,
       itemCount: list.length,
@@ -502,8 +544,8 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  Row timeBox(
-      String startTime, String endTime, int value, selectedValue, setState) {
+  Row timeBox(String startTime, String endTime, SetDate value, selectedValue,
+      setState) {
     String startTimeDate = startTime.split('T')[0];
     String startTimeTime =
         startTime.characters.skipLast(3).toString().split('T')[1];
@@ -517,13 +559,13 @@ class _AddEventPageState extends State<AddEventPage> {
             children: [
               startTimeDate == endTimeDate
                   ? Text(startTimeDate)
-                  : Text(startTimeDate + ' - ' + endTimeDate),
-              Text(startTimeTime + ' - ' + endTimeTime),
+                  : Text('$startTimeDate - $endTimeDate'),
+              Text('$startTimeTime - $endTimeTime'),
+              const Divider(color: Colors.black),
             ],
           ),
         ),
-        Radio<int>(
-            value: value, groupValue: selectedValue, onChanged: setState),
+        Radio<SetDate>(value: value, groupValue: selectedValue, onChanged: setState),
       ],
     );
   }
@@ -540,7 +582,7 @@ class _AddEventPageState extends State<AddEventPage> {
               return SizedBox(
                 width: 100,
                 height: 160,
-                child: timeList(CreateList((value) {
+                child: timeList(createList((value) {
                   setState(() {
                     selectedValue = value;
                   });
@@ -548,6 +590,26 @@ class _AddEventPageState extends State<AddEventPage> {
               );
             },
           ),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleNoGroupSelected(String nullParameter) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        int selectedValue = 0;
+        return AlertDialog(
+          title: Text('Select a $nullParameter'),
           actions: [
             TextButton(
               child: const Text('OK'),
@@ -569,7 +631,23 @@ class _AddEventPageState extends State<AddEventPage> {
       children: [
         ElevatedButton.icon(
           onPressed: () async {
-            _handleSchemaSyncButtonPressed();
+            if (widget.group == null) {
+              var nullParameter = 'group';
+              _handleNoGroupSelected(nullParameter);
+            }  else if (_startSelectedDate == null &&
+                _stopSelectedDate == null) {
+              var nullParameter = 'date';
+              _handleNoGroupSelected(nullParameter);
+            } else if (_startSelectedTime == null &&
+                _stopSelectedTime == null) {
+              var nullParameter = 'time';
+              _handleNoGroupSelected(nullParameter);
+            }  else if (_durationResult == null) {
+              var nullParameter = 'duration';
+              _handleNoGroupSelected(nullParameter);
+            }else {
+              _handleSchemaSyncButtonPressed();
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.lightBlue.shade300,
@@ -580,6 +658,84 @@ class _AddEventPageState extends State<AddEventPage> {
           ),
         ),
       ],
+    );
+  }
+
+  ListView listViewGroup(List<GroupData> list, selectedValue, setState) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: list.length,
+      itemBuilder: (BuildContext context, int index) {
+        var group = list[index];
+        return groupBox(index, group, selectedValue, setState);
+      },
+    );
+  }
+
+  Row groupBox(int value, GroupData group, selectedValue, setState) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              Text(group.groupName),
+            ],
+          ),
+        ),
+        Radio<int>(
+            value: value, groupValue: selectedValue, onChanged: setState),
+      ],
+    );
+  }
+
+  void _handleAddGroupButtonPressed() {
+    Future<List<GroupData>> groups = getGroupData();
+    List<GroupData> groupData = [];
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        int selectedValue = 0;
+        return AlertDialog(
+          title: const Text('Välj en grupp.'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SizedBox(
+                width: 100,
+                height: 160,
+                child: FutureBuilder<List<GroupData>>(
+                    future: groups,
+                    // wrap the list in a Future using Future.value
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        groupData = snapshot.data!;
+                        return listViewGroup(groupData, selectedValue, (value) {
+                          setState(() {
+                            selectedValue = value;
+                          });
+                        });
+                      } else {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: Text('Error..'),
+                        );
+                      }
+                    }),
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                setState(() {
+                  widget.group = groupData[selectedValue];
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
