@@ -34,7 +34,8 @@ class _MyGroups extends State<MyGroups> {
   double width = 0;
   double height = 0;
   final TextEditingController joinGroupController = TextEditingController();
-  final TextEditingController joinGroupAdminController =      TextEditingController();
+  final TextEditingController joinGroupAdminController =
+      TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
   @override
@@ -51,15 +52,15 @@ class _MyGroups extends State<MyGroups> {
         children: [
           Padding(
             padding: EdgeInsets.only(top: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  groupText(),
-                 // refreshButton(),
-                ],
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                groupText(),
+                // refreshButton(),
+              ],
             ),
+          ),
           Expanded(
             child: FutureBuilder<List<GroupData>>(
                 future: displayedGroupData,
@@ -69,8 +70,7 @@ class _MyGroups extends State<MyGroups> {
                     return buildGroups(groupData);
                   } else {
                     return const Padding(
-                        padding: EdgeInsets.only(top: 10),
-                        child: Text(''));
+                        padding: EdgeInsets.only(top: 10), child: Text(''));
                   }
                 }),
           ),
@@ -251,7 +251,10 @@ class _MyGroups extends State<MyGroups> {
           context,
           MaterialPageRoute(
               builder: (_) => Group(
-                    group: group,
+                    admin: group.adminEmail,
+                    groupName: group.groupName,
+                    picture: group.image,
+                    userName: user.displayName.toString(),
                   )),
         );
       },
