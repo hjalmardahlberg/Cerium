@@ -306,6 +306,11 @@ public class Controller {
                     events.add(evCreate);
                 }
             }
+            System.out.println(setDate.getStart_Date());
+            System.out.println(setDate.getEnd_Date());
+            System.out.println(setDate.getStart_Hour());
+            System.out.println(setDate.getEnd_hour());
+            System.out.println(setDate.getDuration());
 
             Datesync freespots = new Datesync();
             return freespots.findFreeSpots(events, LocalDateTime.parse(setDate.getStart_Date(), formatter), LocalDateTime.parse(setDate.getEnd_Date(), formatter),
