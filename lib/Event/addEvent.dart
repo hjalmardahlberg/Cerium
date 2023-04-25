@@ -201,15 +201,6 @@ class _AddEventPageState extends State<AddEventPage> {
         user.email != null &&
         _eventNameController.text != '' &&
         _eventInfoController.text != '') {
-      final eventData = {
-        'name': _eventNameController.text,
-        'info': _eventInfoController.text,
-        'startTime': _startSelectedTime.toString(),
-        'stopTime': _stopSelectedTime.toString(),
-        'startDate': _stopSelectedDate.toString(),
-        'stopDate': _startSelectedDate.toString(),
-        'email': user.email,
-      };
       final url =
           'http://192.121.208.57:8080/event/create/${_eventNameController.text}';
       final headers = {'Content-Type': 'application/json'};
@@ -222,8 +213,7 @@ class _AddEventPageState extends State<AddEventPage> {
           'u_id': widget.group?.u_id,
         };
         final body = jsonEncode(groupBody);
-        final response =
-            await http.put(Uri.parse(url), headers: headers, body: body);
+        final response = await http.put(Uri.parse(url), headers: headers, body: body);
 
         if (response.statusCode == 200) {
           print('User data sent successfully!');
@@ -237,7 +227,7 @@ class _AddEventPageState extends State<AddEventPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text('Please fill in all fields.'),
+            content: const Text('Snälla synca kaländrarna och fyll i alla fält.'),
             actions: [
               TextButton(
                 child: const Text('OK'),

@@ -251,10 +251,7 @@ class _MyGroups extends State<MyGroups> {
           context,
           MaterialPageRoute(
               builder: (_) => Group(
-                    admin: group.adminEmail,
-                    groupName: group.groupName,
-                    picture: group.image,
-                    userName: user.displayName.toString(),
+                     group: group,
                   )),
         );
       },

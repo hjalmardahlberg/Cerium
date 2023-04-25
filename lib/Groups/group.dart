@@ -282,7 +282,9 @@ class _Group extends State<Group> {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => GroupChat(
+              groupAdmin: widget.group.adminEmail,
               groupName: widget.group.groupName,
+              userName: user.displayName.toString(),
             ),
             transitionDuration: Duration.zero,
           ),
