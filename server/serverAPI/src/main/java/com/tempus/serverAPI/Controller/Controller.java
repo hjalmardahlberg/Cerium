@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -282,7 +284,7 @@ public class Controller {
 
 
     //FIXME: Sketchy code, fixa säkerhet och permissions
-     @PutMapping(value = "/event/sync/{g_name}&{a_email}/{start_time}&{end_time}")
+     @PutMapping(value = "/event/sync/{g_name}&{a_email}")
      public List<Event> syncSchedules(@PathVariable String g_name, @PathVariable String a_email, @RequestBody SetDate setDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
         List<Groups> Query = groupRepo.findByNameAndAdmin(g_name, a_email);
@@ -301,7 +303,8 @@ public class Controller {
             }
 
             Datesync freespots = new Datesync();
-            return freespots.findFreeSpots(events, setDate.getStart_Date(), setDate.getEnd_Date(), setDate.getDuration(), setDate.getStart_Hour(), setDate.getEnd_hour());
+            return freespots.findFreeSpots(events, LocalDateTime.parse(setDate.getStart_Date(), formatter), LocalDateTime.parse(setDate.getEnd_Date(), formatter),
+                    Duration.ofMinutes(setDate.getDuration()), LocalTime.parse(setDate.getStart_Hour()), LocalTime.parse(setDate.getEnd_hour()));
 
         }
         else {

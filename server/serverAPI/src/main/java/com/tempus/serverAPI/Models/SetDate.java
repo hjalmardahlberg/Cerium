@@ -14,30 +14,30 @@ import java.time.LocalTime;
 @ToString
 public class SetDate {
 
-    private LocalDateTime Start_Date;
-    private LocalDateTime End_Date;
-    private Duration MeetDuration;
-    private LocalTime Start_Hour;
-    private LocalTime End_hour;
+    private String Start_Date;
+    private String End_Date;
+    private Long MeetDuration;
+    private String Start_Hour;
+    private String End_hour;
 
 
-    public LocalDateTime getStart_Date() {
+    public String getStart_Date() {
         return Start_Date;
     }
 
-    public LocalDateTime getEnd_Date() {
+    public String getEnd_Date() {
         return End_Date;
     }
 
-    public Duration getDuration() {
+    public Long getDuration() {
         return MeetDuration;
     }
 
-    public LocalTime getStart_Hour() {
+    public String getStart_Hour() {
         return Start_Hour;
     }
 
-    public LocalTime getEnd_hour() {
+    public String getEnd_hour() {
         return End_hour;
     }
 
