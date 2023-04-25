@@ -11,6 +11,7 @@ import com.tempus.serverAPI.Repo.GoogleEventRepo;
 import com.tempus.serverAPI.Repo.GroupRepo;
 import com.tempus.serverAPI.Repo.UserRepo;
 import com.tempus.serverAPI.Repo.EventRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -264,10 +265,14 @@ public class Controller {
 
 
 
+    @Transactional
     @PostMapping(value = "/gEvent/import")
     public String importEvents(@RequestBody GroupSchedule hmm) {
 
-        googleEventRepo.deleteAllByUserid(hmm.getU_id());
+        List<GoogleEvent> toDelete = googleEventRepo.findByUserid(hmm.getU_id());
+        for(int i = 0; i < toDelete.size(); i++) {
+            googleEventRepo.delete(toDelete.get(i));
+        }
         for (int i = 0; i < hmm.getSchedules().size(); i++) {
             UserSchedule currSchedule = hmm.getSchedules().get(i);
             GoogleEvent currEvent = new GoogleEvent();

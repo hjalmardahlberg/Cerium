@@ -21,7 +21,6 @@ public class GoogleEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
     private Long id;
 
     @Column(name = "userid")
