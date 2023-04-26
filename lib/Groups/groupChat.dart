@@ -143,7 +143,7 @@ class _GroupChat extends State<GroupChat> {
     };
     final encodedMSG = jsonEncode(message);
     final channel = WebSocketChannel.connect(
-      Uri.parse('192.121.208.57:25565/ws'),
+      Uri.parse('ws://192.121.208.57:25565/ws'),
     );
     channel.sink.add(encodedMSG);
   }
