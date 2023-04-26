@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:duration_picker/duration_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:projecttest/Groups/GroupData.dart';
-import '../refresh.dart';
+import '../fetch.dart';
 import 'setDate.dart';
 
 class AddEventPage extends StatefulWidget {
@@ -22,6 +22,9 @@ class AddEventPage extends StatefulWidget {
 }
 
 class _AddEventPageState extends State<AddEventPage> {
+  List<SetDate> setDateList = [];
+  late SetDate choosenDate;
+
   //the picked image
   File? _imageFile;
 
@@ -93,12 +96,23 @@ class _AddEventPageState extends State<AddEventPage> {
                     icon: const Icon(Icons.group_add),
                     iconSize: 40,
                   )
-                : Center(
-                    child: Text(
-                    gupp!,
-                    style: const TextStyle(fontSize: 24),
-                  )),
-            //ListView(scrollDirection: Axis.horizontal,)
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        gupp!,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          _handleAddGroupButtonPressed();
+                        },
+                        icon: const Icon(Icons.group_add),
+                        iconSize: 24,
+                      )
+                    ],
+                  ),
             const SizedBox(height: 16),
             schemaSyncButton(),
             const SizedBox(height: 16),
@@ -213,7 +227,8 @@ class _AddEventPageState extends State<AddEventPage> {
           'u_id': widget.group?.u_id,
         };
         final body = jsonEncode(groupBody);
-        final response = await http.put(Uri.parse(url), headers: headers, body: body);
+        final response =
+            await http.put(Uri.parse(url), headers: headers, body: body);
 
         if (response.statusCode == 200) {
           print('User data sent successfully!');
@@ -227,7 +242,8 @@ class _AddEventPageState extends State<AddEventPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text('Snälla synca kaländrarna och fyll i alla fält.'),
+            content:
+                const Text('Snälla synca kaländrarna och fyll i alla fält.'),
             actions: [
               TextButton(
                 child: const Text('OK'),
@@ -454,56 +470,77 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  Future<List<Widget>> fetchData(selectedValue) async {
-    print('här1');
+  Future<List<Widget>> fetchData(selectedValue, setState) async {
     List<Widget> list = [];
-    print(_stopSelectedDate.toString());
-    print(_startSelectedDate.toString());
-    print(_startSelectedTime.toString());
-    print(_stopSelectedTime.toString());
-    print(_durationResult.toString());
+
+    _startSelectedDate =
+        _startSelectedDate?.add(Duration(hours: 00, minutes: 01));
+    _stopSelectedDate =
+        _stopSelectedDate?.add(Duration(hours: 23, minutes: 59));
+
+    print(_stopSelectedDate?.toIso8601String());
+    print(_startSelectedDate?.toIso8601String());
+
+    final formattedStartTime =
+        '${_startSelectedTime?.hour.toString().padLeft(2, '0')}:${_startSelectedTime?.minute.toString().padLeft(2, '0')}' +
+            ":00";
+    final formattedEndTime =
+        '${_stopSelectedTime?.hour.toString().padLeft(2, '0')}:${_stopSelectedTime?.minute.toString().padLeft(2, '0')}' +
+            ":00";
+
+    print(formattedStartTime);
+
+    //print(_stopSelectedTime.toString());
+    print(formattedEndTime);
+    print(_durationResult?.inMinutes);
+
     final setDate = {
-      'Start_Date': _stopSelectedDate.toString(),
-      'End_Date': _startSelectedDate.toString(),
-      'Start_Hour': _startSelectedTime.toString(),
-      'End_Hour': _stopSelectedTime.toString(),
-      'MeetDuration': _durationResult.toString(),
+      'start_Date': _startSelectedDate?.toIso8601String(),
+      'end_Date': _stopSelectedDate?.toIso8601String(),
+      'meetDuration': _durationResult?.inMinutes,
+      'start_Hour': formattedStartTime,
+      'end_Hour': formattedEndTime,
     };
+
+    print(setDate);
     final body = jsonEncode(setDate);
-    print('här2');
     String? groupName = widget.group?.groupName;
     String? adminEmail = widget.group?.adminEmail;
-    print('här3');
     final url = 'http://192.121.208.57:8080/event/sync/' +
         groupName! +
         '&' +
-        adminEmail! +
-        '/' +
-        _startSelectedTime.toString() +
-        '&' +
-        _stopSelectedTime.toString();
-    print('här4');
+        adminEmail!;
+
     final headers = {'Content-Type': 'application/json'};
-    print('här5');
+    print(body.toString());
     final response =
         await http.put(Uri.parse(url), headers: headers, body: body);
+
     print(response.body);
-    print('här6');
+
     List<dynamic> responseBody = json.decode(response.body);
-
+    print('responsBody: ${responseBody.length}');
+    int counter = 0;
     for (var time in responseBody) {
-      SetDate temp = SetDate(
-          startTimeDate: time["startTime"], endTimeDate: time["endTime"]);
-      list.add(timeBox(
-          time["startTime"], time["endTime"], temp, selectedValue, setState));
-    }
+      SetDate setDate = SetDate(
+          startTimeDate: time["startTime"],
+          endTimeDate: time["endTime"],
+          value: counter);
+      setDateList.add(setDate);
 
+      try {
+        list.add(timeBox(setDate, selectedValue, setState));
+      } catch (e) {
+        print(e);
+      }
+      ;
+      counter++;
+    }
     return list;
   }
 
   Future<List<Widget>> createList(setState, selectedValue) async {
-    List<Widget> list = await fetchData(selectedValue);
-    print(list);
+    List<Widget> list = await fetchData(selectedValue, setState);
     return list;
   }
 
@@ -534,14 +571,14 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  Row timeBox(String startTime, String endTime, SetDate value, selectedValue,
-      setState) {
-    String startTimeDate = startTime.split('T')[0];
+  Row timeBox(SetDate setDate, selectedValue, setState) {
+    String startTimeDate = setDate.startTimeDate.split('T')[0];
     String startTimeTime =
-        startTime.characters.skipLast(3).toString().split('T')[1];
-    String endTimeDate = endTime.split('T')[0];
+        setDate.startTimeDate.characters.skipLast(3).toString().split('T')[1];
+    String endTimeDate = setDate.endTimeDate.split('T')[0];
     String endTimeTime =
-        endTime.characters.skipLast(3).toString().split('T')[1];
+        setDate.endTimeDate.characters.skipLast(3).toString().split('T')[1];
+
     return Row(
       children: [
         Expanded(
@@ -555,7 +592,10 @@ class _AddEventPageState extends State<AddEventPage> {
             ],
           ),
         ),
-        Radio<SetDate>(value: value, groupValue: selectedValue, onChanged: setState),
+        Radio<int>(
+            value: setDate.value,
+            groupValue: selectedValue,
+            onChanged: setState),
       ],
     );
   }
@@ -585,6 +625,9 @@ class _AddEventPageState extends State<AddEventPage> {
               child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
+                if (setDateList[selectedValue] != null) {
+                  choosenDate = setDateList[selectedValue];
+                }
               },
             ),
           ],
@@ -624,7 +667,7 @@ class _AddEventPageState extends State<AddEventPage> {
             if (widget.group == null) {
               var nullParameter = 'group';
               _handleNoGroupSelected(nullParameter);
-            }  else if (_startSelectedDate == null &&
+            } else if (_startSelectedDate == null &&
                 _stopSelectedDate == null) {
               var nullParameter = 'date';
               _handleNoGroupSelected(nullParameter);
@@ -632,10 +675,10 @@ class _AddEventPageState extends State<AddEventPage> {
                 _stopSelectedTime == null) {
               var nullParameter = 'time';
               _handleNoGroupSelected(nullParameter);
-            }  else if (_durationResult == null) {
+            } else if (_durationResult == null) {
               var nullParameter = 'duration';
               _handleNoGroupSelected(nullParameter);
-            }else {
+            } else {
               _handleSchemaSyncButtonPressed();
             }
           },

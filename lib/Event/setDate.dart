@@ -4,8 +4,9 @@ class SetDate
 
    final String endTimeDate;
 
+   final int value;
 
     const SetDate({
-        required this.startTimeDate,required this.endTimeDate,
+        required this.value, required this.startTimeDate,required this.endTimeDate,
     });
 }
