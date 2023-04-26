@@ -92,6 +92,26 @@ class GoogleSignInProvider extends ChangeNotifier{
     return googleAuth.accessToken;
   }
 
+  Future<List<String>> getCalendarIds() async {
+    final String? accessToken = await getAccessToken();
+    if (accessToken == null) return [];
+
+    final headers = {'Authorization': 'Bearer $accessToken'};
+    final response = await http.get(
+      Uri.parse('https://www.googleapis.com/calendar/v3/users/me/calendarList'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final calendarsJson = json['items'] as List<dynamic>;
+      final calendarIds = calendarsJson.map((c) => c['id'] as String).toList();
+      return calendarIds;
+    } else {
+      throw Exception('Failed to load calendar list: ${response.statusCode}');
+    }
+  }
+
 
   Future<List<Event>> getPrimaryCalendarEvents() async {
     final String? accessToken = await getAccessToken();
@@ -117,26 +137,38 @@ class GoogleSignInProvider extends ChangeNotifier{
   Future<List<Event>> getCalendarEventsInterval(DateTime start, DateTime end) async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return [];
-
     print("GOT ACCESS TOKEN!");
-    final headers = {'Authorization': 'Bearer $accessToken'};
-    final Uri uri = Uri.https('www.googleapis.com', '/calendar/v3/calendars/primary/events', {
-      'timeMin': start.toIso8601String() + 'Z',
-      'timeMax': end.toIso8601String() + 'Z',
-    });
-    final response = await http.get(uri, headers: headers);
 
-    if (response.statusCode == 200) {
-      final json = jsonDecode(response.body);
-      final eventsJson = json['items'] as List<dynamic>;
-      final events = eventsJson.map((e) => Event.fromJson(e)).toList();
-      return events;
-    } else {
-      throw Exception('Failed to load calendar events: ${response.statusCode}');
+    // Hämtar alla vettiga Cal ID's som användaren har (egna + subscriptions)
+    final cal_ids = await getCalendarIds();
+    List<String> filteredIds = cal_ids.where((id) => !id.contains("@group")).toList(); // filtrerade cal_id listan
+    print("Cal ids:" + filteredIds.toString());
+
+    final headers = {'Authorization': 'Bearer $accessToken'};
+    List<Event> allEvents = [];
+
+    for (String id in filteredIds) {
+      final Uri uri = Uri.https('www.googleapis.com', '/calendar/v3/calendars/$id/events', {
+        'timeMin': start.toIso8601String() + 'Z',
+        'timeMax': end.toIso8601String() + 'Z',
+      });
+      final response = await http.get(uri, headers: headers);
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final eventsJson = json['items'] as List<dynamic>;
+        final events = eventsJson.map((e) => Event.fromJson(e)).toList();
+        allEvents.addAll(events);
+      } else {
+        throw Exception('Failed to load calendar events for $id: ${response.statusCode}');
+      }
     }
+
+    return allEvents;
   }
 
-  Future<String?> getCalendarEvents() async {
+
+    Future<String?> getCalendarEvents() async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return null;
     print("GOT ACCESS TOKEN!");
@@ -162,12 +194,44 @@ class GoogleSignInProvider extends ChangeNotifier{
     }
   }
 
-  Future<List<Event>> GetEvents1month() async  {
+  Future<List<Event>> getEvents1Month() async  {
     final now = DateTime.now();
     final start = now;
     final end = now.add(Duration(days: 30));
     final events = await getCalendarEventsInterval(start, end);
     return events;
+  }
+
+  Future<List<Event>> getEvents1Week() async  {
+    final now = DateTime.now();
+    final start = now;
+    final end = now.add(Duration(days: 7));
+    final events = await getCalendarEventsInterval(start, end);
+    return events;
+  }
+
+
+
+  Future<List<Event>> getDataFromCalID(String cal_id) async{
+    final String? accessToken = await getAccessToken();
+    if (accessToken == null) return [];
+
+    final headers = {'Authorization': 'Bearer $accessToken'};
+    final response = await http.get(
+      Uri.parse('https://www.googleapis.com/calendar/v3/calendars/' + cal_id + '/events'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final eventsJson = json['items'] as List<dynamic>;
+      final events = eventsJson.map((e) => Event.fromJson(e)).toList();
+      return events;
+    } else {
+      throw Exception('Failed to load calendar events: ${response.statusCode}');
+    }
+
+
   }
 
 }

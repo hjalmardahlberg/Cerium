@@ -75,14 +75,13 @@ class ProfileWidgetState extends State<ProfileWidget> {
             const Divider(),
             theme(themeManager),
             const SizedBox(height: 10),
-            sendCalender(context, user, themeManager),
-            const SizedBox(height: 10),
             logOut(context),
           ],
         ),
       ),
     );
   }
+
 
   SizedBox theme(themeManager) {
     return SizedBox( width: 175,child:ElevatedButton.icon(
@@ -135,23 +134,24 @@ class ProfileWidgetState extends State<ProfileWidget> {
           final provider =
               Provider.of<GoogleSignInProvider>(context, listen: false);
 
-          // Hämta kalender-data från idag o 1 mån framåt
-          final events = await provider.GetEvents1month();
+          final events = await provider.getEvents1Week();
 
-
-          //print("BODY:");
-          //print(events);
-          //print("");
+          for (var ev in events){
+            print(ev.summary);//ev.start!.dateTime.toString() +' <--> '+ ev.end!.dateTime.toString());
+          }
 
           List<Map<String, dynamic>> ev_lst = [];
 
           for (Event event in events) {
-            final ev_data = {
-              'start': event.start?.dateTime?.toLocal().toIso8601String(),
-              'end': event.end?.dateTime?.toLocal().toIso8601String(),
-            };
+            // FILTRERA BORT NULL
+            if (event.start?.dateTime != null || event.end?.dateTime != null) {
+              final ev_data = {
+                'start': event.start?.dateTime?.toLocal().toIso8601String(),
+                'end': event.end?.dateTime?.toLocal().toIso8601String(),
+              };
 
-            ev_lst.add(ev_data);
+              ev_lst.add(ev_data);
+            }
           }
 
           final final_data_body = {
