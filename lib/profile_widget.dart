@@ -75,6 +75,8 @@ class ProfileWidgetState extends State<ProfileWidget> {
             const Divider(),
             theme(themeManager),
             const SizedBox(height: 10),
+            sendCalender(context, user, themeManager),
+            const SizedBox(height: 10),
             logOut(context),
           ],
         ),
