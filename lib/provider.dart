@@ -230,6 +230,21 @@ class GoogleSignInProvider extends ChangeNotifier{
     } else {
       throw Exception('Failed to load calendar events: ${response.statusCode}');
     }
+  }
+
+  Future<void> exportEventToGoogleCal(
+      String title,
+      String desc,
+      String startTime,
+      String endTime) async {
+
+    final String? accessToken = await getAccessToken();
+    if (accessToken == null) return null;
+
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Tpe': 'application/json',
+    };
 
 
   }
