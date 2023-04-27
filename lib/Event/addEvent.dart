@@ -23,7 +23,7 @@ class AddEventPage extends StatefulWidget {
 
 class _AddEventPageState extends State<AddEventPage> {
   List<SetDate> setDateList = [];
-  late SetDate choosenDate;
+  late SetDate chosenDate = const SetDate(value: 0, startTimeDate: "", endTimeDate: "");
 
   //the picked image
   File? _imageFile;
@@ -50,10 +50,19 @@ class _AddEventPageState extends State<AddEventPage> {
 
   final user = FirebaseAuth.instance.currentUser!;
 
+
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
+
+    double height = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     DateTimeRange? dateRange = DateTimeRange(
         start: _startSelectedDate ?? DateTime.now(),
@@ -66,7 +75,8 @@ class _AddEventPageState extends State<AddEventPage> {
       });
     }
 
-    String? gupp = widget.group?.groupName;
+    String? group = widget.group?.groupName;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: widget.appbar,
@@ -80,39 +90,18 @@ class _AddEventPageState extends State<AddEventPage> {
             const SizedBox(height: 16),
             addTextForm('Enter your events name', _eventNameController),
             const SizedBox(height: 16),
-            datePickerRow(context, width, dateRange, onDatesSelected),
-            const SizedBox(height: 16),
-            timePickerRow(context, width),
-            const SizedBox(height: 16),
-            durationRow(context),
-            const SizedBox(height: 16),
             addTextForm('Enter your events info', _eventInfoController),
             const SizedBox(height: 16),
+            chosenDate.startTimeDate == "" ? datePickerRow(
+                context, width, dateRange, onDatesSelected) : Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [ dateIconPicker(context, dateRange, onDatesSelected),  timeIconPicker(context),  durationIconPicker(context),],),
+            const SizedBox(height: 16),
+            chosenDate.startTimeDate == "" ? timePickerRow(context, width):Center(child:Text("${dateToString(chosenDate.startTimeDate)}-${dateToString(chosenDate.endTimeDate)}"),),
+             const SizedBox(height: 16),
+            chosenDate.startTimeDate == "" ? durationRow(context) :  Center(child:Text("${timeToString(chosenDate.startTimeDate)}-${timeToString(chosenDate.endTimeDate)}"),),
+            const SizedBox(height: 16),
             widget.group == null
-                ? IconButton(
-                    onPressed: () {
-                      _handleAddGroupButtonPressed();
-                    },
-                    icon: const Icon(Icons.group_add),
-                    iconSize: 40,
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        gupp!,
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          _handleAddGroupButtonPressed();
-                        },
-                        icon: const Icon(Icons.group_add),
-                        iconSize: 24,
-                      )
-                    ],
-                  ),
+                ? addGroup()
+                : addGroupWithGroup(group),
             const SizedBox(height: 16),
             schemaSyncButton(),
             const SizedBox(height: 16),
@@ -124,7 +113,72 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  Row durationPicker(BuildContext context) => Row(
+  Row addGroupWithGroup(String? group) {
+    return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                group!,
+                style: const TextStyle(fontSize: 24),
+              ),
+              IconButton(
+                onPressed: () {
+                  _handleAddGroupButtonPressed();
+                },
+                icon: const Icon(Icons.group_add),
+                iconSize: 24,
+              )
+            ],
+          );
+  }
+
+  IconButton addGroup() {
+    return IconButton(
+            onPressed: () {
+              _handleAddGroupButtonPressed();
+            },
+            icon: const Icon(Icons.group_add),
+            iconSize: 40,
+          );
+  }
+
+  IconButton durationIconPicker(BuildContext context) {
+    return IconButton(onPressed:() async {
+  _durationResult = await showDurationPicker(
+  context: context, initialTime: const Duration(minutes: 30));
+  setState(() {});
+  }, icon: const Icon(Icons.timer,size: 30,));
+  }
+
+  IconButton timeIconPicker(BuildContext context) {
+    return IconButton(onPressed:() async {
+  await _selectTime(context);
+  }, icon: const Icon(Icons.access_time,size: 30,));
+  }
+
+  IconButton dateIconPicker(BuildContext context, DateTimeRange dateRange, Null onDatesSelected(dynamic dateRange)) {
+    return IconButton(
+              onPressed: () async {
+                final DateTimeRange? pickedDateRange = await showDateRangePicker(
+                  initialEntryMode: DatePickerEntryMode.input,
+                  context: context,
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 365)),
+                  initialDateRange: dateRange ??
+                      DateTimeRange(
+                          start: DateTime.now(), end: DateTime.now()),
+                );
+
+                if (pickedDateRange != null) {
+                  onDatesSelected?.call(pickedDateRange);
+                }
+              }, icon: const Icon(Icons.calendar_today,
+            size: 30,));
+  }
+
+  Row durationPicker(BuildContext context) =>
+      Row(
         children: [
           ElevatedButton.icon(
               onPressed: () async {
@@ -134,15 +188,23 @@ class _AddEventPageState extends State<AddEventPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    Theme.of(context).bottomNavigationBarTheme.backgroundColor,
-                foregroundColor: Theme.of(context).textTheme.titleMedium?.color,
+                Theme
+                    .of(context)
+                    .bottomNavigationBarTheme
+                    .backgroundColor,
+                foregroundColor: Theme
+                    .of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.color,
               ),
               icon: const Icon(Icons.timer),
               label: const Text('Hur långt är eventet')),
           Padding(
               padding: const EdgeInsets.only(left: 20),
               child: Text(
-                  '${_durationResult?.inHours}h ${_durationResult?.inMinutes.remainder(60)}m')),
+                  '${_durationResult?.inHours}h ${_durationResult?.inMinutes
+                      .remainder(60)}m')),
         ],
       );
 
@@ -156,7 +218,9 @@ class _AddEventPageState extends State<AddEventPage> {
       child: Material(
         elevation: 15.0,
         borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).brightness == Brightness.dark
+        color: Theme
+            .of(context)
+            .brightness == Brightness.dark
             ? Colors.grey.shade800
             : Colors.white,
         child: Center(
@@ -176,7 +240,8 @@ class _AddEventPageState extends State<AddEventPage> {
                 ),
                 const SizedBox(width: 16),
                 Text(
-                    '${_durationResult?.inHours}h ${_durationResult?.inMinutes.remainder(60)}m'),
+                    '${_durationResult?.inHours}h ${_durationResult?.inMinutes
+                        .remainder(60)}m'),
                 const SizedBox(width: 16),
               ],
             ),
@@ -189,7 +254,7 @@ class _AddEventPageState extends State<AddEventPage> {
   Future<void> _getImage() async {
     try {
       final pickedFile =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
+      await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         setState(() {
           _imageFile = File(pickedFile.path);
@@ -216,7 +281,8 @@ class _AddEventPageState extends State<AddEventPage> {
         _eventNameController.text != '' &&
         _eventInfoController.text != '') {
       final url =
-          'http://192.121.208.57:8080/event/create/${_eventNameController.text}';
+          'http://192.121.208.57:8080/event/create/${_eventNameController
+          .text}';
       final headers = {'Content-Type': 'application/json'};
       if (widget.group != null) {
         final groupBody = {
@@ -228,7 +294,7 @@ class _AddEventPageState extends State<AddEventPage> {
         };
         final body = jsonEncode(groupBody);
         final response =
-            await http.put(Uri.parse(url), headers: headers, body: body);
+        await http.put(Uri.parse(url), headers: headers, body: body);
 
         if (response.statusCode == 200) {
           print('User data sent successfully!');
@@ -243,7 +309,7 @@ class _AddEventPageState extends State<AddEventPage> {
           return AlertDialog(
             title: const Text('Error'),
             content:
-                const Text('Snälla synca kaländrarna och fyll i alla fält.'),
+            const Text('Snälla synca kaländrarna och fyll i alla fält.'),
             actions: [
               TextButton(
                 child: const Text('OK'),
@@ -277,8 +343,8 @@ class _AddEventPageState extends State<AddEventPage> {
     );
   }
 
-  GestureDetector datePickerRow(
-      BuildContext context, double width, dateRange, onDatesSelected) {
+  GestureDetector datePickerRow(BuildContext context, double width, dateRange,
+      onDatesSelected) {
     return GestureDetector(
       onTap: () async {
         final DateTimeRange? pickedDateRange = await showDateRangePicker(
@@ -297,7 +363,9 @@ class _AddEventPageState extends State<AddEventPage> {
       child: Material(
         elevation: 15.0,
         borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).brightness == Brightness.dark
+        color: Theme
+            .of(context)
+            .brightness == Brightness.dark
             ? Colors.grey.shade800
             : Colors.white,
         child: Center(
@@ -318,8 +386,8 @@ class _AddEventPageState extends State<AddEventPage> {
                 Text(
                   _startSelectedDate != null
                       ? DateFormat('EEE, M/d/y').format(_startSelectedDate!) +
-                          ' till ' +
-                          DateFormat('EEE, M/d/y').format(_stopSelectedDate!)
+                      ' till ' +
+                      DateFormat('EEE, M/d/y').format(_stopSelectedDate!)
                       : 'Mellan vilka datum kan eventet inträffa?',
                 ),
                 const SizedBox(width: 16),
@@ -361,7 +429,9 @@ class _AddEventPageState extends State<AddEventPage> {
       child: Material(
         elevation: 15.0,
         borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).brightness == Brightness.dark
+        color: Theme
+            .of(context)
+            .brightness == Brightness.dark
             ? Colors.grey.shade800
             : Colors.white,
         child: Center(
@@ -382,30 +452,30 @@ class _AddEventPageState extends State<AddEventPage> {
                 Text(
                   _startSelectedTime != null
                       ? _startSelectedTime!.format(context) +
-                          ' - ' +
-                          _stopSelectedTime!.format(context)
+                      ' - ' +
+                      _stopSelectedTime!.format(context)
                       : 'Mellan vilka tider kan eventet inträffa?',
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
                     _startSelectedTime != null &&
-                            _stopSelectedTime != null &&
-                            DateTime(
-                              1,
-                              1,
-                              1,
-                              _startSelectedTime!.hour,
-                              _startSelectedTime!.minute,
-                            ).isAfter(
-                              DateTime(
-                                1,
-                                1,
-                                1,
-                                _stopSelectedTime!.hour,
-                                _stopSelectedTime!.minute,
-                              ),
-                            )
+                        _stopSelectedTime != null &&
+                        DateTime(
+                          1,
+                          1,
+                          1,
+                          _startSelectedTime!.hour,
+                          _startSelectedTime!.minute,
+                        ).isAfter(
+                          DateTime(
+                            1,
+                            1,
+                            1,
+                            _stopSelectedTime!.hour,
+                            _stopSelectedTime!.minute,
+                          ),
+                        )
                         ? 'End time cannot be earlier than start time'
                         : '',
                     style: const TextStyle(
@@ -482,10 +552,12 @@ class _AddEventPageState extends State<AddEventPage> {
     print(_startSelectedDate?.toIso8601String());
 
     final formattedStartTime =
-        '${_startSelectedTime?.hour.toString().padLeft(2, '0')}:${_startSelectedTime?.minute.toString().padLeft(2, '0')}' +
+        '${_startSelectedTime?.hour.toString().padLeft(
+            2, '0')}:${_startSelectedTime?.minute.toString().padLeft(2, '0')}' +
             ":00";
     final formattedEndTime =
-        '${_stopSelectedTime?.hour.toString().padLeft(2, '0')}:${_stopSelectedTime?.minute.toString().padLeft(2, '0')}' +
+        '${_stopSelectedTime?.hour.toString().padLeft(
+            2, '0')}:${_stopSelectedTime?.minute.toString().padLeft(2, '0')}' +
             ":00";
 
     print(formattedStartTime);
@@ -514,7 +586,7 @@ class _AddEventPageState extends State<AddEventPage> {
     final headers = {'Content-Type': 'application/json'};
     print(body.toString());
     final response =
-        await http.put(Uri.parse(url), headers: headers, body: body);
+    await http.put(Uri.parse(url), headers: headers, body: body);
 
     print(response.body);
 
@@ -572,12 +644,12 @@ class _AddEventPageState extends State<AddEventPage> {
   }
 
   Row timeBox(SetDate setDate, selectedValue, setState) {
-    String startTimeDate = setDate.startTimeDate.split('T')[0];
+    String startTimeDate = dateToString(setDate.startTimeDate);
     String startTimeTime =
-        setDate.startTimeDate.characters.skipLast(3).toString().split('T')[1];
-    String endTimeDate = setDate.endTimeDate.split('T')[0];
+    timeToString(setDate.startTimeDate);
+    String endTimeDate = dateToString(setDate.endTimeDate);
     String endTimeTime =
-        setDate.endTimeDate.characters.skipLast(3).toString().split('T')[1];
+    timeToString(setDate.endTimeDate);
 
     return Row(
       children: [
@@ -625,9 +697,11 @@ class _AddEventPageState extends State<AddEventPage> {
               child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
-                if (setDateList[selectedValue] != null) {
-                  choosenDate = setDateList[selectedValue];
-                }
+                setState(() {
+                  if (setDateList[selectedValue].startTimeDate != "") {
+                    chosenDate = setDateList[selectedValue];
+                  }
+                });
               },
             ),
           ],

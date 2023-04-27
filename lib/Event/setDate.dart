@@ -10,3 +10,11 @@ class SetDate
         required this.value, required this.startTimeDate,required this.endTimeDate,
     });
 }
+
+String dateToString(timeDate){
+  return timeDate = timeDate.split('T')[0];
+}
+
+String timeToString(timeTime){
+  return timeTime = timeTime.characters.skipLast(3).toString().split('T')[1];
+}
