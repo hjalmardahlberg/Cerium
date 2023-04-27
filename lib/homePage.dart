@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:projecttest/provider.dart';
 import 'package:projecttest/refresh.dart';
 
 import 'Event/EventData.dart';
@@ -12,6 +13,8 @@ import 'Groups/myGroups.dart';
 import 'Groups/addGroup.dart';
 import 'profile_widget.dart';
 import 'package:http/http.dart' as http;
+
+import 'package:provider/provider.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -246,6 +249,36 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const ProfileWidget()));
+              },
+            ),
+          ),
+
+          Align(
+            alignment: Alignment.topRight,
+            child: IconButton(
+              padding: const EdgeInsets.all(10),
+              icon: const Icon(Icons.temple_buddhist),
+              iconSize: 30,
+              onPressed: () async {
+                final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+
+                final String title = 'My Event Title';
+                final String desc = 'My Event Description';
+                final DateTime startTime = DateTime.now();
+                final DateTime endTime = startTime.add(const Duration(hours: 2));
+
+                print("TJOLAHOPPSANSA!");
+                print(title);
+                print(desc);
+                print(startTime);
+                print(endTime);
+
+                await provider.exportEventToGoogleCal(
+                  title,
+                  desc,
+                  startTime.toUtc().toIso8601String(),
+                  endTime.toUtc().toIso8601String(),
+                );
               },
             ),
           ),
