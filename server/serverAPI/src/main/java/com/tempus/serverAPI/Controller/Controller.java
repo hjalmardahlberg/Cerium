@@ -16,6 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -126,11 +131,21 @@ public class Controller {
         List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
 
         byte[] imageData = Base64.getDecoder().decode(Image);
-        for (Groups currgroup : QueryResult) {
-            currgroup.setImage(imageData);
-            groupRepo.save(currgroup);
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream(imageData);
+            BufferedImage bImage = ImageIO.read(bis);
+            Path path = Paths.get("src/main/resources/static/images/");
+            String location = "src/main/resources/static/images/" + g_name + ".txt";
+            ImageIO.write(bImage, "jpg", new java.io.File("src/main/resources/static/images/" + g_name + ".jpg"));
+            for (Groups currgroup : QueryResult) {
+
+            }
+            return "Group picture updated";
+        }catch (Exception e){
+            throw new ApiException("Error when processing the request, image is not valid");
         }
-        return "Group picture updated";
+
+
     }
 
     @PutMapping(value = "/group/join/{g_name}&{a_email}")
@@ -151,11 +166,13 @@ public class Controller {
                     throw new ApiForbiddenException("Cannot join a group that user is already a member of!");
                 }
             }
+
             Groups groupToJoin = new Groups();
             groupToJoin.setUser(userJoin);
             groupToJoin.setName(g_name);
             groupToJoin.setAdmin(Queries.get(0).getAdmin());
             user.getGroups().add(groupToJoin);
+            user.getEvents().addAll(Queries.get(0).getEvents());
             groupRepo.save(groupToJoin);
             userRepo.save(userJoin);
             return "Successfully joined the group: " + groupToJoin.getName();
@@ -182,7 +199,8 @@ public class Controller {
                 Groups curr = groupToDelete.get(i);
 
                 if (curr.getAdmin().equals(a_email) && curr.getName().equals(g_name)) {
-                    updateUser.getGroups().remove(i);
+                    int hmm = updateUser.getGroups().indexOf(curr);
+                    updateUser.getGroups().remove(hmm);
                     groupRepo.delete(curr);
                     return "User successfully left the group: " + curr.getName();
                 }
@@ -191,6 +209,7 @@ public class Controller {
         }
 
     }
+
 
     @DeleteMapping(value = "/group/delete/{g_name}")
     public String delGroup(@PathVariable String g_name, @RequestBody Users user) {
@@ -202,8 +221,20 @@ public class Controller {
             for (int i = 0; i < selectedGroup.size(); i++) {
                 Groups currGroup = selectedGroup.get(i);
                 Users currUser = selectedGroup.get(i).getUser();
+
                 int hmm = currUser.getGroups().indexOf(currGroup);
                 currUser.getGroups().remove(hmm);
+                for (int j = 0; j < currGroup.getEvents().size(); j++) {
+                    Events currEvent = currGroup.getEvents().get(j);
+                    Users currEventUser = currEvent.getUser();
+                    for (int k = 0; k < currEventUser.getEvents().size(); k++) { // Här kollar vi att eventet finns i user och det är rätt event som tas bort
+                           if (currEventUser.getEvents().get(k).getGroup().equals(currGroup)) {
+                               currEventUser.getEvents().remove(k);
+                           }
+                    }
+                    currGroup.getEvents().remove(j);
+                    eventRepo.delete(currEvent);
+                }
                 groupRepo.delete(currGroup);
 
             }
@@ -215,10 +246,11 @@ public class Controller {
 
     }
 
-    //FIXME
-    @PutMapping(value = "/event/create/{e_name}")
-    public String createEvent(@RequestBody Groups group, @RequestBody event_description event_description, @PathVariable String e_name) {
-        Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
+    //FIXME: Fånga fallet när inte gruppnamnet finns
+    @PutMapping(value = "/event/create/{e_name}&{e_description}")
+    public String createEvent(@RequestBody Groups group, @PathVariable String e_name, @PathVariable String e_description) {
+        List<Groups> updateGroup = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin());
+        Groups selectedGroup = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin()).get(0);
         List<Events> gEvents = eventRepo.findByName(e_name);
         for(int i = 0; i < gEvents.size(); i++) {
             Events selEvent = gEvents.get(i);
@@ -226,23 +258,66 @@ public class Controller {
                 throw new ApiForbiddenException("Event with given name already exists within that group");
             }
         }
+
+        for (int i = 0; i < updateGroup.size(); i++) {
+            Events createdEvent = new Events();
+            createdEvent.setName(e_name);
+            createdEvent.setGroup(selectedGroup);
+            createdEvent.setDescription(e_description);
+            updateGroup.get(i).getUser().getEvents().add(createdEvent);
+            createdEvent.setUser(updateGroup.get(i).getUser());
+            eventRepo.save(createdEvent);
+
+        }
         Events createdEvent = new Events();
         createdEvent.setName(e_name);
         createdEvent.setGroup(selectedGroup);
-        createdEvent.setDescription(event_description.getEvent_description());
-        gEvents.add(createdEvent);
-        eventRepo.save(createdEvent);
+        createdEvent.setDescription(e_description);
+        List<Events> toAdd = selectedGroup.getEvents();
+        toAdd.add(createdEvent);
+
         groupRepo.save(selectedGroup);
+
+
         return "Successfully created a event within the group: " + group.getName();
 
+    }
+
+    @PutMapping(value = "/user/events")
+    public List<Events> getEvents(@RequestBody Users user) {
+        Users selectedUser = userRepo.findByEmail(user.getEmail());
+        if (selectedUser == null) {
+            throw new ApiException("Cannot find user");
+        }
+        else {
+            List<Events> userEvents = selectedUser.getEvents();
+            if (userEvents.isEmpty()) {
+                throw new ApiException("User has no events");
+            }
+            else {
+                return userEvents;
+            }
+        }
     }
 
     //FIXME
     @DeleteMapping(value = "/event/delete/{e_name}")
     public String delEvent(@PathVariable String e_name, @RequestBody Groups group) {
-        Groups selectedGroup = groupRepo.findById(group.getG_id()).get();
-        //Events selectedEvent = eventRepo.
-        return "Success";
+        Groups selectedGroup = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin()).get(0);
+        List<Events> selectedEvent = eventRepo.findByGroup(selectedGroup);
+        if (selectedEvent.isEmpty()) {
+            throw new ApiException("Cannot delete a event that does not exist");
+        }
+        for (int i = 0; i < selectedEvent.size(); i++) {
+            Users currUser = selectedEvent.get(i).getUser();
+            List<Events> userEvents = currUser.getEvents();
+            for (int j = 0; j < userEvents.size(); j++) {
+                if (userEvents.get(j).getName().equals(e_name) && userEvents.get(j).getGroup().equals(selectedGroup)) {
+                    userEvents.remove(j);
+                }
+            }
+        }
+        return "Successfully deleted event: " + e_name + " from group: " + group.getName();
     }
 
 
@@ -282,7 +357,9 @@ public class Controller {
             googleEventRepo.save(currEvent);
         }
         Users toUpdate = userRepo.findById(hmm.getU_id()).get();
-        toUpdate.setSentSchedule(true);
+        LocalDateTime now = LocalDateTime.now();
+        toUpdate.setLatestSchedule(now.toString());
+        userRepo.save(toUpdate);
         return "Successfully imported user schedule";
 
     }
@@ -313,6 +390,8 @@ public class Controller {
             System.out.println(setDate.getDuration());
 
             Datesync freespots = new Datesync();
+            System.out.println(freespots.findFreeSpots(events, LocalDateTime.parse(setDate.getStart_Date(), formatter), LocalDateTime.parse(setDate.getEnd_Date(), formatter),
+                    Duration.ofMinutes(setDate.getDuration()), LocalTime.parse(setDate.getStart_Hour()), LocalTime.parse(setDate.getEnd_hour())));
             return freespots.findFreeSpots(events, LocalDateTime.parse(setDate.getStart_Date(), formatter), LocalDateTime.parse(setDate.getEnd_Date(), formatter),
                     Duration.ofMinutes(setDate.getDuration()), LocalTime.parse(setDate.getStart_Hour()), LocalTime.parse(setDate.getEnd_hour()));
 

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
 
 import java.util.Date;
 
@@ -40,10 +41,16 @@ public class Events {
     private String description;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "g_id")
     @JsonIgnore
     private Groups group;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "u_id")
+    @JsonIgnore
+    private Users user;
 
 
 

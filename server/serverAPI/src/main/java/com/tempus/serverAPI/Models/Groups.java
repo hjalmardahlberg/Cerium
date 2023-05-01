@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,15 +38,16 @@ public class Groups {
   @Column(name = "owner")
   private String admin;
 
-  @Lob
   @Column(name = "image")
-  private byte[] image;
+  private String image;
 
   /*
   @Transient
   private List<String> userID = new ArrayList<>(); */
 
-  @OneToMany(mappedBy = "name",cascade = CascadeType.ALL, orphanRemoval = true)
+
+  @OneToMany(mappedBy = "group",cascade = CascadeType.ALL, orphanRemoval = true)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JsonIgnore
   private List<Events> events = new ArrayList<Events>();
 

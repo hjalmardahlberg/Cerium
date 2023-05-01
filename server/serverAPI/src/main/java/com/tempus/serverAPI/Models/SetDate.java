@@ -1,8 +1,6 @@
 package com.tempus.serverAPI.Models;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.cglib.core.Local;
 
 import java.time.Duration;
@@ -11,34 +9,36 @@ import java.time.LocalTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
+@Getter
 @ToString
 public class SetDate {
 
-    private String Start_Date;
-    private String End_Date;
-    private Long MeetDuration;
-    private String Start_Hour;
-    private String End_hour;
+    private String start_Date;
+    private String end_Date;
+    private Long meetDuration;
+    private String start_Hour;
+    private String end_Hour;
 
 
     public String getStart_Date() {
-        return Start_Date;
+        return start_Date;
     }
 
     public String getEnd_Date() {
-        return End_Date;
+        return end_Date;
     }
 
     public Long getDuration() {
-        return MeetDuration;
+        return meetDuration;
     }
 
     public String getStart_Hour() {
-        return Start_Hour;
+        return start_Hour;
     }
 
     public String getEnd_hour() {
-        return End_hour;
+        return end_Hour;
     }
 
 }

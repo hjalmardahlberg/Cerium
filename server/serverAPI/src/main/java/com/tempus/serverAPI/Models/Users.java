@@ -29,12 +29,18 @@ public class Users {
     @Column(name = "email", unique = true)
     @NotNull
     private String email;
-    @Transient
-    private Boolean sentSchedule = false;
+
+    @Column(name = "latestSchedule")
+    private String latestSchedule;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Groups> g_id = new ArrayList<Groups>();
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Events> e_id = new ArrayList<Events>();
+
 
 
     public String getId() {
@@ -63,6 +69,10 @@ public class Users {
 
     public List<Groups> getGroups(){
         return g_id;
+    }
+
+    public List<Events> getEvents() {
+        return e_id;
     }
 
     public List<Groups> getGroup(String groupName) {
