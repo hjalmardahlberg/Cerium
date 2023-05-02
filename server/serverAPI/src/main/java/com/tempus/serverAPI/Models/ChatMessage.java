@@ -24,9 +24,11 @@ public class ChatMessage {
     @Column(name = "receiverGroup")
     @NotNull
     private String receiverGroup;
+
     @Column(name = "receiverGroupAdmin")
     @NotNull
     private String receiverGroupAdmin;
+
     @Column(name = "date")
     @NotNull
     private String date;

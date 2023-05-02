@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -79,11 +81,16 @@ public class Controller {
 
     //TODO: Förbättra detta med Lista av user ids i Groups.
     @GetMapping(value = "/groups/users/{g_name}&{a_email}")
-    public List<String> getUsersFromGroup(@PathVariable String g_name, @PathVariable String a_email) {
+    public List<Users> getUsersFromGroup(@PathVariable String g_name, @PathVariable String a_email) {
         List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
-        List<String> toReturn = new ArrayList<>();
+        List<Users> toReturn = new ArrayList<>();
         for (int i = 0; i < QueryResult.size(); i++) {
-            toReturn.add(QueryResult.get(i).getUser().getName());
+            Users toAdd = new Users();
+            toAdd.setId(QueryResult.get(i).getUser().getId());
+            toAdd.setName(QueryResult.get(i).getUser().getName());
+            toAdd.setLatestSchedule(QueryResult.get(i).getUser().getLatestSchedule());
+            toAdd.setEmail(QueryResult.get(i).getUser().getEmail());
+            toReturn.add(toAdd);
         }
         return toReturn;
     }
@@ -127,18 +134,17 @@ public class Controller {
     }
 
     @PutMapping(value = "/group/setpicture/{g_name}&{a_email}")
-    public String setpicture(@PathVariable String g_name, @PathVariable String a_email, @RequestBody String Image){
+    public String setpicture(@PathVariable String g_name, @PathVariable String a_email, @RequestBody byte[] Image){
         List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
 
-        byte[] imageData = Base64.getDecoder().decode(Image);
         try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(imageData);
-            BufferedImage bImage = ImageIO.read(bis);
-            Path path = Paths.get("src/main/resources/static/images/");
-            String location = "src/main/resources/static/images/" + g_name + ".txt";
-            ImageIO.write(bImage, "jpg", new java.io.File("src/main/resources/static/images/" + g_name + ".jpg"));
+            Path path = Paths.get("src/main/resources/static/images/"+g_name+a_email+".txt");
+            Files.deleteIfExists(path);
+            Files.createFile(path);
+            Files.write(path, Image);
             for (Groups currgroup : QueryResult) {
-
+                currgroup.setImage(path.toString());
+                groupRepo.save(currgroup);
             }
             return "Group picture updated";
         }catch (Exception e){
@@ -146,6 +152,20 @@ public class Controller {
         }
 
 
+    }
+    //https://mkyong.com/java/how-to-convert-array-of-bytes-into-file/
+    //https://www.youtube.com/watch?v=Tpwnvi-3pGw
+    @GetMapping(value = "/group/getpicture/{g_name}&{a_email}")
+    public byte[] getPicture(@PathVariable String g_name, @PathVariable String a_email) {
+        Groups QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email).get(0);
+        Path path = Paths.get(QueryResult.getImage());
+        try {
+            byte[] file =  Files.readAllBytes(path);
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    throw new ApiException("Error occured when reading image from database");
     }
 
     @PutMapping(value = "/group/join/{g_name}&{a_email}")
@@ -171,8 +191,8 @@ public class Controller {
             groupToJoin.setUser(userJoin);
             groupToJoin.setName(g_name);
             groupToJoin.setAdmin(Queries.get(0).getAdmin());
-            user.getGroups().add(groupToJoin);
-            user.getEvents().addAll(Queries.get(0).getEvents());
+            userJoin.getGroups().add(groupToJoin);
+            userJoin.getEvents().addAll(Queries.get(0).getEvents());
             groupRepo.save(groupToJoin);
             userRepo.save(userJoin);
             return "Successfully joined the group: " + groupToJoin.getName();
@@ -246,10 +266,12 @@ public class Controller {
 
     }
 
-    //FIXME: Fånga fallet när inte gruppnamnet finns
     @PutMapping(value = "/event/create/{e_name}&{e_description}")
     public String createEvent(@RequestBody Groups group, @PathVariable String e_name, @PathVariable String e_description) {
         List<Groups> updateGroup = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin());
+        if (groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin()).isEmpty()) {
+            throw new ApiException("Error when creating event inside group: group does not exist");
+        }
         Groups selectedGroup = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin()).get(0);
         List<Events> gEvents = eventRepo.findByName(e_name);
         for(int i = 0; i < gEvents.size(); i++) {
@@ -318,6 +340,7 @@ public class Controller {
             }
         }
         return "Successfully deleted event: " + e_name + " from group: " + group.getName();
+
     }
 
 
