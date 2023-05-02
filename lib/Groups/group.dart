@@ -8,6 +8,7 @@ import 'package:projecttest/Event/addEvent.dart';
 import 'package:projecttest/profile_widget.dart';
 import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
+import '../fetch.dart';
 import '../homePage.dart';
 import 'GroupData.dart';
 import 'groupChat.dart';
@@ -41,21 +42,7 @@ class _Group extends State<Group> {
         getGroupParticipants(widget.group.adminEmail, widget.group.groupName);
   }
 
-  static Future<List<GroupParticipants>> getGroupParticipants(
-      admin, groupName) async {
-    final url =
-        'http://192.121.208.57:8080/groups/users/' + groupName + '&' + admin;
 
-    final headers = {'Content-Type': 'application/json'};
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    final body = json.decode(response.body);
-
-    print(response.body);
-    print("list:" + body.map<GroupParticipants>(GroupParticipants.fromJson).toList() + "hej");
-    print("oj");
-    return body.map<GroupParticipants>(GroupParticipants.fromJson).toList();
-  }
 
   AppBar appBar() {
     return AppBar(
@@ -456,7 +443,7 @@ class _Group extends State<Group> {
         itemCount: participantData.length,
         itemBuilder: (context, index) {
           final participant = participantData[index];
-          return profileBox(participant.participantName, 'images/wallsten.jpg',"hej"/*participant.latestSchedule*/);
+          return profileBox(participant.name, 'images/wallsten.jpg',participant.latestSchedule);
         },
       );
 }

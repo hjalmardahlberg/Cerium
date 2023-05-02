@@ -45,7 +45,6 @@ class _AddGroupPageState extends State<AddGroupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData mediaQueryData = MediaQuery.of(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -54,7 +53,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
 
       body: Center(
         child: ListView(
-          padding:mediaQueryData.viewInsets,
+          padding: const EdgeInsets.only(left: 5, right: 5),
             children: [
               if (_imageFile == null) pickImage(height, width, _imageFile),
               if (_imageFile != null) addImage(height, width, _imageFile),
