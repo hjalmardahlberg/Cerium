@@ -117,6 +117,8 @@ class _AddGroupPageState extends State<AddGroupPage> {
       );
     }
   }
+
+
   Align addGroupButton() {
     return
        Align(

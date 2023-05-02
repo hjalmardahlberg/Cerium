@@ -282,7 +282,7 @@ class _AddEventPageState extends State<AddEventPage> {
         _eventInfoController.text != '') {
       final url =
           'http://192.121.208.57:8080/event/create/${_eventNameController
-          .text}';
+          .text}${_eventInfoController.text}';
       final headers = {'Content-Type': 'application/json'};
       if (widget.group != null) {
         final groupBody = {

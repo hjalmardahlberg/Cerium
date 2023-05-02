@@ -52,7 +52,8 @@ class _Group extends State<Group> {
     final body = json.decode(response.body);
 
     print(response.body);
-
+    print("list:" + body.map<GroupParticipants>(GroupParticipants.fromJson).toList() + "hej");
+    print("oj");
     return body.map<GroupParticipants>(GroupParticipants.fromJson).toList();
   }
 
@@ -408,7 +409,7 @@ class _Group extends State<Group> {
     );
   }
 
-  SizedBox profileBox(name, image) {
+  SizedBox profileBox(name, image,date) {
     return SizedBox(
       width: double.infinity,
       height: width / 6,
@@ -436,7 +437,7 @@ class _Group extends State<Group> {
               ),
             ),
             Expanded(
-              child: Text("27/03",
+              child: Text(date,
                   textAlign: TextAlign.end,
                   style: TextStyle(
                     fontSize: 16,
@@ -455,7 +456,7 @@ class _Group extends State<Group> {
         itemCount: participantData.length,
         itemBuilder: (context, index) {
           final participant = participantData[index];
-          return profileBox(participant.participantName, 'images/wallsten.jpg');
+          return profileBox(participant.participantName, 'images/wallsten.jpg',"hej"/*participant.latestSchedule*/);
         },
       );
 }
