@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:projecttest/refresh.dart';
+import 'package:projecttest/fetch.dart';
 
 import 'Event/EventData.dart';
 import 'Event/event.dart';

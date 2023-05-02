@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../homePage.dart';
-import '../refresh.dart';
+import '../fetch.dart';
 import 'GroupData.dart';
 import 'group.dart';
 
@@ -230,21 +230,10 @@ class _MyGroups extends State<MyGroups> {
         },
       );
 
-  Future<String> getOwnerName(group) async {
-    print(group.adminEmail);
-    final url = 'http://192.121.208.57:8080/user/' + group.adminEmail;
 
-    final headers = {'Content-Type': 'application/json'};
-    final response = await http.get(Uri.parse(url), headers: headers);
-
-    final body = json.decode(response.body);
-    print(body);
-    final ownerName = body['name'];
-    return ownerName;
-  }
 
   GestureDetector groupBox(String groupImage, GroupData group) {
-    //  late Future<String> owner = getOwnerName(group);
+    late Future<String> owner =  getUserName(group.adminEmail);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -301,19 +290,26 @@ class _MyGroups extends State<MyGroups> {
                               height: 1.2125 * ffem / fem,
                             ),
                           ),
-                          //  ),
                         ),
-                        //TODO: Fix to be the right owner
-                        Text(
-                          'Ägare: Inte fixat än',
-
-                          //'Ägare: $owner',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.withOpacity(0.9),
-                            height: 1.2125 * ffem / fem,
-                          ),
+                        FutureBuilder<String>(
+                          future: owner,
+                          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                            if (snapshot.hasData) {
+                              return Text(
+                                'Ägare: ${snapshot.data!}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey.withOpacity(0.9),
+                                  height: 1.2125 * ffem / fem,
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          },
                         ),
                       ],
                     ),
