@@ -25,12 +25,13 @@ class _AddGroupPageState extends State<AddGroupPage> {
 
   Future<void> _getImage() async {
     try {
-      final pickedFile =
-          await ImagePicker().getImage(source: ImageSource.gallery);
+      final pickedFile = await ImagePicker().getImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         setState(() {
           _imageFile = File(pickedFile.path);
         });
+        String base64Image = await encodeFileToBase64(_imageFile!);
+        print(base64Image);
       }
     } on PlatformException catch (e) {
       if (e.code == 'permission-denied') {
@@ -41,6 +42,33 @@ class _AddGroupPageState extends State<AddGroupPage> {
     } catch (e) {
       print('Error picking image: $e');
     }
+  }
+
+  // Uploads the image to the server
+  Future<void> _uploadImage(String? g_name, String? a_email) async {
+    try {
+      List<int> imageBytes = await _imageFile!.readAsBytes();
+      final response = await http.put(
+        Uri.parse('http://192.121.208.57:8080/group/setpicture/' + g_name.toString() + "&" + a_email.toString()),
+        headers: {'Content-Type': 'application/octet-stream' },
+        body: imageBytes,
+      );
+
+      if (response.statusCode == 200) {
+        print('Image uploaded successfully');
+      } else {
+        print('Error uploading image: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
+  }
+
+
+  // Encode File (returned from _getImage) to base64
+  Future<String> encodeFileToBase64(File file) async {
+    final bytes = await file.readAsBytes();
+    return base64Encode(bytes);
   }
 
   @override
