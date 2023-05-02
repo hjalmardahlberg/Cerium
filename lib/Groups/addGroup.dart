@@ -116,6 +116,10 @@ class _AddGroupPageState extends State<AddGroupPage> {
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');
+
+        // Call the image upload function after the group has been created
+        await _uploadImage(_groupNameController.text, user.email);
+
         Navigator.pop(context);
         Navigator.pushReplacement(
           context,
