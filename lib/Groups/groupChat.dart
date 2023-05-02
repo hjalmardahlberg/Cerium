@@ -27,11 +27,23 @@ class GroupChat extends StatefulWidget {
 class _GroupChat extends State<GroupChat> {
   final myController = TextEditingController();
   final chatList = List.empty(growable: true);
+  final channel = WebSocketChannel.connect(
+    Uri.parse('ws://192.121.208.57:25565/ws'),
+  );
+  late Stream<dynamic> _stream;
+
+  @override
+  void initState() {
+    super.initState();
+    _stream =
+        channel.stream; // Assign the WebSocket stream to the _stream variable
+  }
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     myController.dispose();
+    channel.sink.close();
     super.dispose();
   }
 
@@ -68,6 +80,12 @@ class _GroupChat extends State<GroupChat> {
     );
   }
 
+  void handleMessage(dynamic data) {
+    setState(() {
+      chatList.add(data.toString());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeManager = Provider.of<ThemeManager>(context);
@@ -80,14 +98,12 @@ class _GroupChat extends State<GroupChat> {
       children: [
         chatLog(),
         chatBox(),
+        streamWidget(),
       ],
     );
 
     populateChatList();
-    return Scaffold(
-      appBar: appBar(context),
-      body: body,
-    );
+    return Scaffold(appBar: appBar(context), body: body);
   }
 
   Padding chatBox() {
@@ -125,6 +141,18 @@ class _GroupChat extends State<GroupChat> {
     );
   }
 
+  Widget streamWidget() {
+    return StreamBuilder(
+      stream: _stream, // Pass the WebSocket stream to the stream parameter
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          handleMessage(snapshot.data);
+        }
+        return SizedBox.shrink();
+      },
+    );
+  }
+
   void populateChatList() {
     //TODO: Servercall
   }
@@ -142,9 +170,7 @@ class _GroupChat extends State<GroupChat> {
       'message': input,
     };
     final encodedMSG = jsonEncode(message);
-    final channel = WebSocketChannel.connect(
-      Uri.parse('ws://192.121.208.57:25565/ws'),
-    );
+
     channel.sink.add(encodedMSG);
   }
 }
