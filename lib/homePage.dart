@@ -30,7 +30,8 @@ class _MyHomePageState extends State<MyHomePage> {
   double height = 0;
   int _currentIndex = 0;
 
-  Future<List<EventData>> eventData = getEventData();
+   final Future<List<GroupData>> groupData = getGroupData();
+   Future<List<EventData>> eventData = getEventData();
 
   @override
   void initState() {
@@ -111,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             )
                 : null,
-            child: MyGroups(),
+            child: MyGroups(groupData: groupData),
           ),
         ],
       ),

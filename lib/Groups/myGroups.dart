@@ -11,22 +11,21 @@ import 'GroupData.dart';
 import 'group.dart';
 
 class MyGroups extends StatefulWidget {
-  const MyGroups({
-    super.key,
+   MyGroups({
+    super.key, this.groupData
   });
-
+  Future<List<GroupData>>? groupData;
   @override
   State<MyGroups> createState() => _MyGroups();
 }
 
 class _MyGroups extends State<MyGroups> {
-  final Future<List<GroupData>> groupData = getGroupData();
-  late Future<List<GroupData>> displayedGroupData;
+  late Future<List<GroupData>> displayedGroupData = widget.groupData!;
 
   @override
   void initState() {
     super.initState();
-    displayedGroupData = groupData;
+    //displayedGroupData = widget.groupData!;
   }
 
   double baseWidth = 390;
@@ -353,9 +352,9 @@ class _MyGroups extends State<MyGroups> {
                                     backgroundColor: Colors.blue);
                               } else {
                                 if (snapshot.hasData) {
-                                  final groupData = snapshot.data!;
+                                  final groupImage = snapshot.data!;
                                   return Image.memory(
-                                    snapshot.data!, fit: BoxFit.cover,);
+                                    groupImage, fit: BoxFit.cover,);
                                 } else {
                                   print("no group image, temp used");
                                   return Image.asset(
