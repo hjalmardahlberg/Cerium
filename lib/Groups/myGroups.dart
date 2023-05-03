@@ -354,11 +354,13 @@ class _MyGroups extends State<MyGroups> {
                                 if (snapshot.hasData) {
                                   final groupImage = snapshot.data!;
                                   print(group.image);
-                                  group.addImage(String.fromCharCodes(groupImage));
+
+                                    group.addImage(String.fromCharCodes(groupImage));
                                   print(group.image);
                                   final List<int> imageList = group.image.codeUnits;
                                   final Uint8List unit8List = Uint8List.fromList(imageList);
-                                  return Image.memory(unit8List, fit: BoxFit.cover,);
+                                  return Image.memory(
+                                    unit8List, fit: BoxFit.cover,);
                                 } else {
                                   print("no group image, temp used");
                                   return Image.asset(

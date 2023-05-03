@@ -49,6 +49,19 @@ final response = await http.get(Uri.parse(url), headers: headers);
 final body = json.decode(response.body);
 
 print('Groups:' + response.body);
+for(var group in body){
+  print("här!");
+  print(group);
+  print(group["name"]);
+ try{ Uint8List image = await getImage(group["name"], group["admin"]);
+
+ group["image"] = jsonEncode(String.fromCharCodes(image));
+ print("bild:" +String.fromCharCodes(image));
+ }catch(e){print(e);};
+
+
+}
+
 
 return body.map<GroupData>(GroupData.fromJson).toList();
 }

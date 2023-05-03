@@ -17,5 +17,5 @@ class GroupData{
 
   addImage(image){this.image = image;}
 
-  static GroupData fromJson(json) => GroupData(adminusername: json['adminusername'],groupName: json['name'], adminEmail: json['admin'],g_id: json['g_id'].toString(),image: "null"/*json['image'].toString()*/ ,u_id: json['u_id'].toString(),);
+  static GroupData fromJson(json) => GroupData(adminusername: json['adminusername'],groupName: json['name'], adminEmail: json['admin'],g_id: json['g_id'].toString(),image: "null" ,u_id: json['u_id'].toString(),);
 }
