@@ -240,4 +240,49 @@ class GoogleSignInProvider extends ChangeNotifier {
       throw Exception('Failed to load calendar events: ${response.statusCode}');
     }
   }
+
+  Future<void> exportEventToGoogleCal(
+      String title,
+      String desc,
+      String startTime,
+      String endTime) async {
+
+    final String? accessToken = await getAccessToken();
+    if (accessToken == null) return null;
+
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    };
+
+    final event_to_export = {
+      'summary': title,
+      'description': desc,
+      'start': {
+        'dateTime': startTime,
+        'timeZone': 'UTC',},
+
+      'end': {'dateTime': endTime,
+        'timeZone': 'UTC'},
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://www.googleapis.com/calendar/v3/calendars/primary/events'),
+        headers: headers,
+        body: jsonEncode(event_to_export),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Event created');
+      } else {
+        throw Exception('Failed to create event: ${response.statusCode} AND: ${response.body}');
+      }
+    } catch (e) {
+      print('Error creating event: $e');
+      rethrow;
+    }
+  }
+
+
 }
