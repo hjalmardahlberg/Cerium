@@ -44,14 +44,27 @@ class _AddGroupPageState extends State<AddGroupPage> {
     }
   }
 
+
+
+  // Encode File (returned from _getImage) to base64
+  Future<String> encodeFileToBase64(File file) async {
+    final bytes = await file.readAsBytes();
+    return base64Encode(bytes);
+  }
+
   // Uploads the image to the server
   Future<void> _uploadImage(String? g_name, String? a_email) async {
     try {
-      List<int> imageBytes = await _imageFile!.readAsBytes();
+      //String base64Image = await encodeFileToBase64(_imageFile!);
+      // Uint8List imageBytes = base64.decode(base64Image);
+
+      Uint8List? imageBytes = await _imageFile?.readAsBytes();
+      Uint8List bytes = Uint8List.fromList(imageBytes!);
+
       final response = await http.put(
         Uri.parse('http://192.121.208.57:8080/group/setpicture/' + g_name.toString() + "&" + a_email.toString()),
         headers: {'Content-Type': 'application/octet-stream' },
-        body: imageBytes,
+        body: bytes,
       );
 
       if (response.statusCode == 200) {
@@ -62,13 +75,6 @@ class _AddGroupPageState extends State<AddGroupPage> {
     } catch (e) {
       print('Error uploading image: $e');
     }
-  }
-
-
-  // Encode File (returned from _getImage) to base64
-  Future<String> encodeFileToBase64(File file) async {
-    final bytes = await file.readAsBytes();
-    return base64Encode(bytes);
   }
 
   @override

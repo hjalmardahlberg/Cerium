@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class MyGroups extends StatefulWidget {
 class _MyGroups extends State<MyGroups> {
   final Future<List<GroupData>> groupData = getGroupData();
   late Future<List<GroupData>> displayedGroupData;
+
 
   @override
   void initState() {
@@ -74,11 +76,35 @@ class _MyGroups extends State<MyGroups> {
                   }
                 }),
           ),
+          buildElevatedButton(),
           joinGroup(),
         ],
       ),
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
+
+  ElevatedButton buildElevatedButton() => ElevatedButton(
+    onPressed: () async {
+      final pic_url = 'http://192.121.208.57:8080/group/getpicture/hello123&viktorkangasniemi@gmail.com';
+      final response = await http.get(Uri.parse(pic_url));
+
+      if (response.statusCode == 200) {
+        Uint8List bytes = response.bodyBytes;
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: Image.memory(bytes),
+          ),
+        );
+      } else {
+        print('Error fetching image: ${response.statusCode}');
+      }
+    },
+    child: Icon(Icons.ice_skating),
+  );
+
+
+
 
   IconButton refreshButton() {
     return IconButton(
