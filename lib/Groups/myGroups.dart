@@ -23,7 +23,6 @@ class _MyGroups extends State<MyGroups> {
   final Future<List<GroupData>> groupData = getGroupData();
   late Future<List<GroupData>> displayedGroupData;
 
-
   @override
   void initState() {
     super.initState();
@@ -37,16 +36,25 @@ class _MyGroups extends State<MyGroups> {
   double height = 0;
   final TextEditingController joinGroupController = TextEditingController();
   final TextEditingController joinGroupAdminController =
-      TextEditingController();
+  TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
   @override
   Widget build(BuildContext context) {
     double baseWidth = 390;
-    fem = MediaQuery.of(context).size.width / baseWidth;
+    fem = MediaQuery
+        .of(context)
+        .size
+        .width / baseWidth;
     ffem = fem * 0.97;
-    width = MediaQuery.of(context).size.width;
-    height = MediaQuery.of(context).size.height;
+    width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    height = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Scaffold(
       //appBar: widget.appbar,
@@ -76,35 +84,11 @@ class _MyGroups extends State<MyGroups> {
                   }
                 }),
           ),
-          buildElevatedButton(),
           joinGroup(),
         ],
       ),
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
-
-  ElevatedButton buildElevatedButton() => ElevatedButton(
-    onPressed: () async {
-      final pic_url = 'http://192.121.208.57:8080/group/getpicture/hello123&viktorkangasniemi@gmail.com';
-      final response = await http.get(Uri.parse(pic_url));
-
-      if (response.statusCode == 200) {
-        Uint8List bytes = response.bodyBytes;
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            content: Image.memory(bytes),
-          ),
-        );
-      } else {
-        print('Error fetching image: ${response.statusCode}');
-      }
-    },
-    child: Icon(Icons.ice_skating),
-  );
-
-
-
 
   IconButton refreshButton() {
     return IconButton(
@@ -163,7 +147,7 @@ class _MyGroups extends State<MyGroups> {
               TextFormField(
                 controller: joinGroupAdminController,
                 decoration:
-                    const InputDecoration(hintText: 'Grupp admins mail...'),
+                const InputDecoration(hintText: 'Grupp admins mail...'),
               ),
             ],
           ),
@@ -236,7 +220,9 @@ class _MyGroups extends State<MyGroups> {
                   child: Text(
                     'Gå med i grupp',
                     style: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark
+                      color: Theme
+                          .of(context)
+                          .brightness == Brightness.dark
                           ? Colors.white
                           : Colors.black,
                     ),
@@ -248,25 +234,26 @@ class _MyGroups extends State<MyGroups> {
     );
   }
 
-  Widget buildGroups(List<GroupData> groupData) => ListView.builder(
+  Widget buildGroups(List<GroupData> groupData) =>
+      ListView.builder(
         itemCount: groupData.length,
         itemBuilder: (context, index) {
           final group = groupData[index];
-          return groupBox('images/wallsten.jpg', group);
+          Future<Uint8List> image = getImage(group.groupName, group.adminEmail);
+          return groupBox(image, group);
         },
       );
 
-
-
-  GestureDetector groupBox(String groupImage, GroupData group) {
-    late Future<String> owner =  getUserName(group.adminEmail);
+  GestureDetector groupBox(Future<Uint8List> image, GroupData group) {
+    late Future<String> owner = getUserName(group.adminEmail);
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (_) => Group(
-                     group: group,
+              builder: (_) =>
+                  Group(
+                    group: group,
                   )),
         );
       },
@@ -275,7 +262,9 @@ class _MyGroups extends State<MyGroups> {
         child: Material(
           elevation: 15.0,
           borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).brightness == Brightness.dark
+          color: Theme
+              .of(context)
+              .brightness == Brightness.dark
               ? Colors.grey.shade800
               : Colors.white,
           child: SizedBox(
@@ -312,14 +301,15 @@ class _MyGroups extends State<MyGroups> {
                             group.groupName,
                             style: TextStyle(
                               fontSize: 15,
-                              fontWeight: FontWeight.w400,
+                              fontWeight: FontWeight.w500,
                               height: 1.2125 * ffem / fem,
                             ),
                           ),
                         ),
                         FutureBuilder<String>(
                           future: owner,
-                          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                          builder: (BuildContext context,
+                              AsyncSnapshot<String> snapshot) {
                             if (snapshot.hasData) {
                               return Text(
                                 'Ägare: ${snapshot.data!}',
@@ -354,10 +344,25 @@ class _MyGroups extends State<MyGroups> {
                           topLeft: Radius.circular(10 * fem),
                           bottomLeft: Radius.circular(10 * fem),
                         ),
-                        child: Image.asset(
-                          groupImage,
-                          fit: BoxFit.fill,
-                        ),
+                        child: FutureBuilder<Uint8List>(
+                            future: image,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState !=
+                                  ConnectionState.done) {
+                                return CircularProgressIndicator(
+                                    backgroundColor: Colors.blue);
+                              } else {
+                                if (snapshot.hasData) {
+                                  final groupData = snapshot.data!;
+                                  return Image.memory(
+                                    snapshot.data!, fit: BoxFit.cover,);
+                                } else {
+                                  print("no group image, temp used");
+                                  return Image.asset(
+                                    "images/wallsten.jpg", fit: BoxFit.cover,);
+                                }
+                              }
+                            }),
                       ),
                     ),
                   ),
