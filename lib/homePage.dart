@@ -162,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: eventData.length,
         itemBuilder: (context, index) {
           final event = eventData[index];
-          return eventBox('images/wallsten.jpg','Info','TBD','TBD',event.event_name);
+          return eventBox('images/wallsten.jpg','Info','TBD','TBD',event.name);
         },
       );
 

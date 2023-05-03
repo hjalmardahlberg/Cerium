@@ -1,3 +1,6 @@
+import 'package:characters/characters.dart';
+import 'package:intl/intl.dart';
+
 class SetDate
 {
    final String startTimeDate;
@@ -16,5 +19,8 @@ String dateToString(timeDate){
 }
 
 String timeToString(timeTime){
-  return timeTime = timeTime.characters.skipLast(3).toString().split('T')[1];
+  DateTime dateObject = DateTime.parse(timeTime);
+  String hours = dateObject.hour.toString().padLeft(2, '0');
+  String minutes = dateObject.minute.toString().padLeft(2, '0');
+  return "$hours:$minutes";
 }

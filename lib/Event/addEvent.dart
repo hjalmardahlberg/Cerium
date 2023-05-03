@@ -272,7 +272,7 @@ class _AddEventPageState extends State<AddEventPage> {
   }
 
   void _handleAddEventButtonPressed() async {
-    print(widget.group);
+    print(widget.group?.groupName);
     if (_startSelectedTime != null &&
         _stopSelectedTime != null &&
         _startSelectedDate != null &&
@@ -281,21 +281,29 @@ class _AddEventPageState extends State<AddEventPage> {
         _eventNameController.text != '' &&
         _eventInfoController.text != '') {
       final url =
-          'http://192.121.208.57:8080/event/create/${_eventNameController
-          .text}${_eventInfoController.text}';
+          'http://192.121.208.57:8080/event/create/' + _eventNameController.text + '&' + _eventInfoController.text;
+
+      print(_eventNameController.text);
+      print(_eventInfoController.text);
+      print(url);
+
       final headers = {'Content-Type': 'application/json'};
       if (widget.group != null) {
+
         final groupBody = {
           'g_id': widget.group?.g_id,
-          'owner': widget.group?.adminEmail,
+          'admin': widget.group?.adminEmail,
           'image': widget.group?.image,
           'name': widget.group?.groupName,
           'u_id': widget.group?.u_id,
         };
+
         final body = jsonEncode(groupBody);
         final response =
         await http.put(Uri.parse(url), headers: headers, body: body);
 
+
+        print(response.body);
         if (response.statusCode == 200) {
           print('User data sent successfully!');
         } else {
