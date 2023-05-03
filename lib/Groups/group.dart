@@ -446,7 +446,7 @@ class _Group extends State<Group> {
           
           DateTime dateTime = DateTime.parse(participant.latestSchedule);
           String time_to_disp = '${dateTime.year}-${dateTime.month.toString().padLeft(2,'0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2,'0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-          
+
           return profileBox(participant.name, 'images/wallsten.jpg',time_to_disp);
         },
       );

@@ -20,12 +20,19 @@ class MyGroups extends StatefulWidget {
 }
 
 class _MyGroups extends State<MyGroups> {
-  late Future<List<GroupData>> displayedGroupData = widget.groupData!;
+
+
+  late Future<List<GroupData>> displayedGroupData;
 
   @override
   void initState() {
     super.initState();
-    //displayedGroupData = widget.groupData!;
+    if(widget.groupData != null){
+      displayedGroupData = widget.groupData!;
+    }
+    else{
+      displayedGroupData = getGroupData();
+    }
   }
 
   double baseWidth = 390;
@@ -238,13 +245,14 @@ class _MyGroups extends State<MyGroups> {
         itemCount: groupData.length,
         itemBuilder: (context, index) {
           final group = groupData[index];
-          Future<Uint8List> image = getImage(group.groupName, group.adminEmail);
-          return groupBox(image, group);
+          return groupBox(group);
         },
       );
 
-  GestureDetector groupBox(Future<Uint8List> image, GroupData group) {
-    late Future<String> owner = getUserName(group.adminEmail);
+
+
+  GestureDetector groupBox(GroupData group) {
+    Future<Uint8List> image = getImage(group.groupName, group.adminEmail);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -305,27 +313,15 @@ class _MyGroups extends State<MyGroups> {
                             ),
                           ),
                         ),
-                        FutureBuilder<String>(
-                          future: owner,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<String> snapshot) {
-                            if (snapshot.hasData) {
-                              return Text(
-                                'Ägare: ${snapshot.data!}',
+
+                       Text('Ägare: ${group.adminusername}',
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.grey.withOpacity(0.9),
                                   height: 1.2125 * ffem / fem,
                                 ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              return CircularProgressIndicator();
-                            }
-                          },
-                        ),
+                              ),
                       ],
                     ),
                   ),
@@ -343,25 +339,33 @@ class _MyGroups extends State<MyGroups> {
                           topLeft: Radius.circular(10 * fem),
                           bottomLeft: Radius.circular(10 * fem),
                         ),
-                        child: FutureBuilder<Uint8List>(
+
+                       //  child: Image.memory(unit8List, fit: BoxFit.cover,),
+                      child:  group.image == "null"?
+                        FutureBuilder<Uint8List>(
                             future: image,
                             builder: (context, snapshot) {
                               if (snapshot.connectionState !=
                                   ConnectionState.done) {
-                                return CircularProgressIndicator(
-                                    backgroundColor: Colors.blue);
+                                return const SizedBox(width:10,height:10, child:CircularProgressIndicator(
+                                   strokeWidth: 1,
+                                    backgroundColor: Colors.blue));
                               } else {
                                 if (snapshot.hasData) {
                                   final groupImage = snapshot.data!;
-                                  return Image.memory(
-                                    groupImage, fit: BoxFit.cover,);
+                                  print(group.image);
+                                  group.addImage(String.fromCharCodes(groupImage));
+                                  print(group.image);
+                                  final List<int> imageList = group.image.codeUnits;
+                                  final Uint8List unit8List = Uint8List.fromList(imageList);
+                                  return Image.memory(unit8List, fit: BoxFit.cover,);
                                 } else {
                                   print("no group image, temp used");
                                   return Image.asset(
                                     "images/wallsten.jpg", fit: BoxFit.cover,);
                                 }
                               }
-                            }),
+                            }): Image.memory(Uint8List.fromList(group.image.codeUnits), fit: BoxFit.cover,),
                       ),
                     ),
                   ),

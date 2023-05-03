@@ -6,6 +6,7 @@ class GroupParticipants{
   final String groups;
   final String events;
 
+
   const GroupParticipants({
     required this.name,
     required this.latestSchedule,

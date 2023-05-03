@@ -87,6 +87,7 @@ return body.map<GroupParticipants>(GroupParticipants.fromJson).toList();
 
 
 Future<Uint8List> getImage(String group_name, String group_admin) async {
+  print("fetching image");
         final pic_url = 'http://192.121.208.57:8080/group/getpicture/' + group_name + '&' + group_admin;
         final response = await http.get(Uri.parse(pic_url));
 
