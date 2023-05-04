@@ -303,13 +303,15 @@ class _AddEventPageState extends State<AddEventPage> {
         final actualBody = {
           'start_time': actual_start?.toIso8601String(),
           'end_time': actual_end?.toIso8601String(),
+          'date': _startSelectedDate!.year.toString() + _startSelectedDate!.month.toString() + _startSelectedDate!.day.toString(),
           'name': _eventNameController.text,
           'description': _eventInfoController.text,
         };
         
         print("IS THIS CORRECT???");
         print(actualBody);
-        
+
+        /*
         final groupBody = {
           'g_id': widget.group?.g_id,
           'admin': widget.group?.adminEmail,
@@ -317,6 +319,7 @@ class _AddEventPageState extends State<AddEventPage> {
           'name': widget.group?.groupName,
           'u_id': widget.group?.u_id,
         };
+        */
 
         final body = jsonEncode(actualBody);
         final response =
