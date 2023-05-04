@@ -72,6 +72,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   font_awesome_flutter: ^9.1.0
   web_socket_channel: ^2.4.0
+  stomp_dart_client: ^0.4.4
 
 dev_dependencies:
   flutter_test:
