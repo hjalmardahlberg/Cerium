@@ -11,26 +11,23 @@ import 'GroupData.dart';
 import 'group.dart';
 
 class MyGroups extends StatefulWidget {
-   MyGroups({
-    super.key, this.groupData
-  });
+  MyGroups({super.key, this.groupData});
+
   Future<List<GroupData>>? groupData;
+
   @override
   State<MyGroups> createState() => _MyGroups();
 }
 
 class _MyGroups extends State<MyGroups> {
-
-
   late Future<List<GroupData>> displayedGroupData;
 
   @override
   void initState() {
     super.initState();
-    if(widget.groupData != null){
+    if (widget.groupData != null) {
       displayedGroupData = widget.groupData!;
-    }
-    else{
+    } else {
       displayedGroupData = getGroupData();
     }
   }
@@ -42,25 +39,16 @@ class _MyGroups extends State<MyGroups> {
   double height = 0;
   final TextEditingController joinGroupController = TextEditingController();
   final TextEditingController joinGroupAdminController =
-  TextEditingController();
+      TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
   @override
   Widget build(BuildContext context) {
     double baseWidth = 390;
-    fem = MediaQuery
-        .of(context)
-        .size
-        .width / baseWidth;
+    fem = MediaQuery.of(context).size.width / baseWidth;
     ffem = fem * 0.97;
-    width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    height = MediaQuery
-        .of(context)
-        .size
-        .height;
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       //appBar: widget.appbar,
@@ -153,7 +141,7 @@ class _MyGroups extends State<MyGroups> {
               TextFormField(
                 controller: joinGroupAdminController,
                 decoration:
-                const InputDecoration(hintText: 'Grupp admins mail...'),
+                    const InputDecoration(hintText: 'Grupp admins mail...'),
               ),
             ],
           ),
@@ -226,9 +214,7 @@ class _MyGroups extends State<MyGroups> {
                   child: Text(
                     'Gå med i grupp',
                     style: TextStyle(
-                      color: Theme
-                          .of(context)
-                          .brightness == Brightness.dark
+                      color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.white
                           : Colors.black,
                     ),
@@ -240,8 +226,7 @@ class _MyGroups extends State<MyGroups> {
     );
   }
 
-  Widget buildGroups(List<GroupData> groupData) =>
-      ListView.builder(
+  Widget buildGroups(List<GroupData> groupData) => ListView.builder(
         itemCount: groupData.length,
         itemBuilder: (context, index) {
           final group = groupData[index];
@@ -249,17 +234,17 @@ class _MyGroups extends State<MyGroups> {
         },
       );
 
-
-
   GestureDetector groupBox(GroupData group) {
-    Future<Uint8List> image = getImage(group.groupName, group.adminEmail);
+    Future<Uint8List>? image;
+    if (group.image == "null") {
+      image = getImage(group.groupName, group.adminEmail);
+    }
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (_) =>
-                  Group(
+              builder: (_) => Group(
                     group: group,
                   )),
         );
@@ -269,9 +254,7 @@ class _MyGroups extends State<MyGroups> {
         child: Material(
           elevation: 15.0,
           borderRadius: BorderRadius.circular(10),
-          color: Theme
-              .of(context)
-              .brightness == Brightness.dark
+          color: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey.shade800
               : Colors.white,
           child: SizedBox(
@@ -314,14 +297,15 @@ class _MyGroups extends State<MyGroups> {
                           ),
                         ),
 
-                       Text('Ägare: ${group.adminusername}',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.grey.withOpacity(0.9),
-                                  height: 1.2125 * ffem / fem,
-                                ),
-                              ),
+                        Text(
+                          'Ägare: ${group.adminusername}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.withOpacity(0.9),
+                            height: 1.2125 * ffem / fem,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -340,34 +324,48 @@ class _MyGroups extends State<MyGroups> {
                           bottomLeft: Radius.circular(10 * fem),
                         ),
 
-                       //  child: Image.memory(unit8List, fit: BoxFit.cover,),
-                      child:  group.image == "null"?
-                        FutureBuilder<Uint8List>(
-                            future: image,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState !=
-                                  ConnectionState.done) {
-                                return const SizedBox(width:10,height:10, child:CircularProgressIndicator(
-                                   strokeWidth: 1,
-                                    backgroundColor: Colors.blue));
-                              } else {
-                                if (snapshot.hasData) {
-                                  final groupImage = snapshot.data!;
-                                  print(group.image);
+                        //  child: Image.memory(unit8List, fit: BoxFit.cover,),
+                        child: group.image == "null"
+                            ? FutureBuilder<Uint8List>(
+                                future: image,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState !=
+                                      ConnectionState.done) {
+                                    return const SizedBox(
+                                        width: 10,
+                                        height: 10,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 1,
+                                            backgroundColor: Colors.blue));
+                                  } else {
+                                    if (snapshot.hasData) {
+                                      final groupImage = snapshot.data!;
+                                      print(group.image);
 
-                                    group.addImage(String.fromCharCodes(groupImage));
-                                  print(group.image);
-                                  final List<int> imageList = group.image.codeUnits;
-                                  final Uint8List unit8List = Uint8List.fromList(imageList);
-                                  return Image.memory(
-                                    unit8List, fit: BoxFit.cover,);
-                                } else {
-                                  print("no group image, temp used");
-                                  return Image.asset(
-                                    "images/wallsten.jpg", fit: BoxFit.cover,);
-                                }
-                              }
-                            }): Image.memory(Uint8List.fromList(group.image.codeUnits), fit: BoxFit.cover,),
+                                      group.addImage(
+                                          String.fromCharCodes(groupImage));
+                                      print(group.image);
+                                      final List<int> imageList =
+                                          group.image.codeUnits;
+                                      final Uint8List unit8List =
+                                          Uint8List.fromList(imageList);
+                                      return Image.memory(
+                                        unit8List,
+                                        fit: BoxFit.cover,
+                                      );
+                                    } else {
+                                      print("no group image, temp used");
+                                      return Image.asset(
+                                        "images/wallsten.jpg",
+                                        fit: BoxFit.cover,
+                                      );
+                                    }
+                                  }
+                                })
+                            : Image.memory(
+                                Uint8List.fromList(group.image.codeUnits),
+                                fit: BoxFit.cover,
+                              ),
                       ),
                     ),
                   ),
