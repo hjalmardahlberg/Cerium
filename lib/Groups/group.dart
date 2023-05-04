@@ -444,8 +444,13 @@ class _Group extends State<Group> {
         itemBuilder: (context, index) {
           final participant = participantData[index];
           
-          DateTime dateTime = DateTime.parse(participant.latestSchedule);
-          String time_to_disp = '${dateTime.year}-${dateTime.month.toString().padLeft(2,'0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2,'0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+          String time_to_disp = "Not Updated";
+
+          if(! participant.latestSchedule.isEmpty) // IF NOT NULL
+          {
+            DateTime dateTime = DateTime.parse(participant.latestSchedule);
+            time_to_disp = '${dateTime.year}-${dateTime.month.toString().padLeft(2,'0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2,'0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+          }
 
           return profileBox(participant.name, 'images/wallsten.jpg',time_to_disp);
         },
