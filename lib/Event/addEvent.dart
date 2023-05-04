@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:googleapis/shared.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:duration_picker/duration_picker.dart';
@@ -288,8 +289,25 @@ class _AddEventPageState extends State<AddEventPage> {
       print(url);
 
       final headers = {'Content-Type': 'application/json'};
+
+      DateTime? actual_start = _startSelectedDate?.subtract(Duration(hours: _startSelectedDate!.hour, minutes: _startSelectedDate!.minute));
+      actual_start = actual_start?.add(Duration(hours: _startSelectedTime!.hour, minutes: _startSelectedTime!.minute));
+
+      DateTime? actual_end = _stopSelectedDate?.subtract(Duration(hours: _stopSelectedDate!.hour, minutes: _stopSelectedDate!.minute));
+      actual_end = actual_end?.add(Duration(hours: _stopSelectedTime!.hour, minutes: _stopSelectedTime!.minute));
+
       if (widget.group != null) {
 
+        final actualBody = {
+          'start': actual_start?.toIso8601String(),
+          'end': actual_end?.toIso8601String(),
+          'name': _eventNameController.text,
+          'desc': _eventInfoController.text,
+        };
+        
+        print("IS THIS CORRECT???");
+        print(actualBody);
+        
         final groupBody = {
           'g_id': widget.group?.g_id,
           'admin': widget.group?.adminEmail,
