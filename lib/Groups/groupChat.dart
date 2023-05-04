@@ -1,5 +1,7 @@
 import 'dart:convert';
-
+import 'package:stomp_dart_client/stomp.dart';
+import 'package:stomp_dart_client/stomp_config.dart';
+import 'package:stomp_dart_client/stomp_frame.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
@@ -24,28 +26,39 @@ class GroupChat extends StatefulWidget {
   State<GroupChat> createState() => _GroupChat();
 }
 
+void onConnectCallback(StompFrame connectFrame) {
+  print("Connected to server");
+}
+
+final client = StompClient(
+  config: StompConfig.SockJS(
+    url: 'http://192.121.208.57:25565/ws',
+    onConnect: onConnectCallback,
+    beforeConnect: () async {
+      print('waiting to connect...');
+      //await Future.delayed(Duration(milliseconds: 200));
+      print('connecting...');
+    },
+    onWebSocketError: (dynamic error) => print(error.toString()),
+    stompConnectHeaders: {'Authorization': 'Bearer yourToken'},
+    webSocketConnectHeaders: {'Authorization': 'Bearer yourToken'},
+  ),
+);
+
 class _GroupChat extends State<GroupChat> {
+
   final myController = TextEditingController();
   final chatList = List.empty(growable: true);
-  final channel = WebSocketChannel.connect(
-    Uri.parse('ws://192.121.208.57:25565/ws'),
-  );
-  late Stream<dynamic> _stream;
 
-  @override
-  void initState() {
-    super.initState();
-    _stream =
-        channel.stream; // Assign the WebSocket stream to the _stream variable
-  }
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     myController.dispose();
-    channel.sink.close();
     super.dispose();
   }
+
+
 
   AppBar appBar(context) {
     return AppBar(
@@ -80,14 +93,24 @@ class _GroupChat extends State<GroupChat> {
     );
   }
 
-  void handleMessage(dynamic data) {
-    setState(() {
-      chatList.add(data.toString());
-    });
+  Future<void> subscribe() async {
+    await Future.delayed(Duration(milliseconds: 200));
+    client.subscribe(
+      destination: '/topic/group/messages/${widget.groupName}&${widget
+          .groupAdmin}',
+      callback: (frame) {
+        List<dynamic>? result = json.decode(frame.body!);
+        setState(() {
+          chatList.add(result.toString());
+        });
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    client.activate();
+    subscribe();
     final themeManager = Provider.of<ThemeManager>(context);
     double baseWidth = 390;
     double fem = MediaQuery.of(context).size.width / baseWidth;
@@ -98,7 +121,6 @@ class _GroupChat extends State<GroupChat> {
       children: [
         chatLog(),
         chatBox(),
-        streamWidget(),
       ],
     );
 
@@ -141,17 +163,6 @@ class _GroupChat extends State<GroupChat> {
     );
   }
 
-  Widget streamWidget() {
-    return StreamBuilder(
-      stream: _stream, // Pass the WebSocket stream to the stream parameter
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          handleMessage(snapshot.data);
-        }
-        return SizedBox.shrink();
-      },
-    );
-  }
 
   void populateChatList() {
     //TODO: Servercall
@@ -171,6 +182,9 @@ class _GroupChat extends State<GroupChat> {
     };
     final encodedMSG = jsonEncode(message);
 
-    channel.sink.add(encodedMSG);
+    client.send(
+      destination: '/app/chat/group/${widget.groupName}&${widget.groupAdmin}',
+      body: encodedMSG,
+    );
   }
 }
