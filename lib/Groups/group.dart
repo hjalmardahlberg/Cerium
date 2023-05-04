@@ -443,10 +443,9 @@ class _Group extends State<Group> {
         itemCount: participantData.length,
         itemBuilder: (context, index) {
           final participant = participantData[index];
-          
-          String time_to_disp = "Not Updated";
 
-          if(! participant.latestSchedule.isEmpty) // IF NOT NULL
+          String time_to_disp = "Ej Uppdaterad";
+          if(! (participant.latestSchedule.toString() == "null"))
           {
             DateTime dateTime = DateTime.parse(participant.latestSchedule);
             time_to_disp = '${dateTime.year}-${dateTime.month.toString().padLeft(2,'0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2,'0')}:${dateTime.minute.toString().padLeft(2, '0')}';
