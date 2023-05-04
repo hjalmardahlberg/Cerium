@@ -290,6 +290,7 @@ class _AddEventPageState extends State<AddEventPage> {
 
       final headers = {'Content-Type': 'application/json'};
 
+      // FUL FIX FÖR ATT FÅ FRAM RÄTT DateTime STRING ATT SKICKA. Slår ihop datetime med TimeOfDay
       DateTime? actual_start = _startSelectedDate?.subtract(Duration(hours: _startSelectedDate!.hour, minutes: _startSelectedDate!.minute));
       actual_start = actual_start?.add(Duration(hours: _startSelectedTime!.hour, minutes: _startSelectedTime!.minute));
 
