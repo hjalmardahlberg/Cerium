@@ -281,8 +281,10 @@ class _AddEventPageState extends State<AddEventPage> {
         user.email != null &&
         _eventNameController.text != '' &&
         _eventInfoController.text != '') {
+
+      if (widget.group != null) {
       final url =
-          'http://192.121.208.57:8080/event/create/' + _eventNameController.text + '&' + _eventInfoController.text;
+          'http://192.121.208.57:8080/event/create/' + widget.group!.groupName.toString() + '&' + widget.group!.adminEmail.toString();
 
       print(_eventNameController.text);
       print(_eventInfoController.text);
@@ -297,18 +299,19 @@ class _AddEventPageState extends State<AddEventPage> {
       DateTime? actual_end = _stopSelectedDate?.subtract(Duration(hours: _stopSelectedDate!.hour, minutes: _stopSelectedDate!.minute));
       actual_end = actual_end?.add(Duration(hours: _stopSelectedTime!.hour, minutes: _stopSelectedTime!.minute));
 
-      if (widget.group != null) {
 
         final actualBody = {
-          'start': actual_start?.toIso8601String(),
-          'end': actual_end?.toIso8601String(),
+          'start_time': actual_start?.toIso8601String(),
+          'end_time': actual_end?.toIso8601String(),
+          'date': _startSelectedDate!.year.toString() + _startSelectedDate!.month.toString() + _startSelectedDate!.day.toString(),
           'name': _eventNameController.text,
-          'desc': _eventInfoController.text,
+          'description': _eventInfoController.text,
         };
         
         print("IS THIS CORRECT???");
         print(actualBody);
-        
+
+        /*
         final groupBody = {
           'g_id': widget.group?.g_id,
           'admin': widget.group?.adminEmail,
@@ -316,8 +319,9 @@ class _AddEventPageState extends State<AddEventPage> {
           'name': widget.group?.groupName,
           'u_id': widget.group?.u_id,
         };
+        */
 
-        final body = jsonEncode(groupBody);
+        final body = jsonEncode(actualBody);
         final response =
         await http.put(Uri.parse(url), headers: headers, body: body);
 
