@@ -1,6 +1,4 @@
-import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:projecttest/fetch.dart';
 
@@ -11,7 +9,7 @@ import 'Groups/GroupData.dart';
 import 'Groups/myGroups.dart';
 import 'Groups/addGroup.dart';
 import 'profile_widget.dart';
-import 'package:http/http.dart' as http;
+
 
 
 class MyHomePage extends StatefulWidget {
@@ -30,13 +28,14 @@ class _MyHomePageState extends State<MyHomePage> {
   double height = 0;
   int _currentIndex = 0;
 
-   final Future<List<GroupData>> groupData = getGroupData();
-   Future<List<EventData>> eventData = getEventData();
+   late Future<List<GroupData>> groupData;
+   late Future<List<EventData>> eventData;
 
   @override
   void initState() {
     super.initState();
     eventData = getEventData();
+    groupData = getGroupData();
   }
 
 
@@ -125,11 +124,9 @@ class _MyHomePageState extends State<MyHomePage> {
             : Colors.white,
         currentIndex: _currentIndex,
         items: _bottomNavigationBarItems,
-        onTap: (index) {
+        onTap: (index) async {
           if (index == 1) {
-            // middle item
-            setState(() {
-              _currentIndex == 0
+              bool result =  _currentIndex == 0
                   ? Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -138,15 +135,33 @@ class _MyHomePageState extends State<MyHomePage> {
                           appbar: homeAppBar(),
                         )),
               )
-                  : Navigator.push(
+                  : await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (_) =>
                         AddGroupPage(
                           appbar: homeAppBar(),
                         )),
-              ); // set current index to middle page index
-            });
+              );
+              if (result != null && result) {
+                setState(() {
+                  print("kommer hit");
+                  groupData = getGroupData();
+                  _currentIndex = 0;
+                  _pageController.animateToPage(_currentIndex,
+                      duration: const Duration(microseconds: 500),
+                      curve: Curves.ease);
+
+                  _currentIndex = 0;
+                  _pageController.animateToPage(_currentIndex,
+                      duration: const Duration(microseconds: 500),
+                      curve: Curves.ease);
+                });
+
+              } else {
+                // do something else if the group was not successfully added
+              }// set current index to middle page index
+
           } else {
             _pageController.animateToPage(index,
                 duration: const Duration(microseconds: 500),

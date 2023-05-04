@@ -28,7 +28,7 @@ class _MyGroups extends State<MyGroups> {
     if (widget.groupData != null) {
       displayedGroupData = widget.groupData!;
     } else {
-      displayedGroupData = getGroupData();
+      try{displayedGroupData = getGroupData();}catch(e){print(e);}
     }
   }
 
@@ -179,7 +179,7 @@ class _MyGroups extends State<MyGroups> {
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
                   setState(() {
-                    displayedGroupData = getGroupData();
+                   try{ displayedGroupData = getGroupData();}catch(e){print(e);}
                   });
                 } else {
                   print('Error sending user data: ${response.statusCode}');

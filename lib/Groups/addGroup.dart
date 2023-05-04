@@ -125,11 +125,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
 
         // Call the image upload function after the group has been created
         await _uploadImage(_groupNameController.text, user.email);
-        Navigator.pop(context);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (BuildContext context) => MyHomePage(pageIndex: 2,)),
-        );
+        Navigator.pop(context,true);
       } else {
         print('Error sending user data: ${response.statusCode}');
       }
