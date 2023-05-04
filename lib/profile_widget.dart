@@ -130,7 +130,7 @@ class ProfileWidgetState extends State<ProfileWidget> {
                 print(route.settings.name);
                 return route.isFirst;
               });
-            //  provider.logout();
+              provider.logout();
             //  Navigator.popUntil(context, ModalRoute.withName('/login'));
             },
           ),
