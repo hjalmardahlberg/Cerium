@@ -126,8 +126,12 @@ class ProfileWidgetState extends State<ProfileWidget> {
             onPressed: () {
               final provider =
                   Provider.of<GoogleSignInProvider>(context, listen: false);
-              provider.logout();
-              Navigator.popUntil(context, ModalRoute.withName('/login'));
+              Navigator.popUntil(context, (route) {
+                print(route.settings.name);
+                return route.isFirst;
+              });
+            //  provider.logout();
+            //  Navigator.popUntil(context, ModalRoute.withName('/login'));
             },
           ),
         ),
