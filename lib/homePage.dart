@@ -162,7 +162,17 @@ class _MyHomePageState extends State<MyHomePage> {
         itemCount: eventData.length,
         itemBuilder: (context, index) {
           final event = eventData[index];
-          return eventBox('images/wallsten.jpg','Info','TBD','TBD',event.name);
+          print("LAKUSJHDLAJSDKLJHAS");
+          print(event.name);
+          print(event.start);
+          print(event.end);
+          String date_to_disp = event.start.substring(0, event.start.indexOf('T'));
+
+          DateTime start_date = DateTime.parse(event.start);
+          DateTime end_date = DateTime.parse(event.end);
+          String time_to_disp = start_date.hour.toString() + ':' + start_date.minute.toString() +' - '+ end_date.hour.toString() + ':' + end_date.minute.toString();
+
+          return eventBox('images/wallsten.jpg','Info',date_to_disp,time_to_disp,event.name);
         },
       );
 
