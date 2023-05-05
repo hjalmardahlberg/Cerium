@@ -28,7 +28,11 @@ class _MyGroups extends State<MyGroups> {
     if (widget.groupData != null) {
       displayedGroupData = widget.groupData!;
     } else {
-      try{displayedGroupData = getGroupData();}catch(e){print(e);}
+      try {
+        displayedGroupData = getGroupData();
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
@@ -85,9 +89,9 @@ class _MyGroups extends State<MyGroups> {
   }
 
   Future<void> refreshList() async {
-        setState(() {
-          displayedGroupData = getGroupData();
-        });
+    setState(() {
+      displayedGroupData = getGroupData();
+    });
   }
 
   Text groupText() {
@@ -174,7 +178,11 @@ class _MyGroups extends State<MyGroups> {
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
                   setState(() {
-                   try{ displayedGroupData = getGroupData();}catch(e){print(e);}
+                    try {
+                      displayedGroupData = getGroupData();
+                    } catch (e) {
+                      print(e);
+                    }
                   });
                 } else {
                   print('Error sending user data: ${response.statusCode}');
@@ -222,15 +230,15 @@ class _MyGroups extends State<MyGroups> {
   }
 
   Widget buildGroups(List<GroupData> groupData) => RefreshIndicator(
-      onRefresh: refreshList,
-      child: ListView.builder(
-        itemCount: groupData.length,
-        itemBuilder: (context, index) {
-          final group = groupData[index];
-          return groupBox(group);
-        },
-      ),
-  );
+        onRefresh: refreshList,
+        child: ListView.builder(
+          itemCount: groupData.length,
+          itemBuilder: (context, index) {
+            final group = groupData[index];
+            return groupBox(group);
+          },
+        ),
+      );
 
   GestureDetector groupBox(GroupData group) {
     Future<Uint8List>? image;
@@ -309,62 +317,72 @@ class _MyGroups extends State<MyGroups> {
                   ),
                 ),
                 Positioned(
-                  // wallstoeno8C (23:38)
                   left: 0 * fem,
                   top: 0 * fem,
                   child: Align(
-                    child: SizedBox(
-                      width: width / 3,
-                      height: width / 4,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10 * fem),
-                          bottomLeft: Radius.circular(10 * fem),
-                        ),
+                    alignment: Alignment.center,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10 * fem),
+                        bottomLeft: Radius.circular(10 * fem),
+                      ),
 
-                        //  child: Image.memory(unit8List, fit: BoxFit.cover,),
-                        child: group.image == "null"
-                            ? FutureBuilder<Uint8List>(
-                                future: image,
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState !=
-                                      ConnectionState.done) {
-                                    return const SizedBox(
-                                        width: 10,
-                                        height: 10,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 1,
-                                            backgroundColor: Colors.blue));
+                      //  child: Image.memory(unit8List, fit: BoxFit.cover,),
+                      child: group.image == "null"
+                          ? FutureBuilder<Uint8List>(
+                              future: image,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState !=
+                                    ConnectionState.done) {
+                                  return Padding(
+                                      padding: EdgeInsets.only(
+                                          left: (width / 3)/3.5 ,
+                                          top: (width / 4)/3.5,),
+
+                                      child: const CircularProgressIndicator(
+                                        strokeWidth: 1,
+                                        backgroundColor: Colors.blue,
+                                      ));
+                                } else {
+                                  if (snapshot.hasData) {
+                                    final groupImage = snapshot.data!;
+                                    print(group.image);
+
+                                    group.addImage(
+                                        String.fromCharCodes(groupImage));
+                                    print(group.image);
+                                    final List<int> imageList =
+                                        group.image.codeUnits;
+                                    final Uint8List unit8List =
+                                        Uint8List.fromList(imageList);
+                                    return SizedBox(
+                                        width: width / 3,
+                                        height: width / 4,
+                                        child: Image.memory(
+                                          unit8List,
+                                          fit: BoxFit.cover,
+                                        ));
                                   } else {
-                                    if (snapshot.hasData) {
-                                      final groupImage = snapshot.data!;
-                                      print(group.image);
-
-                                      group.addImage(
-                                          String.fromCharCodes(groupImage));
-                                      print(group.image);
-                                      final List<int> imageList =
-                                          group.image.codeUnits;
-                                      final Uint8List unit8List =
-                                          Uint8List.fromList(imageList);
-                                      return Image.memory(
-                                        unit8List,
-                                        fit: BoxFit.cover,
-                                      );
-                                    } else {
-                                      print("no group image, temp used");
-                                      return Image.asset(
+                                    print("no group image, temp used");
+                                    return SizedBox(
+                                      width: width / 3,
+                                      height: width / 4,
+                                      child: Image.asset(
                                         "images/wallsten.jpg",
                                         fit: BoxFit.cover,
-                                      );
-                                    }
+                                      ),
+                                    );
                                   }
-                                })
-                            : Image.memory(
+                                }
+                              })
+                          : SizedBox(
+                              width: width / 3,
+                              height: width / 4,
+                              child: Image.memory(
                                 Uint8List.fromList(group.image.codeUnits),
                                 fit: BoxFit.cover,
                               ),
-                      ),
+                            ),
                     ),
                   ),
                 ),
