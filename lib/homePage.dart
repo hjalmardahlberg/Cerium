@@ -201,14 +201,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 5),
-              child: IconButton(
-                icon: Icon(Icons.ios_share),
+      //      Padding(
+             // padding: EdgeInsets.only(top: 5),
+            IconButton(
+              padding: const EdgeInsets.only(bottom:0,top:10),
+                icon: Column(
+                  children: const [
+                    Icon(Icons.ios_share),
+                    Text("Exportera",style: TextStyle(fontSize: 10),)
+                  ],
+                ),
                 onPressed: () {
                   // Add your onPressed action here
                 },
-              ),
+            //  ),
             ),
           ],
         ),
