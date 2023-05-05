@@ -50,7 +50,7 @@ class _SignUpWidgetState extends State<SignUpWidget>
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Logga in i dit konto för att fortsätta',
+              'Logga in på ditt konto för att fortsätta',
               style: TextStyle(fontSize: 16),
             ),
           ),
