@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:projecttest/fetch.dart';
 
@@ -10,12 +9,11 @@ import 'Groups/myGroups.dart';
 import 'Groups/addGroup.dart';
 import 'profile_widget.dart';
 
-
-
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key,required this.pageIndex});
+  const MyHomePage({super.key, required this.pageIndex});
 
   final int pageIndex;
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -28,8 +26,8 @@ class _MyHomePageState extends State<MyHomePage> {
   double height = 0;
   int _currentIndex = 0;
 
-   late Future<List<GroupData>> groupData;
-   late Future<List<EventData>> eventData;
+  late Future<List<GroupData>> groupData;
+  late Future<List<EventData>> eventData;
 
   @override
   void initState() {
@@ -38,30 +36,21 @@ class _MyHomePageState extends State<MyHomePage> {
     groupData = getGroupData();
   }
 
-
   @override
   Widget build(BuildContext context) {
     //Sizes
-    fem = MediaQuery
-        .of(context)
-        .size
-        .width / baseWidth;
+    fem = MediaQuery.of(context).size.width / baseWidth;
     ffem = fem * 0.97;
-    width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    height = MediaQuery
-        .of(context)
-        .size
-        .height;
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
 
     //appbar
     final appbar = homeAppBar();
 
     //bottomNavigationBar
 
-    PageController _pageController = PageController(initialPage: widget.pageIndex);
+    PageController _pageController =
+        PageController(initialPage: widget.pageIndex);
     final _bottomNavigationBarItems = [
       const BottomNavigationBarItem(
           icon: Icon(Icons.event),
@@ -90,26 +79,26 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             decoration: _currentIndex == 2
                 ? const BoxDecoration(
-              border: Border(
-                right: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
-            )
+                    border: Border(
+                      right: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                    ),
+                  )
                 : null,
             child: MyEvents(),
           ),
           Container(
             decoration: _currentIndex == 0
                 ? const BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
-            )
+                    border: Border(
+                      left: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                    ),
+                  )
                 : null,
             child: MyGroups(groupData: groupData),
           ),
@@ -117,51 +106,45 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         // type: BottomNavigationBarType.fixed,
-        backgroundColor: Theme
-            .of(context)
-            .brightness == Brightness.dark
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey.shade800
             : Colors.white,
         currentIndex: _currentIndex,
         items: _bottomNavigationBarItems,
         onTap: (index) async {
           if (index == 1) {
-              bool? result =  _currentIndex == 0
-                  ? await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) =>
-                        AddEventPage(
-                          appbar: homeAppBar(),
-                        )),
-              )
-                  : await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) =>
-                        AddGroupPage(
-                          appbar: homeAppBar(),
-                        )),
-              );
-              if (result != null && result) {
-                setState(() {
-                  groupData = getGroupData();
-                  eventData = getEventData();
-                  _currentIndex = 0;
-                  _pageController.animateToPage(_currentIndex,
-                      duration: const Duration(microseconds: 500),
-                      curve: Curves.ease);
+            bool? result = _currentIndex == 0
+                ? await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => AddEventPage(
+                              appbar: homeAppBar(),
+                            )),
+                  )
+                : await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => AddGroupPage(
+                              appbar: homeAppBar(),
+                            )),
+                  );
+            if (result != null && result) {
+              setState(() {
+                groupData = getGroupData();
+                eventData = getEventData();
+                _currentIndex = 0;
+                _pageController.animateToPage(_currentIndex,
+                    duration: const Duration(microseconds: 500),
+                    curve: Curves.ease);
 
-                  _currentIndex = 0;
-                  _pageController.animateToPage(_currentIndex,
-                      duration: const Duration(microseconds: 500),
-                      curve: Curves.ease);
-                });
-
-              } else {
-                // do something else if the group was not successfully added
-              }// set current index to middle page index
-
+                _currentIndex = 0;
+                _pageController.animateToPage(_currentIndex,
+                    duration: const Duration(microseconds: 500),
+                    curve: Curves.ease);
+              });
+            } else {
+              // do something else if the group was not successfully added
+            } // set current index to middle page index
           } else {
             _pageController.animateToPage(index,
                 duration: const Duration(microseconds: 500),
@@ -178,60 +161,89 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-
   Widget buildGroups(List<EventData> eventData) => RefreshIndicator(
-      onRefresh: refreshEvent,
-      child: ListView.builder(
-        itemCount: eventData.length,
-        itemBuilder: (context, index) {
-          final event = eventData[index];
-          String date_to_disp = event.start.substring(0, event.start.indexOf('T'));
+        onRefresh: refreshEvent,
+        child: ListView.builder(
+          itemCount: eventData.length,
+          itemBuilder: (context, index) {
+            final event = eventData[index];
+            String date_to_disp =
+                event.start.substring(0, event.start.indexOf('T'));
 
-          DateTime start_date = DateTime.parse(event.start);
-          DateTime end_date = DateTime.parse(event.end);
-          String time_to_disp = start_date.hour.toString().padLeft(2,'0') + ':' + start_date.minute.toString().padLeft(2,'0') +' - '+ end_date.hour.toString().padLeft(2,'0') + ':' + end_date.minute.toString().padLeft(2,'0');
+            DateTime start_date = DateTime.parse(event.start);
+            DateTime end_date = DateTime.parse(event.end);
+            String time_to_disp = start_date.hour.toString().padLeft(2, '0') +
+                ':' +
+                start_date.minute.toString().padLeft(2, '0') +
+                ' - ' +
+                end_date.hour.toString().padLeft(2, '0') +
+                ':' +
+                end_date.minute.toString().padLeft(2, '0');
 
-          return eventBox('images/wallsten.jpg','Info',date_to_disp,time_to_disp,event.name);
-        },
-      ),
+            return eventBox('images/wallsten.jpg', 'Info', date_to_disp,
+                time_to_disp, event.name);
+          },
+        ),
       );
 
-
   Column MyEvents() {
-    return Column(
-      children: [
-        eventText(),
-        Expanded(
-          child: FutureBuilder<List<EventData>>(
-              future: eventData, builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final eventData = snapshot.data!;
-              return buildGroups(eventData);
-            }
-            else {
-              return const Padding(padding:EdgeInsets.only(top:10), child:Text(''));
-            }
-          }),
+    return Column(children: [
+      Container(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(left: width / 7),
+                  child: eventText(),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: IconButton(
+                icon: Icon(Icons.ios_share),
+                onPressed: () {
+                  // Add your onPressed action here
+                },
+              ),
+            ),
+          ],
         ),
-        TextButton( onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) =>
-                    EventPage(
-                      picture: 'images/wallsten.jpg',
-                      appbar: homeAppBar(),
-                      theEventName: 'EventName',
-                      eventInfo: 'eventInfo',
-                      date: 'TBD',
-                      time: 'TBD',
-                    )),
-          );
-        },child: const Text('Event page'))
-    ]
-    );
+      ),
+      Expanded(
+        child: FutureBuilder<List<EventData>>(
+            future: eventData,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final eventData = snapshot.data!;
+                return buildGroups(eventData);
+              } else {
+                return const Padding(
+                    padding: EdgeInsets.only(top: 10), child: Text(''));
+              }
+            }),
+      ),
+      TextButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => EventPage(
+                        picture: 'images/wallsten.jpg',
+                        appbar: homeAppBar(),
+                        theEventName: 'EventName',
+                        eventInfo: 'eventInfo',
+                        date: 'TBD',
+                        time: 'TBD',
+                      )),
+            );
+          },
+          child: const Text('Event page'))
+    ]);
   }
-
 
   Center eventText() {
     return const Center(
@@ -253,9 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return AppBar(
       automaticallyImplyLeading: true,
       titleSpacing: 0,
-      backgroundColor:Theme
-          .of(context)
-          .brightness == Brightness.dark
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
           ? Colors.grey.shade800
           : Colors.white,
       title: Row(
@@ -289,19 +299,19 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  GestureDetector eventBox(String eventImage,
-      String eventInfo,
-      String eventDate,
-      String eventTime,
-      String eventName,
-      ) {
+  GestureDetector eventBox(
+    String eventImage,
+    String eventInfo,
+    String eventDate,
+    String eventTime,
+    String eventName,
+  ) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (_) =>
-                  EventPage(
+              builder: (_) => EventPage(
                     picture: eventImage,
                     appbar: homeAppBar(),
                     theEventName: eventName,
@@ -311,119 +321,118 @@ class _MyHomePageState extends State<MyHomePage> {
                   )),
         );
       },
-    child: Padding(padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-      child: Material(
-        elevation: 15.0,
-        borderRadius: BorderRadius.circular(10),
-        color: Theme
-            .of(context)
-            .brightness == Brightness.dark
-            ? Colors.grey.shade800
-            : Colors.white,
-        child: SizedBox(
-          width: double.infinity,
-          height: width / 4,
-          child: Stack(
-            children: [
-              Positioned(
-                // eventboxQTS (23:34)
-                left: 0 * fem,
-                top: 0 * fem,
-                child: SizedBox(
-                  height: 135 * fem,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10 * fem),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+        child: Material(
+          elevation: 15.0,
+          borderRadius: BorderRadius.circular(10),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey.shade800
+              : Colors.white,
+          child: SizedBox(
+            width: double.infinity,
+            height: width / 4,
+            child: Stack(
+              children: [
+                Positioned(
+                  // eventboxQTS (23:34)
+                  left: 0 * fem,
+                  top: 0 * fem,
+                  child: SizedBox(
+                    height: 135 * fem,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10 * fem),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                top: 10 * fem,
-                left: (140 * fem),
-                child: SizedBox(
-                  height: width / 4,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Expanded(
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Text(
-                          eventName,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                            height: 1.2125 * ffem / fem,
+                Positioned(
+                  top: 10 * fem,
+                  left: (140 * fem),
+                  child: SizedBox(
+                    height: width / 4,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Expanded(
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Text(
+                            eventName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              height: 1.2125 * ffem / fem,
+                            ),
                           ),
+                          //  ),
                         ),
-                        //  ),
-                      ),
 
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                eventDate,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.2125 * ffem / fem,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  'Kl: $eventTime',
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  eventDate,
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w400,
                                     height: 1.2125 * ffem / fem,
                                   ),
                                 ),
-                              ),
-                            ],
+                                Expanded(
+                                  child: Text(
+                                    'Kl: $eventTime',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.2125 * ffem / fem,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                // wallstoeno8C (23:38)
-                left: 0 * fem,
-                top: 0 * fem,
-                child: Align(
-                  child: SizedBox(
-                    width: width / 3,
-                    height: width / 4,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10 * fem),
-                        bottomLeft: Radius.circular(10 * fem),
-                      ),
-                      child: Image.asset(
-                        eventImage,
-                        fit: BoxFit.fill,
+                Positioned(
+                  // wallstoeno8C (23:38)
+                  left: 0 * fem,
+                  top: 0 * fem,
+                  child: Align(
+                    child: SizedBox(
+                      width: width / 3,
+                      height: width / 4,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10 * fem),
+                          bottomLeft: Radius.circular(10 * fem),
+                        ),
+                        child: Image.asset(
+                          eventImage,
+                          fit: BoxFit.fill,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }
