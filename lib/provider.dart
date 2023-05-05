@@ -237,50 +237,26 @@ class GoogleSignInProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> evIsUnique(
-      String title, String start, String end, String? accessToken) async {
-
+  Future<bool> evIsUnique(String title, String start, String end, String? accessToken) async {
     final headers = {
       'Authorization': 'Bearer $accessToken',
       'Content-Type': 'application/json',
     };
 
-    final query = {
-      'summary': title,
-      'start': {
-        'dateTime': start,
-        'timeZone': 'UTC',
-      },
-      'end': {
-        'dateTime': end,
-        'timeZone': 'UTC',
-      },
-    };
+    final events = await getEvents1Week(); // get all events in the next week
 
-    final queryParams = query.entries
-        .map((entry) => '${entry.key}=${jsonEncode(entry.value)}')
-        .join('&');
-
-    try {
-      final url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
-      final response = await http.get(
-        Uri.parse('$url?$queryParams'),
-        headers: headers,
-      );
-
-      if (response.statusCode == 200) {
-        final events = jsonDecode(response.body)['items'] as List<dynamic>;
-        return events.isEmpty;
-      } else {
-        final error = jsonDecode(response.body)['error'];
-        print('Error fetching events: ${response.statusCode} - ${error['message']}\nFull response body: ${response.body}');
-        throw Exception(
-            'Failed to fetch events: ${response.statusCode} - ${error['message']}');
+    for (final event in events) {
+      print(event.summary.toString() + " <--> " + title);
+      print(event.start?.dateTime?.toIso8601String());
+      print(start);// + "  OOOOO  " + start);
+      if (event.summary == title && event.start?.dateTime?.toIso8601String() == start + "Z" && event.end?.dateTime?.toIso8601String() == end + "Z") {
+        print("\n\nIS NOT UNIQUE!!!!!!\n\n");
+        return false; // event already exists
       }
-    } catch (e) {
-      print('Error fetching events: $e');
-      rethrow;
     }
+
+    print("EVENT IS UNIQUE!!");
+    return true; // event does not exist
   }
 
   Future<void> exportEventToGoogleCal(
