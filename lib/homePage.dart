@@ -185,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           DateTime start_date = DateTime.parse(event.start);
           DateTime end_date = DateTime.parse(event.end);
-          String time_to_disp = start_date.hour.toString() + ':' + start_date.minute.toString() +' - '+ end_date.hour.toString() + ':' + end_date.minute.toString();
+          String time_to_disp = start_date.hour.toString().padLeft(2,'0') + ':' + start_date.minute.toString().padLeft(2,'0') +' - '+ end_date.hour.toString().padLeft(2,'0') + ':' + end_date.minute.toString().padLeft(2,'0');
 
           return eventBox('images/wallsten.jpg','Info',date_to_disp,time_to_disp,event.name);
         },
