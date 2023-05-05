@@ -329,6 +329,7 @@ class _AddEventPageState extends State<AddEventPage> {
         print(response.body);
         if (response.statusCode == 200) {
           print('User data sent successfully!');
+          Navigator.pop(context,true);
         } else {
           print('Error sending user data: ${response.statusCode}');
         }
@@ -657,7 +658,7 @@ class _AddEventPageState extends State<AddEventPage> {
         } else {
           return const Padding(
             padding: EdgeInsets.only(top: 10),
-            child: Text('Error..'),
+            child:CircularProgressIndicator(),
           );
         }
       },
@@ -844,7 +845,12 @@ class _AddEventPageState extends State<AddEventPage> {
                     future: groups,
                     // wrap the list in a Future using Future.value
                     builder: (context, snapshot) {
-                      if (snapshot.hasData) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      else if (snapshot.hasData) {
                         groupData = snapshot.data!;
                         return listViewGroup(groupData, selectedValue, (value) {
                           setState(() {

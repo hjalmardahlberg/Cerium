@@ -100,10 +100,10 @@ class ProfileWidgetState extends State<ProfileWidget> {
               color: themeManager.isDarkMode ? Colors.white : Colors.black),
         ),
         icon: Padding(
-          padding: EdgeInsets.only(right: 5.0),
+          padding: const EdgeInsets.only(right: 5.0),
           child: themeManager.isDarkMode
-              ? Icon(Icons.wb_sunny_outlined)
-              : Icon(Icons.nightlight_round),
+              ? const Icon(Icons.wb_sunny_outlined)
+              : const Icon(Icons.nightlight_round),
         ),
         label: Center(
           child: Text(
@@ -191,11 +191,11 @@ class ProfileWidgetState extends State<ProfileWidget> {
           side: BorderSide(
               color: themeManager.isDarkMode ? Colors.white : Colors.black),
         ),
-        icon: Padding(
+        icon: const Padding(
           padding: EdgeInsets.only(right: 5.0),
           child: Icon(Icons.send),
         ),
-        label: Center(
+        label: const Center(
           child: Text(
             'Skicka Kalender',
             style: TextStyle(fontSize: 15),

@@ -84,15 +84,10 @@ class _MyGroups extends State<MyGroups> {
     ); // This trailing comma makes auto-formatting nicer for build methods.
   }
 
-  IconButton refreshButton() {
-    return IconButton(
-      onPressed: () {
+  Future<void> refreshList() async {
         setState(() {
           displayedGroupData = getGroupData();
         });
-      },
-      icon: const Icon(Icons.refresh),
-    );
   }
 
   Text groupText() {
@@ -226,13 +221,16 @@ class _MyGroups extends State<MyGroups> {
     );
   }
 
-  Widget buildGroups(List<GroupData> groupData) => ListView.builder(
+  Widget buildGroups(List<GroupData> groupData) => RefreshIndicator(
+      onRefresh: refreshList,
+      child: ListView.builder(
         itemCount: groupData.length,
         itemBuilder: (context, index) {
           final group = groupData[index];
           return groupBox(group);
         },
-      );
+      ),
+  );
 
   GestureDetector groupBox(GroupData group) {
     Future<Uint8List>? image;
