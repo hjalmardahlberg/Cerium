@@ -126,8 +126,8 @@ class _MyHomePageState extends State<MyHomePage> {
         items: _bottomNavigationBarItems,
         onTap: (index) async {
           if (index == 1) {
-              bool result =  _currentIndex == 0
-                  ? Navigator.push(
+              bool? result =  _currentIndex == 0
+                  ? await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (_) =>
@@ -145,8 +145,8 @@ class _MyHomePageState extends State<MyHomePage> {
               );
               if (result != null && result) {
                 setState(() {
-                  print("kommer hit");
                   groupData = getGroupData();
+                  eventData = getEventData();
                   _currentIndex = 0;
                   _pageController.animateToPage(_currentIndex,
                       duration: const Duration(microseconds: 500),
@@ -172,15 +172,19 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget buildGroups(List<EventData> eventData) =>
-      ListView.builder(
+  Future<void> refreshEvent() async {
+    setState(() {
+      eventData = getEventData();
+    });
+  }
+
+
+  Widget buildGroups(List<EventData> eventData) => RefreshIndicator(
+      onRefresh: refreshEvent,
+      child: ListView.builder(
         itemCount: eventData.length,
         itemBuilder: (context, index) {
           final event = eventData[index];
-          print("LAKUSJHDLAJSDKLJHAS");
-          print(event.name);
-          print(event.start);
-          print(event.end);
           String date_to_disp = event.start.substring(0, event.start.indexOf('T'));
 
           DateTime start_date = DateTime.parse(event.start);
@@ -189,6 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           return eventBox('images/wallsten.jpg','Info',date_to_disp,time_to_disp,event.name);
         },
+      ),
       );
 
 
