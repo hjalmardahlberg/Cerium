@@ -241,6 +241,42 @@ class GoogleSignInProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> evIsUnique(String title, String start, String end, String? accessToken) async {
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    };
+
+    final query = {
+      'q': '$title',
+      'timeMin': start,
+      'timeMax': end,
+    };
+
+    try {
+      final response = await http.get(
+        Uri(
+          scheme: 'https',
+          host: 'www.googleapis.com',
+          path: '/calendar/v3/calendars/primary/events',
+          queryParameters: query,
+        ),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        final events = jsonDecode(response.body)['items'] as List<dynamic>;
+        return events.isEmpty;
+      } else {
+        throw Exception('Failed to fetch events: ${response.statusCode} AND: ${response.body}');
+      }
+    } catch (e) {
+      print('Error fetching events: $e');
+      rethrow;
+    }
+  }
+
+
   Future<void> exportEventToGoogleCal(
       String title,
       String desc,
@@ -249,6 +285,10 @@ class GoogleSignInProvider extends ChangeNotifier {
 
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return null;
+
+    if(! (await evIsUnique(title, startTime, endTime, accessToken))){ // IF EVENT ALREADY EXIST
+      throw Exception("Event already exist in Google Calendar!");
+    }
 
     final headers = {
       'Authorization': 'Bearer $accessToken',
@@ -265,6 +305,8 @@ class GoogleSignInProvider extends ChangeNotifier {
       'end': {'dateTime': endTime,
         'timeZone': 'UTC'},
     };
+
+
 
     try {
       final response = await http.post(
