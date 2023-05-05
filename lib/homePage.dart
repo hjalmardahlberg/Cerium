@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:projecttest/fetch.dart';
+import 'package:projecttest/provider.dart';
 
 import 'Event/EventData.dart';
 import 'Event/event.dart';
@@ -8,6 +10,9 @@ import 'Groups/GroupData.dart';
 import 'Groups/myGroups.dart';
 import 'Groups/addGroup.dart';
 import 'profile_widget.dart';
+
+import 'package:provider/provider.dart';
+import 'provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.pageIndex});
@@ -211,8 +216,19 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text("Exportera",style: TextStyle(fontSize: 10),)
                   ],
                 ),
-                onPressed: () {
-                  // Add your onPressed action here
+                onPressed: () async{
+                  List<EventData> ev_lst = await eventData;
+                  final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+
+                  for(EventData event in ev_lst){
+                    print("HELLLOOOOOO HAHAHAHAHA");
+                    print(event.name);
+                    print(event.start);
+                    print(event.end);
+                    provider.exportEventToGoogleCal(event.name, event.description, event.start, event.end);
+                  }
+
+
                 },
             //  ),
             ),
