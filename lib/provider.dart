@@ -25,6 +25,26 @@ class GoogleSignInProvider extends ChangeNotifier {
 
   GoogleSignInAccount get user => _user!;
 
+  Future<void> update_pfp(String? u_email, String? image_url) async {
+
+    print("INT THIS SHIT");
+    print(image_url);
+    print(u_email);
+
+    var uri = Uri.parse('http://192.121.208.57:8080/user/picture/save&' + u_email.toString() + '&' + image_url.toString());
+    print("THIS IS THE FUCKING URL TO SERVER");
+    print(uri.toString());
+
+    try {
+      var response = await http.put(uri);
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update profile picture: ${response.statusCode}\n${response.body}');
+      }
+    } catch (error) {
+      throw Exception('Failed to update profile picture: $error');
+    }
+  }
+
   Future googleLogin() async {
     try {
       final googleUser = await googleSignIn.signIn();
@@ -53,6 +73,9 @@ class GoogleSignInProvider extends ChangeNotifier {
         'name': fire_base_user.displayName,
         'email': fire_base_user.email,
       };
+
+      print("YOOOOOOOOOO");
+      update_pfp(fire_base_user.email, fire_base_user.photoURL);
 
       final url = 'http://192.121.208.57:8080/save';
       final headers = {'Content-Type': 'application/json'};
