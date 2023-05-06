@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
 import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:googleapis_auth/googleapis_auth.dart';
 
@@ -15,15 +14,12 @@ import 'secrets.dart';
 
 import 'package:jwt_decoder/jwt_decoder.dart';
 
-
 class GoogleSignInProvider extends ChangeNotifier {
   final googleSignIn = GoogleSignIn(
     scopes: <String>[
       calendar.CalendarApi.calendarScope,
-
     ],
   );
-
 
   GoogleSignInAccount? _user;
 
@@ -62,8 +58,8 @@ class GoogleSignInProvider extends ChangeNotifier {
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode(userData);
       //print(body.toString());
-      final response = await http.post(
-          Uri.parse(url), headers: headers, body: body);
+      final response =
+          await http.post(Uri.parse(url), headers: headers, body: body);
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');
@@ -88,8 +84,8 @@ class GoogleSignInProvider extends ChangeNotifier {
   Future<String?> getAccessToken() async {
     final GoogleSignInAccount? googleUser = _user;
     if (googleUser == null) return null;
-    final GoogleSignInAuthentication googleAuth = await googleUser
-        .authentication;
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
     print("ACCESS TOKEN: " + googleAuth.accessToken.toString());
     return googleAuth.accessToken;
@@ -137,15 +133,16 @@ class GoogleSignInProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<Event>> getCalendarEventsInterval(DateTime start,
-      DateTime end) async {
+  Future<List<Event>> getCalendarEventsInterval(
+      DateTime start, DateTime end) async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return [];
     print("GOT ACCESS TOKEN!");
 
     // Hämtar alla vettiga Cal ID's som användaren har (egna + subscriptions)
     final cal_ids = await getCalendarIds();
-    List<String> filteredIds = cal_ids.where((id) => !id.contains("@group"))
+    List<String> filteredIds = cal_ids
+        .where((id) => !id.contains("@group"))
         .toList(); // filtrerade cal_id listan
     print("Cal ids:" + filteredIds.toString());
 
@@ -153,8 +150,8 @@ class GoogleSignInProvider extends ChangeNotifier {
     List<Event> allEvents = [];
 
     for (String id in filteredIds) {
-      final Uri uri = Uri.https(
-          'www.googleapis.com', '/calendar/v3/calendars/$id/events', {
+      final Uri uri =
+          Uri.https('www.googleapis.com', '/calendar/v3/calendars/$id/events', {
         'timeMin': start.toIso8601String() + 'Z',
         'timeMax': end.toIso8601String() + 'Z',
       });
@@ -210,7 +207,6 @@ class GoogleSignInProvider extends ChangeNotifier {
     return events;
   }
 
-
   Future<List<Event>> getEvents1Week() async {
     final now = DateTime.now();
     final start = now;
@@ -219,14 +215,14 @@ class GoogleSignInProvider extends ChangeNotifier {
     return events;
   }
 
-
   Future<List<Event>> getDataFromCalID(String cal_id) async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return [];
 
     final headers = {'Authorization': 'Bearer $accessToken'};
     final response = await http.get(
-      Uri.parse('https://www.googleapis.com/calendar/v3/calendars/' + cal_id +
+      Uri.parse('https://www.googleapis.com/calendar/v3/calendars/' +
+          cal_id +
           '/events'),
       headers: headers,
     );
@@ -247,84 +243,63 @@ class GoogleSignInProvider extends ChangeNotifier {
       'Content-Type': 'application/json',
     };
 
-    final query = {
-      'q': '$title',
-      'timeMin': start,
-      'timeMax': end,
-    };
+    final events = await getEvents1Week(); // get all events in the next week
 
-    try {
-      final response = await http.get(
-        Uri(
-          scheme: 'https',
-          host: 'www.googleapis.com',
-          path: '/calendar/v3/calendars/primary/events',
-          queryParameters: query,
-        ),
-        headers: headers,
-      );
-
-      if (response.statusCode == 200) {
-        final events = jsonDecode(response.body)['items'] as List<dynamic>;
-        return events.isEmpty;
-      } else {
-        throw Exception('Failed to fetch events: ${response.statusCode} AND: ${response.body}');
+    for (final event in events) {
+      print(event.summary.toString() + " <--> " + title);
+      print(event.start?.dateTime?.toIso8601String());
+      print(start);// + "  OOOOO  " + start);
+      if (event.summary == title && event.start?.dateTime?.toIso8601String() == start + "Z" && event.end?.dateTime?.toIso8601String() == end + "Z") {
+        print("\n\nIS NOT UNIQUE!!!!!!\n\n");
+        return false; // event already exists
       }
-    } catch (e) {
-      print('Error fetching events: $e');
-      rethrow;
     }
+
+    print("EVENT IS UNIQUE!!");
+    return true; // event does not exist
   }
 
-
   Future<void> exportEventToGoogleCal(
-      String title,
-      String desc,
-      String startTime,
-      String endTime) async {
-
+      String title, String desc, String startTime, String endTime) async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return null;
 
-    if(! (await evIsUnique(title, startTime, endTime, accessToken))){ // IF EVENT ALREADY EXIST
-      throw Exception("Event already exist in Google Calendar!");
-    }
+    if (await evIsUnique(title, startTime, endTime, accessToken)) {
+      // IF EVENT UNIQUE
 
-    final headers = {
-      'Authorization': 'Bearer $accessToken',
-      'Content-Type': 'application/json',
-    };
+      final headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
 
-    final event_to_export = {
-      'summary': title,
-      'description': desc,
-      'start': {
-        'dateTime': startTime,
-        'timeZone': 'UTC',},
+      final event_to_export = {
+        'summary': title,
+        'description': desc,
+        'start': {
+          'dateTime': startTime,
+          'timeZone': 'UTC',
+        },
+        'end': {'dateTime': endTime, 'timeZone': 'UTC'},
+      };
 
-      'end': {'dateTime': endTime,
-        'timeZone': 'UTC'},
-    };
+      try {
+        final response = await http.post(
+          Uri.parse(
+              'https://www.googleapis.com/calendar/v3/calendars/primary/events'),
+          headers: headers,
+          body: jsonEncode(event_to_export),
+        );
 
-
-
-    try {
-      final response = await http.post(
-        Uri.parse('https://www.googleapis.com/calendar/v3/calendars/primary/events'),
-        headers: headers,
-        body: jsonEncode(event_to_export),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print('Event created');
-      } else {
-        throw Exception('Failed to create event: ${response.statusCode} AND: ${response.body}');
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          print('Event created');
+        } else {
+          throw Exception(
+              'Failed to create event: ${response.statusCode} AND: ${response.body}');
+        }
+      } catch (e) {
+        print('Error creating event: $e');
+        rethrow;
       }
-    } catch (e) {
-      print('Error creating event: $e');
-      rethrow;
     }
   }
-
-
 }
