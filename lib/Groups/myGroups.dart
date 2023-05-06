@@ -156,9 +156,7 @@ class _MyGroups extends State<MyGroups> {
               onPressed: () async {
                 // do something with the text entered in the TextFormField
                 String groupName = joinGroupNameController.text;
-                print('Entered Text: $groupName');
                 String groupAdmin = joinGroupAdminController.text;
-                print('Entered Text: $groupAdmin');
                 Navigator.pop(context);
 
                 final user = FirebaseAuth.instance.currentUser!;
@@ -174,7 +172,7 @@ class _MyGroups extends State<MyGroups> {
                 final headers = {'Content-Type': 'application/json'};
                 final response = await http.put(Uri.parse(url),
                     headers: headers, body: userBody);
-                print(response.body);
+                print("Joined group:" + response.body);
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
                   setState(() {
@@ -246,14 +244,17 @@ class _MyGroups extends State<MyGroups> {
       image = getImage(group.groupName, group.adminEmail);
     }
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+       bool? result = await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => Group(
                     group: group,
                   )),
         );
+       if (result != null && result) {
+         refreshList();
+       }
       },
       child: Padding(
         padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
@@ -326,8 +327,6 @@ class _MyGroups extends State<MyGroups> {
                         topLeft: Radius.circular(10 * fem),
                         bottomLeft: Radius.circular(10 * fem),
                       ),
-
-                      //  child: Image.memory(unit8List, fit: BoxFit.cover,),
                       child: group.image == "null"
                           ? FutureBuilder<Uint8List>(
                               future: image,
@@ -346,11 +345,8 @@ class _MyGroups extends State<MyGroups> {
                                 } else {
                                   if (snapshot.hasData) {
                                     final groupImage = snapshot.data!;
-                                    print(group.image);
-
                                     group.addImage(
                                         String.fromCharCodes(groupImage));
-                                    print(group.image);
                                     final List<int> imageList =
                                         group.image.codeUnits;
                                     final Uint8List unit8List =

@@ -3,26 +3,26 @@ class EventData{
   final String e_id;
   final String date;
   final String end;
+   String image;
   final String start;
-  final String g_id;
+  final String group;
   final String description;
-  final String user;
   final String u_id;
 
-  const EventData({
+   EventData({
     required this.name,
     required this.e_id,
     required this.date,
     required this.end,
+    required this.image,
     required this.start,
-    required this.g_id,
+    required this.group,
     required this.description,
-    required this.user,
     required this.u_id,
   });
 
+  addImage(image){this.image = image;}
 
-
-  static EventData fromJson(json) => EventData(name: json['name'].toString(),e_id: json['e_id'].toString(),date:json['date'].toString() ,end:json['end_time'].toString() ,start: json['start_time'].toString(),g_id: json['g_id'].toString(),description: json['description'].toString(),user: json['user'].toString(),u_id: json['u_id'].toString());
+  static EventData fromJson(json) => EventData(name: json['name'].toString(),e_id: json['e_id'].toString(),date:json['date'].toString() ,end:json['end_time'].toString(),image: 'null' ,start: json['start_time'].toString(),group: json['group'].toString(),description: json['description'].toString(),u_id: json['u_id'].toString());
 }
 

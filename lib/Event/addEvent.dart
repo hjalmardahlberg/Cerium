@@ -283,13 +283,7 @@ class _AddEventPageState extends State<AddEventPage> {
         _eventInfoController.text != '') {
 
       if (widget.group != null) {
-      final url =
-          'http://192.121.208.57:8080/event/create/' + widget.group!.groupName.toString() + '&' + widget.group!.adminEmail.toString();
-
-      print(_eventNameController.text);
-      print(_eventInfoController.text);
-      print(url);
-
+      final url = 'http://192.121.208.57:8080/event/create/' + widget.group!.groupName.toString() + '&' + widget.group!.adminEmail.toString();
       final headers = {'Content-Type': 'application/json'};
 
       // FUL FIX FÖR ATT FÅ FRAM RÄTT DateTime STRING ATT SKICKA. Slår ihop datetime med TimeOfDay
@@ -328,6 +322,10 @@ class _AddEventPageState extends State<AddEventPage> {
 
         print(response.body);
         if (response.statusCode == 200) {
+          print('eName:' + _eventNameController.text);
+          print('groupName:' + (widget.group?.groupName)!);
+          print('AMain:' + (widget.group?.adminEmail)!);
+          uploadEventImage(_eventNameController.text,widget.group?.groupName,widget.group?.adminEmail,_imageFile);
           print('User data sent successfully!');
           Navigator.pop(context,true);
         } else {
@@ -846,7 +844,7 @@ class _AddEventPageState extends State<AddEventPage> {
                     // wrap the list in a Future using Future.value
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
+                        return const Center(
                           child: CircularProgressIndicator(),
                         );
                       }

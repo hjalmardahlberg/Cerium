@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:projecttest/fetch.dart';
 
@@ -7,7 +9,7 @@ import 'Event/addEvent.dart';
 import 'Groups/GroupData.dart';
 import 'Groups/myGroups.dart';
 import 'Groups/addGroup.dart';
-import 'profile_widget.dart';
+import 'profilePage.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.pageIndex});
@@ -136,11 +138,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 _pageController.animateToPage(_currentIndex,
                     duration: const Duration(microseconds: 500),
                     curve: Curves.ease);
-
-                _currentIndex = 0;
-                _pageController.animateToPage(_currentIndex,
-                    duration: const Duration(microseconds: 500),
-                    curve: Curves.ease);
               });
             } else {
               // do something else if the group was not successfully added
@@ -180,8 +177,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ':' +
                 end_date.minute.toString().padLeft(2, '0');
 
-            return eventBox('images/wallsten.jpg', 'Info', date_to_disp,
-                time_to_disp, event.name);
+            return eventBox(event, date_to_disp,
+                time_to_disp);
           },
         ),
       );
@@ -201,20 +198,23 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-      //      Padding(
-             // padding: EdgeInsets.only(top: 5),
+            //      Padding(
+            // padding: EdgeInsets.only(top: 5),
             IconButton(
-              padding: const EdgeInsets.only(bottom:0,top:10),
-                icon: Column(
-                  children: const [
-                    Icon(Icons.ios_share),
-                    Text("Exportera",style: TextStyle(fontSize: 10),)
-                  ],
-                ),
-                onPressed: () {
-                  // Add your onPressed action here
-                },
-            //  ),
+              padding: const EdgeInsets.only(bottom: 0, top: 10),
+              icon: Column(
+                children: const [
+                  Icon(Icons.ios_share),
+                  Text(
+                    "Exportera",
+                    style: TextStyle(fontSize: 10),
+                  )
+                ],
+              ),
+              onPressed: () {
+                // Add your onPressed action here
+              },
+              //  ),
             ),
           ],
         ),
@@ -305,25 +305,26 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  GestureDetector eventBox(
-    String eventImage,
-    String eventInfo,
-    String eventDate,
-    String eventTime,
-    String eventName,
-  ) {
+  GestureDetector eventBox(EventData event,String date,String time) {
+    Future<Uint8List>? image;
+    if (event.image == "null") {
+      List <String> group = event.group.split(':');
+      print('g_id: ' + event.group);
+      print('group' + group.toString());
+      image = getEventImage(event.name, group[2].split(' ')[1].split(',')[0], group[3].split(' ')[1].split(',')[0]);
+    }
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => EventPage(
-                    picture: eventImage,
+                    picture: event.image,
                     appbar: homeAppBar(),
-                    theEventName: eventName,
-                    eventInfo: eventInfo,
-                    date: eventDate,
-                    time: eventTime,
+                    theEventName: event.name,
+                    eventInfo: event.description,
+                    date: event.date,
+                    time: event.start + event.end,
                   )),
         );
       },
@@ -366,7 +367,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Padding(
                           padding: const EdgeInsets.only(top: 5),
                           child: Text(
-                            eventName,
+                            event.name,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 15,
@@ -388,7 +389,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  eventDate,
+                                  date,
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w400,
@@ -397,7 +398,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    'Kl: $eventTime',
+                                    'Kl: $time',
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w400,
@@ -426,10 +427,72 @@ class _MyHomePageState extends State<MyHomePage> {
                           topLeft: Radius.circular(10 * fem),
                           bottomLeft: Radius.circular(10 * fem),
                         ),
-                        child: Image.asset(
-                          eventImage,
-                          fit: BoxFit.fill,
-                        ),
+                        child: event.image == "null"
+                            ? FutureBuilder<Uint8List>(
+                                future: image,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState !=
+                                      ConnectionState.done) {
+                                    return Padding(
+                                        padding: EdgeInsets.only(
+                                          left: (width / 3) / 3.5,
+                                          top: (width / 4) / 3.5,
+                                        ),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 1,
+                                          backgroundColor: Colors.blue,
+                                        ));
+                                  } else {
+                                    if (snapshot.hasData) {
+                                      final groupImage = snapshot.data!;
+                                      print(event.image);
+
+                                      event.addImage(
+                                          String.fromCharCodes(groupImage));
+                                      print(event.image);
+                                      final List<int> imageList =
+                                          event.image.codeUnits;
+                                      final Uint8List unit8List =
+                                          Uint8List.fromList(imageList);
+                                      return SizedBox(
+                                          width: width / 3,
+                                          height: width / 4,
+                                          child: Image.memory(
+                                            unit8List,
+                                            fit: BoxFit.cover,
+                                          ));
+                                    } else {
+                                      print("no group image, temp used");
+                                      event.addImage( "images/wallsten.jpg");
+                                      return SizedBox(
+                                        width: width / 3,
+                                        height: width / 4,
+                                        child: Image.asset(
+                                          "images/wallsten.jpg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                })
+                            :
+                        event.image == "images/wallsten.jpg" ?
+                        SizedBox(
+                          width: width / 3,
+                          height: width / 4,
+                          child: Image.asset(
+                            "images/wallsten.jpg",
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                        :SizedBox(
+                                width: width / 3,
+                                height: width / 4,
+                                child: Image.memory(
+                                  Uint8List.fromList(event.image.codeUnits),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                       ),
                     ),
                   ),

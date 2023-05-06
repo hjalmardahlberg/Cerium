@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
-import 'package:projecttest/profile_widget.dart';
+import 'package:projecttest/profilePage.dart';
 import '../Theme/themeConstants.dart';
 import 'eventParticipants.dart';
 

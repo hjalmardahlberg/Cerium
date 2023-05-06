@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projecttest/Event/addEvent.dart';
-import 'package:projecttest/profile_widget.dart';
+import 'package:projecttest/profilePage.dart';
 import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
 import '../fetch.dart';
@@ -116,7 +116,7 @@ class _Group extends State<Group> {
                 print(response.body);
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
-                  Navigator.of(context).pop();
+                  Navigator.pop(context,true);
                 } else {
                   print('Error sending user data: ${response.statusCode}');
                   success = false;
@@ -321,14 +321,7 @@ class _Group extends State<Group> {
               }
               print(success);
               if (success) {
-                Navigator.pop(context);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => MyHomePage(
-                            pageIndex: 2,
-                          )),
-                );
+                Navigator.pop(context,true);
               }
             },
             icon: const Icon(
