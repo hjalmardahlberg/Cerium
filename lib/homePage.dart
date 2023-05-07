@@ -160,27 +160,29 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+
+
   Widget buildGroups(List<EventData> eventData) => RefreshIndicator(
         onRefresh: refreshEvent,
         child: ListView.builder(
           itemCount: eventData.length,
           itemBuilder: (context, index) {
             final event = eventData[index];
-            String date_to_disp =
-                event.start.substring(0, event.start.indexOf('T'));
+            String date_to_disp = event.start.substring(0, event.start.indexOf('T'));
 
             DateTime start_date = DateTime.parse(event.start);
             DateTime end_date = DateTime.parse(event.end);
-            String time_to_disp = start_date.hour.toString().padLeft(2, '0') +
-                ':' +
-                start_date.minute.toString().padLeft(2, '0') +
-                ' - ' +
-                end_date.hour.toString().padLeft(2, '0') +
-                ':' +
-                end_date.minute.toString().padLeft(2, '0');
+            print("startDate:"+ start_date.toString());
+            print("today:" + DateTime.now().toString());
 
-            return eventBox(event, date_to_disp,
-                time_to_disp);
+            if(start_date.isBefore(DateTime.now())){
+              deleteEvent(event);
+            }
+            else{
+             String time_to_disp = start_date.hour.toString().padLeft(2, '0') + ':' + start_date.minute.toString().padLeft(2, '0') + ' - ' + end_date.hour.toString().padLeft(2, '0') + ':' + end_date.minute.toString().padLeft(2, '0');
+
+             return eventBox(event, date_to_disp, time_to_disp);
+            }
           },
         ),
       );

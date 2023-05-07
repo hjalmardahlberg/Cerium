@@ -12,8 +12,6 @@ import 'Groups/groupParticipnats.dart';
 
 import 'package:image_to_byte/image_to_byte.dart';
 
-
-
 Future<List<EventData>> getEventData() async {
 final user = FirebaseAuth.instance.currentUser!;
 
@@ -38,6 +36,42 @@ print('Events:'+response.body);
 return body.map<EventData>(EventData.fromJson).toList();
 }
 
+Future<void> deleteEvent(EventData event) async {
+  final url = 'http://192.121.208.57:8080/event/delete/'+ event.name;
+  final headers = {'Content-Type': 'application/json'};
+  List<String> groups = event.group.split(',');
+  String g_id = groups[0].split(':')[1].replaceAll(' ', '');
+  String owner = groups[2].split(':')[1].replaceAll(' ', '');
+  String image = groups[3].split(':')[1].replaceAll(' ', '');
+  String name = groups[5].split(':')[1].replaceAll(' ', '');
+  String u_id = groups[0].split(':')[1].replaceAll(' ', '');
+  String adminusername = groups[4].split(':')[1].replaceAll(' ', '');
+  print("gid:" + g_id);
+  print("owner:" + owner);
+  print("image:" + image);
+  print("name:" + name);
+  print("u_id:" + u_id);
+  print("adminusername:" + adminusername);
+
+  final group = {
+    'g_id': g_id,
+    'owner': owner,
+    'image':image,
+    'name': name,
+    'u_id': u_id,
+    'adminusername':adminusername,
+  };
+  print("nybyggd:" + group.toString());
+  final groupBody = jsonEncode(group);
+  final response = await http.delete(Uri.parse(url), headers: headers, body:groupBody);
+  //final body = json.decode(response.body);
+
+  if (response.statusCode == 200) {
+    print('Event successfully deleted');
+  } else {
+    print('Error deleting event: ${response.statusCode}');
+  }
+}
 
 Future<List<GroupData>> getGroupData() async {
 final user = FirebaseAuth.instance.currentUser!;
@@ -114,7 +148,7 @@ Future<void> uploadImage(String? g_name, String? a_email, _imageFile) async {
 }
 
 Future<Uint8List> getImage(String group_name, String group_admin) async {
-  print("fetching image");
+  //print("fetching image");
         final pic_url = 'http://192.121.208.57:8080/group/getpicture/' + group_name + '&' + group_admin;
         final response = await http.get(Uri.parse(pic_url));
 
@@ -158,7 +192,7 @@ Future<void> uploadEventImage(String? e_name,String? g_name, String? a_email, Fi
 }
 
 Future<Uint8List> getEventImage(String e_name, String g_name,String a_email) async {
-  print("fetching image");
+ // print("fetching image");
   print(e_name);
   print(g_name);
   print(a_email);
