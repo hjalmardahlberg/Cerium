@@ -43,12 +43,6 @@ public class ChatController {
         messageRepo.save(msg);
     }
 
-    @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
-    public String greet(Message msg) {
-        return "Hello, " + msg.getMessage();
-    }
-
     @GetMapping(value = "/testgreet")
     public String testGreet() {
         return "Hello, World!";

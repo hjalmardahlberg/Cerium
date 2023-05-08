@@ -107,8 +107,8 @@ public class Controller {
         }
     }
 
-    @PutMapping(value = "/user/picture/save&{u_email}&{Image}")
-    public String saveUserPicture(@PathVariable String Image, @PathVariable String u_email){
+    @PutMapping(value = "/user/picture/save&{u_email}")
+    public String saveUserPicture(@RequestBody String Image, @PathVariable String u_email){
         Users user = userRepo.findByEmail(u_email);
         if (user == null) {
             throw new ApiException("User is not found");
@@ -117,12 +117,13 @@ public class Controller {
         userRepo.save(user);
         return "Saved user picture";
     }
-    @GetMapping(value = "/user/picture/get")
+    @PutMapping(value = "/user/picture/get")
     public String getUserPicture(@RequestBody Users user){
-        if (user == null) {
+        Users usr = userRepo.findByEmail(user.getEmail());
+        if (usr == null) {
             throw new ApiException("User is not found");
         }
-        return user.getImage();
+        return usr.getImage();
     }
 
 
