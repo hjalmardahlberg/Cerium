@@ -110,6 +110,7 @@ class _GroupChat extends State<GroupChat> {
           .groupAdmin}',
       callback: (frame) {
         List<dynamic>? result = json.decode(frame.body!);
+        print("result:"+result.toString());
         chatList.add(result.toString());
         setState(() {});
       },
@@ -191,14 +192,14 @@ class _GroupChat extends State<GroupChat> {
   }
 
   chatInput(
-      String input, String groupName, String userName, String groupAdmin) {
+      String input, String groupName, String groupAdmin, String userName) {
     setState(() {
       chatList.add(Text(input));
     });
     final message = {
-      'senderName': groupAdmin,
+      'senderName': userName,
       'receiverGroup': groupName,
-      'receiverGroupAdmin': userName,
+      'receiverGroupAdmin': groupAdmin,
       'date': DateTime.now().toString(),
       'message': input,
     };
