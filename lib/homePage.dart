@@ -171,7 +171,8 @@ class _MyHomePageState extends State<MyHomePage> {
             String date_to_disp = event.start.substring(0, event.start.indexOf('T'));
             DateTime start_date = DateTime.parse(event.start);
             DateTime end_date = DateTime.parse(event.end);
-            print("startDate:"+ start_date.toString());
+            print("startDate:" + start_date.toString());
+            print("endDate:"+ end_date.toString());
             print("today:" + DateTime.now().toString());
 
             if(end_date.isBefore(DateTime.now())){

@@ -300,14 +300,17 @@ class GoogleSignInProvider extends ChangeNotifier {
         'Content-Type': 'application/json',
       };
 
-      final event_to_export = {
+      final event_to_export = { //FUNKAR NU BARA I SVENSK TID SÅ VAR BARA I SVERIGE!!!
         'summary': title,
         'description': desc,
         'start': {
           'dateTime': startTime,
-          'timeZone': 'UTC',
+          'timeZone': 'Europe/Stockholm',
         },
-        'end': {'dateTime': endTime, 'timeZone': 'UTC'},
+        'end': {
+          'dateTime': endTime,
+          'timeZone': 'Europe/Stockholm',
+        },
       };
 
       try {

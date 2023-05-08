@@ -286,17 +286,10 @@ class _AddEventPageState extends State<AddEventPage> {
       final url = 'http://192.121.208.57:8080/event/create/' + widget.group!.groupName.toString() + '&' + widget.group!.adminEmail.toString();
       final headers = {'Content-Type': 'application/json'};
 
-      // FUL FIX FÖR ATT FÅ FRAM RÄTT DateTime STRING ATT SKICKA. Slår ihop datetime med TimeOfDay
-      DateTime? actual_start = _startSelectedDate?.subtract(Duration(hours: _startSelectedDate!.hour, minutes: _startSelectedDate!.minute));
-      actual_start = actual_start?.add(Duration(hours: _startSelectedTime!.hour, minutes: _startSelectedTime!.minute));
-
-      DateTime? actual_end = _stopSelectedDate?.subtract(Duration(hours: _stopSelectedDate!.hour, minutes: _stopSelectedDate!.minute));
-      actual_end = actual_end?.add(Duration(hours: _stopSelectedTime!.hour, minutes: _stopSelectedTime!.minute));
-
 
         final actualBody = {
-          'start_time': actual_start?.toIso8601String(),
-          'end_time': actual_end?.toIso8601String(),
+          'start_time': chosenDate.startTimeDate,
+          'end_time': chosenDate.endTimeDate,
           'date': _startSelectedDate!.year.toString() + _startSelectedDate!.month.toString() + _startSelectedDate!.day.toString(),
           'name': _eventNameController.text,
           'description': _eventInfoController.text,
