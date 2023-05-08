@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import '../fetch.dart';
 import '../homePage.dart';
 import 'myGroups.dart';
 
@@ -53,29 +54,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
   }
 
   // Uploads the image to the server
-  Future<void> _uploadImage(String? g_name, String? a_email) async {
-    try {
-      //String base64Image = await encodeFileToBase64(_imageFile!);
-      // Uint8List imageBytes = base64.decode(base64Image);
 
-      Uint8List? imageBytes = await _imageFile?.readAsBytes();
-      Uint8List bytes = Uint8List.fromList(imageBytes!);
-
-      final response = await http.put(
-        Uri.parse('http://192.121.208.57:8080/group/setpicture/' + g_name.toString() + "&" + a_email.toString()),
-        headers: {'Content-Type': 'application/octet-stream' },
-        body: bytes,
-      );
-
-      if (response.statusCode == 200) {
-        print('Image uploaded successfully');
-      } else {
-        print('Error uploading image: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error uploading image: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +103,7 @@ class _AddGroupPageState extends State<AddGroupPage> {
         print('User data sent successfully!');
 
         // Call the image upload function after the group has been created
-        await _uploadImage(_groupNameController.text, user.email);
+        await uploadImage(_groupNameController.text, user.email, _imageFile);
         Navigator.pop(context,true);
       } else {
         print('Error sending user data: ${response.statusCode}');

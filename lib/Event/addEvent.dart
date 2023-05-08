@@ -94,11 +94,11 @@ class _AddEventPageState extends State<AddEventPage> {
             addTextForm('Enter your events info', _eventInfoController),
             const SizedBox(height: 16),
             chosenDate.startTimeDate == "" ? datePickerRow(
-                context, width, dateRange, onDatesSelected) : Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [ dateIconPicker(context, dateRange, onDatesSelected),  timeIconPicker(context),  durationIconPicker(context),],),
+                context, width, dateRange, onDatesSelected) : Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [ dateIconPicker(context, dateRange, onDatesSelected), SizedBox(width: width/12,) ,timeIconPicker(context),SizedBox(width:  width/12,)  , durationIconPicker(context),],),
             const SizedBox(height: 16),
-            chosenDate.startTimeDate == "" ? timePickerRow(context, width):Center(child:Text("${dateToString(chosenDate.startTimeDate)}-${dateToString(chosenDate.endTimeDate)}"),),
+            chosenDate.startTimeDate == "" ? timePickerRow(context, width):Center(child: (dateToString(chosenDate.startTimeDate) == dateToString(chosenDate.endTimeDate)) ? Text("Datum: ${dateToString(chosenDate.startTimeDate)}",style: TextStyle(fontSize: 24),):Text( "${dateToString(chosenDate.startTimeDate)} till ${dateToString(chosenDate.endTimeDate)}",style: TextStyle(fontSize: 24)),),
              const SizedBox(height: 16),
-            chosenDate.startTimeDate == "" ? durationRow(context) :  Center(child:Text("${timeToString(chosenDate.startTimeDate)}-${timeToString(chosenDate.endTimeDate)}"),),
+            chosenDate.startTimeDate == "" ? durationRow(context) :  Center(child: Text("Kl: ${timeToString(chosenDate.startTimeDate)}-${timeToString(chosenDate.endTimeDate)}",style: TextStyle(fontSize: 24),),),
             const SizedBox(height: 16),
             widget.group == null
                 ? addGroup()
@@ -149,13 +149,13 @@ class _AddEventPageState extends State<AddEventPage> {
   _durationResult = await showDurationPicker(
   context: context, initialTime: const Duration(minutes: 30));
   setState(() {});
-  }, icon: const Icon(Icons.timer,size: 30,));
+  }, icon: const Icon(Icons.timer,size: 40,));
   }
 
   IconButton timeIconPicker(BuildContext context) {
     return IconButton(onPressed:() async {
   await _selectTime(context);
-  }, icon: const Icon(Icons.access_time,size: 30,));
+  }, icon: const Icon(Icons.access_time,size: 40,));
   }
 
   IconButton dateIconPicker(BuildContext context, DateTimeRange dateRange, Null onDatesSelected(dynamic dateRange)) {
@@ -175,7 +175,7 @@ class _AddEventPageState extends State<AddEventPage> {
                   onDatesSelected?.call(pickedDateRange);
                 }
               }, icon: const Icon(Icons.calendar_today,
-            size: 30,));
+            size: 40,));
   }
 
   Row durationPicker(BuildContext context) =>
@@ -283,43 +283,20 @@ class _AddEventPageState extends State<AddEventPage> {
         _eventInfoController.text != '') {
 
       if (widget.group != null) {
-      final url =
-          'http://192.121.208.57:8080/event/create/' + widget.group!.groupName.toString() + '&' + widget.group!.adminEmail.toString();
-
-      print(_eventNameController.text);
-      print(_eventInfoController.text);
-      print(url);
-
+      final url = 'http://192.121.208.57:8080/event/create/' + widget.group!.groupName.toString() + '&' + widget.group!.adminEmail.toString();
       final headers = {'Content-Type': 'application/json'};
-
-      // FUL FIX FÖR ATT FÅ FRAM RÄTT DateTime STRING ATT SKICKA. Slår ihop datetime med TimeOfDay
-      DateTime? actual_start = _startSelectedDate?.subtract(Duration(hours: _startSelectedDate!.hour, minutes: _startSelectedDate!.minute));
-      actual_start = actual_start?.add(Duration(hours: _startSelectedTime!.hour, minutes: _startSelectedTime!.minute));
-
-      DateTime? actual_end = _stopSelectedDate?.subtract(Duration(hours: _stopSelectedDate!.hour, minutes: _stopSelectedDate!.minute));
-      actual_end = actual_end?.add(Duration(hours: _stopSelectedTime!.hour, minutes: _stopSelectedTime!.minute));
 
 
         final actualBody = {
-          'start_time': actual_start?.toIso8601String(),
-          'end_time': actual_end?.toIso8601String(),
+          'start_time': chosenDate.startTimeDate,
+          'end_time': chosenDate.endTimeDate,
           'date': _startSelectedDate!.year.toString() + _startSelectedDate!.month.toString() + _startSelectedDate!.day.toString(),
           'name': _eventNameController.text,
           'description': _eventInfoController.text,
         };
         
-        print("IS THIS CORRECT???");
-        print(actualBody);
 
-        /*
-        final groupBody = {
-          'g_id': widget.group?.g_id,
-          'admin': widget.group?.adminEmail,
-          'image': widget.group?.image,
-          'name': widget.group?.groupName,
-          'u_id': widget.group?.u_id,
-        };
-        */
+        print(actualBody);
 
         final body = jsonEncode(actualBody);
         final response =
@@ -328,6 +305,10 @@ class _AddEventPageState extends State<AddEventPage> {
 
         print(response.body);
         if (response.statusCode == 200) {
+          print('eName:' + _eventNameController.text);
+          print('groupName:' + (widget.group?.groupName)!);
+          print('AMain:' + (widget.group?.adminEmail)!);
+          uploadEventImage(_eventNameController.text,widget.group?.groupName,widget.group?.adminEmail,_imageFile);
           print('User data sent successfully!');
           Navigator.pop(context,true);
         } else {
@@ -654,7 +635,7 @@ class _AddEventPageState extends State<AddEventPage> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final timeData = snapshot.data!;
-          return listViewBuilder(timeData);
+          return timeData.length != 0 ? listViewBuilder(timeData): Text("Inga tider hittades");
         } else {
           return const Padding(
             padding: EdgeInsets.only(top: 10),
@@ -670,7 +651,7 @@ class _AddEventPageState extends State<AddEventPage> {
       shrinkWrap: true,
       itemCount: list.length,
       itemBuilder: (BuildContext context, int index) {
-        return list[index];
+        return list[index]; //list.length != 0 ? list[index] : Text("Inga tider hittades");
       },
     );
   }
@@ -846,7 +827,7 @@ class _AddEventPageState extends State<AddEventPage> {
                     // wrap the list in a Future using Future.value
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
+                        return const Center(
                           child: CircularProgressIndicator(),
                         );
                       }

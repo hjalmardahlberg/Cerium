@@ -4,8 +4,10 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:projecttest/Event/addEvent.dart';
-import 'package:projecttest/profile_widget.dart';
+import 'package:projecttest/profilePage.dart';
+import 'package:projecttest/provider.dart';
 import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
 import '../fetch.dart';
@@ -116,7 +118,7 @@ class _Group extends State<Group> {
                 print(response.body);
                 if (response.statusCode == 200) {
                   print('User data sent successfully!');
-                  Navigator.of(context).pop();
+                  Navigator.pop(context,true);
                 } else {
                   print('Error sending user data: ${response.statusCode}');
                   success = false;
@@ -220,12 +222,12 @@ class _Group extends State<Group> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         groupNameAndExit(),
-        const Padding(
-            padding: EdgeInsets.only(left: 20, top: 20),
-            child: Text("Deltagare")),
         Row(
           children: [
-            Padding(
+            const Padding(
+                padding: EdgeInsets.only(left: 20, top: 20),
+                child: Text("Deltagare", style: TextStyle(fontSize: 16))),
+           /* Padding(
               padding: const EdgeInsets.only(left: 20, top: 10),
               child: TextButton.icon(
                 onPressed: () {
@@ -240,12 +242,12 @@ class _Group extends State<Group> {
                           themeManager.isDarkMode ? Colors.white : Colors.black,
                     )),
               ),
-            ),
+            ),*/
             const Expanded(
               child: Padding(
                 padding: EdgeInsets.only(right: 10),
                 child: Text('Senaste\nuppdatering',
-                    textAlign: TextAlign.end, style: TextStyle(fontSize: 20)),
+                    textAlign: TextAlign.end, style: TextStyle(fontSize: 16)),
               ),
             )
           ],
@@ -321,14 +323,7 @@ class _Group extends State<Group> {
               }
               print(success);
               if (success) {
-                Navigator.pop(context);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => MyHomePage(
-                            pageIndex: 2,
-                          )),
-                );
+                Navigator.pop(context,true);
               }
             },
             icon: const Icon(
@@ -408,7 +403,7 @@ class _Group extends State<Group> {
               padding: const EdgeInsets.only(left: 0),
               child: CircleAvatar(
                 radius: 30,
-                backgroundImage: AssetImage(image),
+                backgroundImage: NetworkImage(image),
               ),
             ),
             const SizedBox(
@@ -451,7 +446,24 @@ class _Group extends State<Group> {
             time_to_disp = '${dateTime.year}-${dateTime.month.toString().padLeft(2,'0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2,'0')}:${dateTime.minute.toString().padLeft(2, '0')}';
           }
 
-          return profileBox(participant.name, 'images/wallsten.jpg',time_to_disp);
+          final prov = Provider.of<GoogleSignInProvider>(context, listen: false);
+
+          final pic_url_future =  prov.getProfilePic(participant);
+
+          return FutureBuilder<String?>(
+            future: pic_url_future,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                print("URL:");
+                print(snapshot.data);
+                return profileBox(participant.name, snapshot.data!, time_to_disp);
+              } else {
+                // Return a placeholder widget or a loading indicator while waiting for the future to complete
+                return CircularProgressIndicator();
+              }
+            },
+          );
         },
       );
+
 }

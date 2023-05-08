@@ -4,7 +4,7 @@ import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter/material.dart';
-import 'package:projecttest/profile_widget.dart';
+import 'package:projecttest/profilePage.dart';
 import 'package:provider/provider.dart';
 import '../Theme/themeConstants.dart';
 import 'package:http/http.dart' as http;

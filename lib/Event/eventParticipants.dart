@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:projecttest/profile_widget.dart';
+import 'package:projecttest/profilePage.dart';
 import 'package:provider/provider.dart';
 import '../Theme/themeConstants.dart';
 

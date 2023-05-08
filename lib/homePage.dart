@@ -1,5 +1,6 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:projecttest/fetch.dart';
 import 'package:projecttest/provider.dart';
 
@@ -9,10 +10,8 @@ import 'Event/addEvent.dart';
 import 'Groups/GroupData.dart';
 import 'Groups/myGroups.dart';
 import 'Groups/addGroup.dart';
-import 'profile_widget.dart';
-
+import 'profilePage.dart';
 import 'package:provider/provider.dart';
-import 'provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.pageIndex});
@@ -141,11 +140,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 _pageController.animateToPage(_currentIndex,
                     duration: const Duration(microseconds: 500),
                     curve: Curves.ease);
-
-                _currentIndex = 0;
-                _pageController.animateToPage(_currentIndex,
-                    duration: const Duration(microseconds: 500),
-                    curve: Curves.ease);
               });
             } else {
               // do something else if the group was not successfully added
@@ -166,27 +160,30 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+
+
   Widget buildGroups(List<EventData> eventData) => RefreshIndicator(
         onRefresh: refreshEvent,
         child: ListView.builder(
           itemCount: eventData.length,
           itemBuilder: (context, index) {
             final event = eventData[index];
-            String date_to_disp =
-                event.start.substring(0, event.start.indexOf('T'));
-
+            String date_to_disp = event.start.substring(0, event.start.indexOf('T'));
             DateTime start_date = DateTime.parse(event.start);
             DateTime end_date = DateTime.parse(event.end);
-            String time_to_disp = start_date.hour.toString().padLeft(2, '0') +
-                ':' +
-                start_date.minute.toString().padLeft(2, '0') +
-                ' - ' +
-                end_date.hour.toString().padLeft(2, '0') +
-                ':' +
-                end_date.minute.toString().padLeft(2, '0');
+            print("startDate:" + start_date.toString());
+            print("endDate:"+ end_date.toString());
+            print("today:" + DateTime.now().toString());
 
-            return eventBox('images/wallsten.jpg', 'Info', date_to_disp,
-                time_to_disp, event.name);
+            if(end_date.isBefore(DateTime.now())){
+              deleteEvent(event);
+              refreshEvent();
+            }
+            else{
+             String time_to_disp = start_date.hour.toString().padLeft(2, '0') + ':' + start_date.minute.toString().padLeft(2, '0') + ' - ' + end_date.hour.toString().padLeft(2, '0') + ':' + end_date.minute.toString().padLeft(2, '0');
+
+             return eventBox(event, date_to_disp, time_to_disp);
+            }
           },
         ),
       );
@@ -206,31 +203,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-      //      Padding(
-             // padding: EdgeInsets.only(top: 5),
+            //      Padding(
+            // padding: EdgeInsets.only(top: 5),
             IconButton(
-              padding: const EdgeInsets.only(bottom:0,top:10),
-                icon: Column(
-                  children: const [
-                    Icon(Icons.ios_share),
-                    Text("Exportera",style: TextStyle(fontSize: 10),)
-                  ],
-                ),
-                onPressed: () async{
-                  List<EventData> ev_lst = await eventData;
-                  final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+              padding: const EdgeInsets.only(bottom: 0, top: 10),
+              icon: Column(
+                children: const [
+                  Icon(Icons.ios_share),
+                  Text(
+                    "Exportera",
+                    style: TextStyle(fontSize: 10),
+                  )
+                ],
+              ),
+              onPressed: () async {
+                List<EventData> ev_lst = await eventData;
+                final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
 
-                  for(EventData event in ev_lst){
-                    print("HELLLOOOOOO HAHAHAHAHA");
-                    print(event.name);
-                    print(event.start);
-                    print(event.end);
-                    provider.exportEventToGoogleCal(event.name, event.description, event.start, event.end);
-                  }
-
-
-                },
-            //  ),
+                for(EventData event in ev_lst){
+                  print("HELLLOOOOOO HAHAHAHAHA");
+                  print(event.name);
+                  print(event.start);
+                  print(event.end);
+                  provider.exportEventToGoogleCal(event.name, event.description, event.start, event.end);
+                }
+              },
+              //  ),
             ),
           ],
         ),
@@ -248,22 +246,6 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             }),
       ),
-      TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => EventPage(
-                        picture: 'images/wallsten.jpg',
-                        appbar: homeAppBar(),
-                        theEventName: 'EventName',
-                        eventInfo: 'eventInfo',
-                        date: 'TBD',
-                        time: 'TBD',
-                      )),
-            );
-          },
-          child: const Text('Event page'))
     ]);
   }
 
@@ -321,25 +303,25 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  GestureDetector eventBox(
-    String eventImage,
-    String eventInfo,
-    String eventDate,
-    String eventTime,
-    String eventName,
-  ) {
+  GestureDetector eventBox(EventData event,String date,String time) {
+    Future<Uint8List>? image;
+    List <String> group = event.group.split(':');
+    if (event.image == "null") {
+      image = getEventImage(event.name, group[2].split(' ')[1].split(',')[0], group[3].split(' ')[1].split(',')[0]);
+    }
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => EventPage(
-                    picture: eventImage,
+                    picture: event.image,
                     appbar: homeAppBar(),
-                    theEventName: eventName,
-                    eventInfo: eventInfo,
-                    date: eventDate,
-                    time: eventTime,
+                    theEventName: event.name,
+                    groupName:  group[2].split(' ')[1].split(',')[0],
+                    eventInfo: event.description,
+                    date: date,
+                    time: time,
                   )),
         );
       },
@@ -382,7 +364,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Padding(
                           padding: const EdgeInsets.only(top: 5),
                           child: Text(
-                            eventName,
+                            event.name,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 15,
@@ -404,7 +386,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  eventDate,
+                                  date,
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w400,
@@ -413,7 +395,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    'Kl: $eventTime',
+                                    'Kl: $time',
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w400,
@@ -442,10 +424,72 @@ class _MyHomePageState extends State<MyHomePage> {
                           topLeft: Radius.circular(10 * fem),
                           bottomLeft: Radius.circular(10 * fem),
                         ),
-                        child: Image.asset(
-                          eventImage,
-                          fit: BoxFit.fill,
-                        ),
+                        child: event.image == "null"
+                            ? FutureBuilder<Uint8List>(
+                                future: image,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState !=
+                                      ConnectionState.done) {
+                                    return Padding(
+                                        padding: EdgeInsets.only(
+                                          left: (width / 3) / 3.5,
+                                          top: (width / 4) / 3.5,
+                                        ),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 1,
+                                          backgroundColor: Colors.blue,
+                                        ));
+                                  } else {
+                                    if (snapshot.hasData) {
+                                      final groupImage = snapshot.data!;
+                                      print(event.image);
+
+                                      event.addImage(
+                                          String.fromCharCodes(groupImage));
+                                      print(event.image);
+                                      final List<int> imageList =
+                                          event.image.codeUnits;
+                                      final Uint8List unit8List =
+                                          Uint8List.fromList(imageList);
+                                      return SizedBox(
+                                          width: width / 3,
+                                          height: width / 4,
+                                          child: Image.memory(
+                                            unit8List,
+                                            fit: BoxFit.cover,
+                                          ));
+                                    } else {
+                                      print("no group image, temp used");
+                                      event.addImage( "images/wallsten.jpg");
+                                      return SizedBox(
+                                        width: width / 3,
+                                        height: width / 4,
+                                        child: Image.asset(
+                                          "images/wallsten.jpg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                })
+                            :
+                        event.image == "images/wallsten.jpg" ?
+                        SizedBox(
+                          width: width / 3,
+                          height: width / 4,
+                          child: Image.asset(
+                            "images/wallsten.jpg",
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                        :SizedBox(
+                                width: width / 3,
+                                height: width / 4,
+                                child: Image.memory(
+                                  Uint8List.fromList(event.image.codeUnits),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                       ),
                     ),
                   ),
