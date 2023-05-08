@@ -112,6 +112,7 @@ class _GroupChat extends State<GroupChat> {
         List<dynamic>? result = json.decode(frame.body!);
         print("result:"+result.toString());
         chatList.add(result.toString());
+        print(result.toString());
         setState(() {});
       },
     );
