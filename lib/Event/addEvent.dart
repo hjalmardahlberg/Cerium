@@ -94,11 +94,11 @@ class _AddEventPageState extends State<AddEventPage> {
             addTextForm('Enter your events info', _eventInfoController),
             const SizedBox(height: 16),
             chosenDate.startTimeDate == "" ? datePickerRow(
-                context, width, dateRange, onDatesSelected) : Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [ dateIconPicker(context, dateRange, onDatesSelected),  timeIconPicker(context),  durationIconPicker(context),],),
+                context, width, dateRange, onDatesSelected) : Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [ dateIconPicker(context, dateRange, onDatesSelected), SizedBox(width: width/12,) ,timeIconPicker(context),SizedBox(width:  width/12,)  , durationIconPicker(context),],),
             const SizedBox(height: 16),
-            chosenDate.startTimeDate == "" ? timePickerRow(context, width):Center(child:Text("${dateToString(chosenDate.startTimeDate)}-${dateToString(chosenDate.endTimeDate)}"),),
+            chosenDate.startTimeDate == "" ? timePickerRow(context, width):Center(child: (dateToString(chosenDate.startTimeDate) == dateToString(chosenDate.endTimeDate)) ? Text("Datum: ${dateToString(chosenDate.startTimeDate)}",style: TextStyle(fontSize: 24),):Text( "${dateToString(chosenDate.startTimeDate)} till ${dateToString(chosenDate.endTimeDate)}",style: TextStyle(fontSize: 24)),),
              const SizedBox(height: 16),
-            chosenDate.startTimeDate == "" ? durationRow(context) :  Center(child:Text("${timeToString(chosenDate.startTimeDate)}-${timeToString(chosenDate.endTimeDate)}"),),
+            chosenDate.startTimeDate == "" ? durationRow(context) :  Center(child: Text("Kl: ${timeToString(chosenDate.startTimeDate)}-${timeToString(chosenDate.endTimeDate)}",style: TextStyle(fontSize: 24),),),
             const SizedBox(height: 16),
             widget.group == null
                 ? addGroup()
@@ -149,13 +149,13 @@ class _AddEventPageState extends State<AddEventPage> {
   _durationResult = await showDurationPicker(
   context: context, initialTime: const Duration(minutes: 30));
   setState(() {});
-  }, icon: const Icon(Icons.timer,size: 30,));
+  }, icon: const Icon(Icons.timer,size: 40,));
   }
 
   IconButton timeIconPicker(BuildContext context) {
     return IconButton(onPressed:() async {
   await _selectTime(context);
-  }, icon: const Icon(Icons.access_time,size: 30,));
+  }, icon: const Icon(Icons.access_time,size: 40,));
   }
 
   IconButton dateIconPicker(BuildContext context, DateTimeRange dateRange, Null onDatesSelected(dynamic dateRange)) {
@@ -175,7 +175,7 @@ class _AddEventPageState extends State<AddEventPage> {
                   onDatesSelected?.call(pickedDateRange);
                 }
               }, icon: const Icon(Icons.calendar_today,
-            size: 30,));
+            size: 40,));
   }
 
   Row durationPicker(BuildContext context) =>
@@ -302,18 +302,8 @@ class _AddEventPageState extends State<AddEventPage> {
           'description': _eventInfoController.text,
         };
         
-        print("IS THIS CORRECT???");
-        print(actualBody);
 
-        /*
-        final groupBody = {
-          'g_id': widget.group?.g_id,
-          'admin': widget.group?.adminEmail,
-          'image': widget.group?.image,
-          'name': widget.group?.groupName,
-          'u_id': widget.group?.u_id,
-        };
-        */
+        print(actualBody);
 
         final body = jsonEncode(actualBody);
         final response =

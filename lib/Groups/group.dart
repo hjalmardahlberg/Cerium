@@ -220,12 +220,12 @@ class _Group extends State<Group> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         groupNameAndExit(),
-        const Padding(
-            padding: EdgeInsets.only(left: 20, top: 20),
-            child: Text("Deltagare")),
         Row(
           children: [
-            Padding(
+            const Padding(
+                padding: EdgeInsets.only(left: 20, top: 20),
+                child: Text("Deltagare", style: TextStyle(fontSize: 16))),
+           /* Padding(
               padding: const EdgeInsets.only(left: 20, top: 10),
               child: TextButton.icon(
                 onPressed: () {
@@ -240,12 +240,12 @@ class _Group extends State<Group> {
                           themeManager.isDarkMode ? Colors.white : Colors.black,
                     )),
               ),
-            ),
+            ),*/
             const Expanded(
               child: Padding(
                 padding: EdgeInsets.only(right: 10),
                 child: Text('Senaste\nuppdatering',
-                    textAlign: TextAlign.end, style: TextStyle(fontSize: 20)),
+                    textAlign: TextAlign.end, style: TextStyle(fontSize: 16)),
               ),
             )
           ],
