@@ -169,7 +169,6 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (context, index) {
             final event = eventData[index];
             String date_to_disp = event.start.substring(0, event.start.indexOf('T'));
-
             DateTime start_date = DateTime.parse(event.start);
             DateTime end_date = DateTime.parse(event.end);
             print("startDate:"+ start_date.toString());
@@ -321,8 +320,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     appbar: homeAppBar(),
                     theEventName: event.name,
                     eventInfo: event.description,
-                    date: event.date,
-                    time: event.start + event.end,
+                    date: date,
+                    time: time,
                   )),
         );
       },

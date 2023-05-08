@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
@@ -38,7 +39,6 @@ class _EventPageState extends State<EventPage> {
     double height = MediaQuery.of(context).size.height;
     final themeManager = Provider.of<ThemeManager>(context);
 
-
     return Scaffold(
       appBar: appBar(context),
       body: Column(
@@ -53,43 +53,6 @@ class _EventPageState extends State<EventPage> {
       ),
       //bottomNavigationBar: widget.bottomNavigationBar,
     );
-  }
-
-  void _handleschemasyncButtonPressed(schema) async {
-    if (schema != null && widget.date == null && widget.time == null) {
-      final schemaData = {
-        'schema': schema,
-      };
-      const url = 'http://192.121.208.57:8080/save';
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode(schemaData);
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        print('User data sent successfully!');
-      } else {
-        print('Error sending user data: ${response.statusCode}');
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Här ska man skicka in sitt schema sen'),
-            actions: [
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
   }
 
   AppBar appBar(context) {
@@ -114,7 +77,8 @@ class _EventPageState extends State<EventPage> {
           Align(
             alignment: Alignment.topRight,
             child: IconButton(
-              padding: EdgeInsets.only(top:10,bottom: 10,left:sidePadding,right:sidePadding),
+              padding: EdgeInsets.only(
+                  top: 10, bottom: 10, left: sidePadding, right: sidePadding),
               icon: const Icon(Icons.settings),
               iconSize: 30,
               onPressed: () {
@@ -132,7 +96,8 @@ class _EventPageState extends State<EventPage> {
       String eventInfo, double height, double width, themeManager) {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.only(top:10,bottom: 10,left:sidePadding,right:sidePadding),
+        padding: EdgeInsets.only(
+            top: 10, bottom: 10, left: sidePadding, right: sidePadding),
         child: SizedBox(
           height: height / 5,
           width: width,
@@ -167,7 +132,7 @@ class _EventPageState extends State<EventPage> {
 
   Padding dateAndTime(String date, String time) {
     return Padding(
-      padding: EdgeInsets.only(top:10,left:sidePadding,right:sidePadding),
+      padding: EdgeInsets.only(top: 10, left: sidePadding, right: sidePadding),
       child: Row(
         children: [
           Icon(Icons.calendar_month, size: 24),
@@ -214,7 +179,7 @@ class _EventPageState extends State<EventPage> {
 
   Padding eventName(String eventName) {
     return Padding(
-      padding: EdgeInsets.only(top:5,left:sidePadding,right:sidePadding),
+      padding: EdgeInsets.only(top: 5, left: sidePadding, right: sidePadding),
       child: Text(eventName, style: const TextStyle(fontSize: 24)),
     );
   }
@@ -231,8 +196,8 @@ class _EventPageState extends State<EventPage> {
           ),
           child: FittedBox(
             fit: BoxFit.fill,
-            child: Image(
-              image: AssetImage(widget.picture),
+            child: Image.memory(
+              Uint8List.fromList(widget.picture.codeUnits),
               fit: BoxFit.fill,
             ),
           ),
