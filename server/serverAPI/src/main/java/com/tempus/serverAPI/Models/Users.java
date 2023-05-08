@@ -36,11 +36,12 @@ public class Users {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Groups> g_id = new ArrayList<Groups>();
-
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Events> e_id = new ArrayList<Events>();
-
+    //@Transient
+    @Column(name = "image")
+    private String image;
 
 
     public String getId() {

@@ -107,6 +107,25 @@ public class Controller {
         }
     }
 
+    @PutMapping(value = "/user/picture/save&{u_email}&{Image}")
+    public String saveUserPicture(@PathVariable String Image, @PathVariable String u_email){
+        Users user = userRepo.findByEmail(u_email);
+        if (user == null) {
+            throw new ApiException("User is not found");
+        }
+        user.setImage(Image);
+        userRepo.save(user);
+        return "Saved user picture";
+    }
+    @GetMapping(value = "/user/picture/get")
+    public String getUserPicture(@RequestBody Users user){
+        if (user == null) {
+            throw new ApiException("User is not found");
+        }
+        return user.getImage();
+    }
+
+
     @PutMapping(value = "/group/create/{g_name}")
     public String createGroup(@PathVariable String g_name, @RequestBody Users user) {
 
@@ -123,6 +142,7 @@ public class Controller {
                 gCreate.setName(g_name);
                 gCreate.setUser(updatedUser);
                 gCreate.setAdmin(updatedUser.getEmail());
+                gCreate.setAdminusername(updatedUser.getName());
                 user.getGroups().add(gCreate);
                 groupRepo.save(gCreate);
                 userRepo.save(updatedUser);
@@ -143,7 +163,7 @@ public class Controller {
             Files.createFile(path);
             Files.write(path, Image);
             for (Groups currgroup : QueryResult) {
-                currgroup.setImage(path.toString());
+                currgroup.setImage(path.toString()); //?? kanske ska vara ngt annat än tostring
                 groupRepo.save(currgroup);
             }
             return "Group picture updated";
@@ -158,10 +178,12 @@ public class Controller {
     @GetMapping(value = "/group/getpicture/{g_name}&{a_email}")
     public byte[] getPicture(@PathVariable String g_name, @PathVariable String a_email) {
         Groups QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email).get(0);
+        if (QueryResult.getImage() == null) {
+            throw new ApiException("Error when processing the request, group does not have an image");
+        }
         Path path = Paths.get(QueryResult.getImage());
         try {
-            byte[] file =  Files.readAllBytes(path);
-            return file;
+            return Files.readAllBytes(path);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -191,7 +213,9 @@ public class Controller {
             groupToJoin.setUser(userJoin);
             groupToJoin.setName(g_name);
             groupToJoin.setAdmin(Queries.get(0).getAdmin());
+            groupToJoin.setImage(Queries.get(0).getImage());
             userJoin.getGroups().add(groupToJoin);
+            groupToJoin.setAdminusername(Queries.get(0).getAdminusername());
             userJoin.getEvents().addAll(Queries.get(0).getEvents());
             groupRepo.save(groupToJoin);
             userRepo.save(userJoin);
@@ -246,14 +270,22 @@ public class Controller {
                 currUser.getGroups().remove(hmm);
                 for (int j = 0; j < currGroup.getEvents().size(); j++) {
                     Events currEvent = currGroup.getEvents().get(j);
+
+                    /*
+
                     Users currEventUser = currEvent.getUser();
                     for (int k = 0; k < currEventUser.getEvents().size(); k++) { // Här kollar vi att eventet finns i user och det är rätt event som tas bort
                            if (currEventUser.getEvents().get(k).getGroup().equals(currGroup)) {
                                currEventUser.getEvents().remove(k);
                            }
-                    }
+                    } */
                     currGroup.getEvents().remove(j);
                     eventRepo.delete(currEvent);
+                }
+                try {
+                    Files.delete(Paths.get(currGroup.getImage()));
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 groupRepo.delete(currGroup);
 
@@ -266,44 +298,81 @@ public class Controller {
 
     }
 
-    @PutMapping(value = "/event/create/{e_name}&{e_description}")
-    public String createEvent(@RequestBody Groups group, @PathVariable String e_name, @PathVariable String e_description) {
-        List<Groups> updateGroup = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin());
-        if (groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin()).isEmpty()) {
+    @PutMapping(value = "/event/create/{g_name}&{a_email}")
+    public String createEvent(@RequestBody Events event, @PathVariable String g_name, @PathVariable String a_email) {
+        List<Groups> updateGroup = groupRepo.findByNameAndAdmin(g_name, a_email);
+        if (groupRepo.findByNameAndAdmin(g_name, a_email).isEmpty()) {
             throw new ApiException("Error when creating event inside group: group does not exist");
         }
-        Groups selectedGroup = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin()).get(0);
-        List<Events> gEvents = eventRepo.findByName(e_name);
+        Groups selectedGroup = updateGroup.get(0);
+        List<Events> gEvents = eventRepo.findByName(event.getName());
         for(int i = 0; i < gEvents.size(); i++) {
             Events selEvent = gEvents.get(i);
-            if(selEvent.getGroup().getName().equals(group.getName())) {
+            if(selEvent.getGroup().getName().equals(selectedGroup.getName())) {
                 throw new ApiForbiddenException("Event with given name already exists within that group");
             }
         }
 
-        for (int i = 0; i < updateGroup.size(); i++) {
-            Events createdEvent = new Events();
-            createdEvent.setName(e_name);
-            createdEvent.setGroup(selectedGroup);
-            createdEvent.setDescription(e_description);
-            updateGroup.get(i).getUser().getEvents().add(createdEvent);
-            createdEvent.setUser(updateGroup.get(i).getUser());
-            eventRepo.save(createdEvent);
-
-        }
         Events createdEvent = new Events();
-        createdEvent.setName(e_name);
-        createdEvent.setGroup(selectedGroup);
-        createdEvent.setDescription(e_description);
-        List<Events> toAdd = selectedGroup.getEvents();
-        toAdd.add(createdEvent);
+        createdEvent.setName(event.getName());
+        createdEvent.setDescription(event.getDescription());
+        createdEvent.setDate(event.getDate());
+        createdEvent.setStart_time(event.getStart_time());
+        createdEvent.setEnd_time(event.getEnd_time());
+        //FIXME: Dubbletter
+        createdEvent.setGroup(selectedGroup); // KOMMER ENDAST VARA PÅ GRUPPÄGAREN
+        /*
+        //Behöver nog inte ha user event relation
+        for (int i = 0; i < updateGroup.size(); i++) { // Lägger till eventet i alla users som är med i gruppen
+            Users usr = updateGroup.get(i).getUser();
+            List<Events> usrEv = usr.getEvents();
+            usrEv.add(createdEvent);
+            //createdEvent.setUser(updateGroup.get(i).getUser());
+            userRepo.save(usr);
+        }*/
 
+        eventRepo.save(createdEvent);
         groupRepo.save(selectedGroup);
 
 
-        return "Successfully created a event within the group: " + group.getName();
+        return "Successfully created a event within the group: " + selectedGroup.getName();
 
     }
+    @PutMapping(value = "/event/picture/save/{e_name}&{g_name}&{a_email}")
+    public String setEventPicture(@RequestBody byte[] image, @PathVariable String e_name, @PathVariable String g_name, @PathVariable String a_email) {
+        List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
+        Events eventResult = eventRepo.findByNameAndGroup(e_name, QueryResult.get(0));
+        try {
+            Path path = Paths.get("src/main/resources/static/images/"+a_email+g_name+e_name+".txt");
+            Files.deleteIfExists(path);
+            Files.createFile(path);
+            Files.write(path, image);
+            eventResult.setImage(path.toString());
+            eventRepo.save(eventResult);
+            return "Event-picture updated";
+        }catch (Exception e){
+            throw new ApiException("Error when processing the request, image is not valid");
+        }
+    }
+
+    @GetMapping(value = "/event/picture/get/{e_name}&{g_name}&{a_email}")
+    public byte[] getEventPicture(@PathVariable String e_name, @PathVariable String g_name, @PathVariable String a_email) {
+        List<Groups> QueryResult = groupRepo.findByNameAndAdmin(g_name, a_email);
+        if (QueryResult.isEmpty()) {
+            throw new ApiException("Error when processing the request, group does not exist");
+        }
+        Events eventResult = eventRepo.findByNameAndGroup(e_name, QueryResult.get(0));
+        if (eventResult.getImage() == null) {
+            throw new ApiException("Error when processing the request, event does not have an image");
+        }
+        try {
+            Path path = Paths.get(eventResult.getImage());
+            return Files.readAllBytes(path);
+        }catch (Exception e){
+            throw new ApiException("Error when processing the request, image is not valid");
+        }
+    }
+
 
     @PutMapping(value = "/user/events")
     public List<Events> getEvents(@RequestBody Users user) {
@@ -312,33 +381,61 @@ public class Controller {
             throw new ApiException("Cannot find user");
         }
         else {
-            List<Events> userEvents = selectedUser.getEvents();
-            if (userEvents.isEmpty()) {
-                throw new ApiException("User has no events");
-            }
-            else {
-                return userEvents;
-            }
+
+
+                List<Events> toReturn = new ArrayList<>();
+                List<Groups> usrGroups = selectedUser.getGroups();
+                for(int i = 0; i < usrGroups.size(); i++) {
+                    Groups currGroup = usrGroups.get(i);
+                    Groups topGroup = groupRepo.findByNameAndAdmin(currGroup.getName(), currGroup.getAdmin()).get(0);
+                    toReturn.addAll(topGroup.getEvents());
+                }
+                return toReturn;
+
         }
     }
 
     //FIXME
     @DeleteMapping(value = "/event/delete/{e_name}")
     public String delEvent(@PathVariable String e_name, @RequestBody Groups group) {
-        Groups selectedGroup = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin()).get(0);
+        List<Groups> QueryResults = groupRepo.findByNameAndAdmin(group.getName(), group.getAdmin());
+        Groups selectedGroup = QueryResults.get(0);
         List<Events> selectedEvent = eventRepo.findByGroup(selectedGroup);
         if (selectedEvent.isEmpty()) {
             throw new ApiException("Cannot delete a event that does not exist");
         }
         for (int i = 0; i < selectedEvent.size(); i++) {
-            Users currUser = selectedEvent.get(i).getUser();
+            if(selectedEvent.get(i).getName().equals(e_name)) {
+                selectedGroup.getEvents().remove(i);
+                try {
+                    Path path = Paths.get(selectedEvent.get(i).getImage());
+                    Files.deleteIfExists(path);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                eventRepo.delete(selectedEvent.get(i));
+            }
+        } //FIXME: Vi vill gå in i gruppen som har eventet och ta bort rätt event.
+        for (int i = 0; i < QueryResults.size(); i++) {
+            Users currUser = QueryResults.get(i).getUser();
+            for (int j = 0; j < currUser.getEvents().size(); j++) {
+                if (currUser.getEvents().get(j).getName().equals(e_name) && currUser.getEvents().get(j).getGroup().equals(selectedGroup)) {
+                    currUser.getEvents().remove(j);
+                    userRepo.save(currUser);
+                }
+            }
+        }
+
+        /*
+        for (int i = 0; i < selectedEvent.size(); i++) {
+            //Users currUser = selectedEvent.get(i).getUser();
             List<Events> userEvents = currUser.getEvents();
             for (int j = 0; j < userEvents.size(); j++) {
                 if (userEvents.get(j).getName().equals(e_name) && userEvents.get(j).getGroup().equals(selectedGroup)) {
                     userEvents.remove(j);
                 }
             }
-        }
+        } */
         return "Successfully deleted event: " + e_name + " from group: " + group.getName();
 
     }
@@ -398,8 +495,8 @@ public class Controller {
 
             for (int i = 0; i < Query.size(); i++) {
                 if (googleEventRepo.findByUserid(Query.get(i).getUser().getId()).isEmpty()) {
-                    throw new ApiForbiddenException("User " + Query.get(i).getUser().getEmail() + " hasn't imported their schedule, this error should've been caught in the frontend");
-                } //TODO: Detta ska fångas i frontend
+                    break;
+                }
                 for (int j = 0; j < googleEventRepo.findByUserid(Query.get(i).getUser().getId()).size(); j++) {
                     GoogleEvent currGEv = googleEventRepo.findByUserid(Query.get(i).getUser().getId()).get(j);
                     Event evCreate = new Event(LocalDateTime.parse(currGEv.getStart(),formatter), LocalDateTime.parse(currGEv.getEnd(), formatter));

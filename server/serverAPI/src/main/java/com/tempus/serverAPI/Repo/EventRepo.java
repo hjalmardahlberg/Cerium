@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface EventRepo extends JpaRepository<Events, Long> {
 
-    List<Events> findByName(String name);
+    List<Events> findByName(String event_name);
+
+    Events findByNameAndGroup(String event_name, Groups group);
 
     List<Events> findByGroup(Groups g_id);
 }

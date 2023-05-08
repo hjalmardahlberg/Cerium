@@ -30,7 +30,7 @@ public class Groups {
   @NotNull
   private String name;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "u_id")
   @JsonIgnore
   private Users user;
@@ -40,6 +40,9 @@ public class Groups {
 
   @Column(name = "image")
   private String image;
+
+  @Column(name = "adminusername")
+  private String adminusername;
 
   /*
   @Transient

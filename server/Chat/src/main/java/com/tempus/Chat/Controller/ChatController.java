@@ -47,6 +47,11 @@ public class ChatController {
         return "Hello, " + msg.getMessage();
     }
 
+    @GetMapping(value = "/testgreet")
+    public String testGreet() {
+        return "Hello, World!";
+    }
+
     @GetMapping("/chat/group/messages/{g_name}&{a_email}")
     public List<Message> getMessages(@PathVariable String g_name, @PathVariable String a_email) {
         return chatService.fetchGroupMessages(g_name, a_email);

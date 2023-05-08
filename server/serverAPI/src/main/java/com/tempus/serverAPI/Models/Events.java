@@ -40,17 +40,20 @@ public class Events {
     @Column (name = "description")
     private String description;
 
-
+    @Column(name = "image")
+    private String image;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "g_id")
-    @JsonIgnore
     private Groups group;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "u_id")
     @JsonIgnore
     private Users user;
+
+
 
 
 
