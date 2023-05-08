@@ -109,10 +109,12 @@ class _GroupChat extends State<GroupChat> {
       destination: '/topic/group/messages/${widget.groupName}&${widget
           .groupAdmin}',
       callback: (frame) {
-        List<dynamic>? result = json.decode(frame.body!);
-        print("result:"+result.toString());
-        chatList.add(result.toString());
+        Map<String, dynamic>? result = json.decode(frame.body!);
+        print("KAJSHDKJASHJDAHS\n\n");
+        print("result:"+result?["message"]); //toString());
+        chatList.add(Text(result?["message"])); //.toString());
         print(result.toString());
+        print("\n");
         setState(() {});
       },
     );
