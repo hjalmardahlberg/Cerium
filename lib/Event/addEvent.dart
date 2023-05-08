@@ -635,7 +635,7 @@ class _AddEventPageState extends State<AddEventPage> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final timeData = snapshot.data!;
-          return listViewBuilder(timeData);
+          return timeData.length != 0 ? listViewBuilder(timeData): Text("Inga tider hittades");
         } else {
           return const Padding(
             padding: EdgeInsets.only(top: 10),
@@ -651,7 +651,7 @@ class _AddEventPageState extends State<AddEventPage> {
       shrinkWrap: true,
       itemCount: list.length,
       itemBuilder: (BuildContext context, int index) {
-        return list[index];
+        return list[index]; //list.length != 0 ? list[index] : Text("Inga tider hittades");
       },
     );
   }

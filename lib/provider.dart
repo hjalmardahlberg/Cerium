@@ -273,11 +273,21 @@ class GoogleSignInProvider extends ChangeNotifier {
 
     for (final event in events) {
       print(event.summary.toString() + " <--> " + title);
-      print(event.start?.dateTime?.toIso8601String());
-      print(start); // + "  OOOOO  " + start);
+      print("GOOGLE:");
+      print(event.start?.dateTime?.add(Duration(hours: 2)).toIso8601String());
+      print("OWN\n" +start + ".000Z");
+
+      print("");
+
+      print("GOOGLE:");
+      print(event.end?.dateTime?.add(Duration(hours: 2)).toIso8601String());
+      print("OWN\n" + end + ".000Z");
+
+      // BEAUTIFUL CODE <3<3
+      //print(start); // + "  OOOOO  " + start);
       if (event.summary == title &&
-          event.start?.dateTime?.toIso8601String() == start + "Z" &&
-          event.end?.dateTime?.toIso8601String() == end + "Z") {
+          event.start?.dateTime?.add(Duration(hours: 2)).toIso8601String() == start + ".000Z" &&
+          event.end?.dateTime?.add(Duration(hours: 2)).toIso8601String() == end + ".000Z") {
         print("\n\nIS NOT UNIQUE!!!!!!\n\n");
         return false; // event already exists
       }
@@ -322,10 +332,10 @@ class GoogleSignInProvider extends ChangeNotifier {
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
-          print('Event created');
+          print('Event exported to google cal');
         } else {
           throw Exception(
-              'Failed to create event: ${response.statusCode} AND: ${response
+              'Failed to export event: ${response.statusCode} AND: ${response
                   .body}');
         }
       } catch (e) {
