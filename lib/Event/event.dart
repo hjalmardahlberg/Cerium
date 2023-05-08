@@ -1,11 +1,12 @@
-import 'dart:convert';
+
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:projecttest/profilePage.dart';
 import '../Theme/themeConstants.dart';
-import 'eventParticipants.dart';
+
 
 class EventPage extends StatefulWidget {
   const EventPage(
@@ -13,6 +14,7 @@ class EventPage extends StatefulWidget {
       required this.picture,
       required this.appbar,
       required this.theEventName,
+        required this.groupName,
       required this.eventInfo,
       required this.date,
       required this.time})
@@ -21,6 +23,7 @@ class EventPage extends StatefulWidget {
   final String picture;
   final AppBar appbar;
   final String theEventName;
+  final String groupName;
   final String eventInfo;
   final String date;
   final String time;
@@ -38,7 +41,6 @@ class _EventPageState extends State<EventPage> {
     double height = MediaQuery.of(context).size.height;
     final themeManager = Provider.of<ThemeManager>(context);
 
-
     return Scaffold(
       appBar: appBar(context),
       body: Column(
@@ -46,50 +48,13 @@ class _EventPageState extends State<EventPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           eventImage(height, width),
-          eventName(widget.theEventName),
+          Row(children: [eventName(widget.theEventName),Expanded(child:SizedBox(width: width/2,)), const Icon(Icons.group,size: 24,),Padding(child:Text(widget.groupName,style: const TextStyle(fontSize: 24)), padding: EdgeInsets.only(left:5,right: sidePadding))],),
           dateAndTime(widget.date, widget.time),
           eventInformation(widget.eventInfo, height, width, themeManager),
         ],
       ),
       //bottomNavigationBar: widget.bottomNavigationBar,
     );
-  }
-
-  void _handleschemasyncButtonPressed(schema) async {
-    if (schema != null && widget.date == null && widget.time == null) {
-      final schemaData = {
-        'schema': schema,
-      };
-      const url = 'http://192.121.208.57:8080/save';
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode(schemaData);
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        print('User data sent successfully!');
-      } else {
-        print('Error sending user data: ${response.statusCode}');
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Här ska man skicka in sitt schema sen'),
-            actions: [
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
   }
 
   AppBar appBar(context) {
@@ -114,7 +79,8 @@ class _EventPageState extends State<EventPage> {
           Align(
             alignment: Alignment.topRight,
             child: IconButton(
-              padding: EdgeInsets.only(top:10,bottom: 10,left:sidePadding,right:sidePadding),
+              padding: EdgeInsets.only(
+                  top: 10, bottom: 10, left: sidePadding, right: sidePadding),
               icon: const Icon(Icons.settings),
               iconSize: 30,
               onPressed: () {
@@ -132,7 +98,8 @@ class _EventPageState extends State<EventPage> {
       String eventInfo, double height, double width, themeManager) {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.only(top:10,bottom: 10,left:sidePadding,right:sidePadding),
+        padding: EdgeInsets.only(
+            top: 10, bottom: 10, left: sidePadding, right: sidePadding),
         child: SizedBox(
           height: height / 5,
           width: width,
@@ -167,46 +134,17 @@ class _EventPageState extends State<EventPage> {
 
   Padding dateAndTime(String date, String time) {
     return Padding(
-      padding: EdgeInsets.only(top:10,left:sidePadding,right:sidePadding),
+      padding: EdgeInsets.only(top: 10, left: sidePadding, right: sidePadding),
       child: Row(
         children: [
           Icon(Icons.calendar_month, size: 24),
           Text(date, style: const TextStyle(fontSize: 24)),
+          SizedBox(width:16,),
           Icon(
             Icons.access_time,
             size: 24,
           ),
           Text(time, style: const TextStyle(fontSize: 24)),
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                padding: const EdgeInsets.all(0),
-                icon: Column(
-                  children: const [
-                    Icon(Icons.group),
-                    Text(
-                      'Deltagare',
-                      style: TextStyle(fontSize: 10),
-                    ),
-                  ],
-                ),
-                iconSize: 30,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          EventParticipants(
-                        eventName: widget.theEventName,
-                      ),
-                      transitionDuration: Duration.zero,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -214,7 +152,7 @@ class _EventPageState extends State<EventPage> {
 
   Padding eventName(String eventName) {
     return Padding(
-      padding: EdgeInsets.only(top:5,left:sidePadding,right:sidePadding),
+      padding: EdgeInsets.only(top: 5, left: sidePadding, right: sidePadding),
       child: Text(eventName, style: const TextStyle(fontSize: 24)),
     );
   }
@@ -231,8 +169,8 @@ class _EventPageState extends State<EventPage> {
           ),
           child: FittedBox(
             fit: BoxFit.fill,
-            child: Image(
-              image: AssetImage(widget.picture),
+            child: Image.memory(
+              Uint8List.fromList(widget.picture.codeUnits),
               fit: BoxFit.fill,
             ),
           ),

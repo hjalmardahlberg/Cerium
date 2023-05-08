@@ -169,7 +169,6 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (context, index) {
             final event = eventData[index];
             String date_to_disp = event.start.substring(0, event.start.indexOf('T'));
-
             DateTime start_date = DateTime.parse(event.start);
             DateTime end_date = DateTime.parse(event.end);
             print("startDate:"+ start_date.toString());
@@ -305,10 +304,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   GestureDetector eventBox(EventData event,String date,String time) {
     Future<Uint8List>? image;
+    List <String> group = event.group.split(':');
     if (event.image == "null") {
-      List <String> group = event.group.split(':');
-      print('g_id: ' + event.group);
-      print('group' + group.toString());
       image = getEventImage(event.name, group[2].split(' ')[1].split(',')[0], group[3].split(' ')[1].split(',')[0]);
     }
     return GestureDetector(
@@ -320,9 +317,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     picture: event.image,
                     appbar: homeAppBar(),
                     theEventName: event.name,
+                    groupName:  group[2].split(' ')[1].split(',')[0],
                     eventInfo: event.description,
-                    date: event.date,
-                    time: event.start + event.end,
+                    date: date,
+                    time: time,
                   )),
         );
       },
