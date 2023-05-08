@@ -185,7 +185,7 @@ class _GroupChat extends State<GroupChat> {
     print(response.body);
     messageList.forEach((element) {
         //Message message = element as Message;
-        chatList.add(Text(element.toString()));
+        chatList.add(Text(element['message']));
     });
     setState(() {});
 
