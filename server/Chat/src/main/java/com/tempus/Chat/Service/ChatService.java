@@ -18,7 +18,6 @@ public class ChatService {
     MessageRepo messageRepo;
 
     public void sendMessage(String groupName, String adminEmail, Message msg) {
-        messageRepo.save(msg);
         simpMessagingTemplate.convertAndSend("/group/messages/"+groupName+"&"+adminEmail, msg);
     }
 

@@ -1,8 +1,6 @@
 package com.tempus.Chat.Models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -13,7 +11,12 @@ import lombok.*;
 @Data
 @Entity
 public class Message {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "m_id")
+    private long id;
+
     @Column(name = "senderName")
     private String senderName;
 
