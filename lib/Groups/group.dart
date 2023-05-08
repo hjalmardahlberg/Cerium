@@ -4,8 +4,10 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:projecttest/Event/addEvent.dart';
 import 'package:projecttest/profilePage.dart';
+import 'package:projecttest/provider.dart';
 import '../Theme/themeConstants.dart';
 import 'package:provider/provider.dart';
 import '../fetch.dart';
@@ -401,7 +403,7 @@ class _Group extends State<Group> {
               padding: const EdgeInsets.only(left: 0),
               child: CircleAvatar(
                 radius: 30,
-                backgroundImage: AssetImage(image),
+                backgroundImage: NetworkImage(image),
               ),
             ),
             const SizedBox(
@@ -444,7 +446,24 @@ class _Group extends State<Group> {
             time_to_disp = '${dateTime.year}-${dateTime.month.toString().padLeft(2,'0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2,'0')}:${dateTime.minute.toString().padLeft(2, '0')}';
           }
 
-          return profileBox(participant.name, 'images/wallsten.jpg',time_to_disp);
+          final prov = Provider.of<GoogleSignInProvider>(context, listen: false);
+
+          final pic_url_future =  prov.getProfilePic(participant);
+
+          return FutureBuilder<String?>(
+            future: pic_url_future,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                print("URL:");
+                print(snapshot.data);
+                return profileBox(participant.name, snapshot.data!, time_to_disp);
+              } else {
+                // Return a placeholder widget or a loading indicator while waiting for the future to complete
+                return CircularProgressIndicator();
+              }
+            },
+          );
         },
       );
+
 }

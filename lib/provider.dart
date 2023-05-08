@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 
 import 'dart:convert';
 import 'package:googleapis/calendar/v3.dart';
+import 'package:projecttest/Groups/groupParticipnats.dart';
 
 import 'secrets.dart';
 
@@ -26,19 +27,20 @@ class GoogleSignInProvider extends ChangeNotifier {
   GoogleSignInAccount get user => _user!;
 
   Future<void> update_pfp(String? u_email, String? image_url) async {
-
     print("INT THIS SHIT");
     print(image_url);
     print(u_email);
 
-    var uri = Uri.parse('http://192.121.208.57:8080/user/picture/save&' + u_email.toString());
+    var uri = Uri.parse(
+        'http://192.121.208.57:8080/user/picture/save&' + u_email.toString());
     print("THIS IS THE FUCKING URL TO SERVER");
     print(uri.toString());
 
     try {
       var response = await http.put(uri, body: image_url);
       if (response.statusCode != 200) {
-        throw Exception('Failed to update profile picture: ${response.statusCode}\n${response.body}');
+        throw Exception('Failed to update profile picture: ${response
+            .statusCode}\n${response.body}');
       }
     } catch (error) {
       throw Exception('Failed to update profile picture: $error');
@@ -82,7 +84,7 @@ class GoogleSignInProvider extends ChangeNotifier {
       final body = jsonEncode(userData);
       //print(body.toString());
       final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
+      await http.post(Uri.parse(url), headers: headers, body: body);
 
       if (response.statusCode == 200) {
         print('User data sent successfully!');
@@ -108,7 +110,7 @@ class GoogleSignInProvider extends ChangeNotifier {
     final GoogleSignInAccount? googleUser = _user;
     if (googleUser == null) return null;
     final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+    await googleUser.authentication;
 
     print("ACCESS TOKEN: " + googleAuth.accessToken.toString());
     return googleAuth.accessToken;
@@ -156,8 +158,8 @@ class GoogleSignInProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<Event>> getCalendarEventsInterval(
-      DateTime start, DateTime end) async {
+  Future<List<Event>> getCalendarEventsInterval(DateTime start,
+      DateTime end) async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return [];
     print("GOT ACCESS TOKEN!");
@@ -174,7 +176,7 @@ class GoogleSignInProvider extends ChangeNotifier {
 
     for (String id in filteredIds) {
       final Uri uri =
-          Uri.https('www.googleapis.com', '/calendar/v3/calendars/$id/events', {
+      Uri.https('www.googleapis.com', '/calendar/v3/calendars/$id/events', {
         'timeMin': start.toIso8601String() + 'Z',
         'timeMax': end.toIso8601String() + 'Z',
       });
@@ -260,7 +262,8 @@ class GoogleSignInProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> evIsUnique(String title, String start, String end, String? accessToken) async {
+  Future<bool> evIsUnique(String title, String start, String end,
+      String? accessToken) async {
     final headers = {
       'Authorization': 'Bearer $accessToken',
       'Content-Type': 'application/json',
@@ -271,8 +274,10 @@ class GoogleSignInProvider extends ChangeNotifier {
     for (final event in events) {
       print(event.summary.toString() + " <--> " + title);
       print(event.start?.dateTime?.toIso8601String());
-      print(start);// + "  OOOOO  " + start);
-      if (event.summary == title && event.start?.dateTime?.toIso8601String() == start + "Z" && event.end?.dateTime?.toIso8601String() == end + "Z") {
+      print(start); // + "  OOOOO  " + start);
+      if (event.summary == title &&
+          event.start?.dateTime?.toIso8601String() == start + "Z" &&
+          event.end?.dateTime?.toIso8601String() == end + "Z") {
         print("\n\nIS NOT UNIQUE!!!!!!\n\n");
         return false; // event already exists
       }
@@ -282,8 +287,8 @@ class GoogleSignInProvider extends ChangeNotifier {
     return true; // event does not exist
   }
 
-  Future<void> exportEventToGoogleCal(
-      String title, String desc, String startTime, String endTime) async {
+  Future<void> exportEventToGoogleCal(String title, String desc,
+      String startTime, String endTime) async {
     final String? accessToken = await getAccessToken();
     if (accessToken == null) return null;
 
@@ -317,12 +322,45 @@ class GoogleSignInProvider extends ChangeNotifier {
           print('Event created');
         } else {
           throw Exception(
-              'Failed to create event: ${response.statusCode} AND: ${response.body}');
+              'Failed to create event: ${response.statusCode} AND: ${response
+                  .body}');
         }
       } catch (e) {
         print('Error creating event: $e');
         rethrow;
       }
+    }
+  }
+
+
+  Future<String?> getProfilePic(GroupParticipants user) async {
+
+    final String? accessToken = await getAccessToken();
+    if (accessToken == null) return null;
+
+    final userData = {
+      'email': user.email,
+    };
+
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    };
+
+    final body = jsonEncode(userData);
+    final url = 'http://192.121.208.57:8080/user/picture/get';
+
+    final response =
+    await http.put(Uri.parse(url), headers: headers, body: body);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Successfull fetch');
+      print(response.body);
+      return response.body;
+    } else {
+      throw Exception(
+          'Failed to create event: ${response.statusCode} AND: ${response
+              .body}');
     }
   }
 }

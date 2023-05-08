@@ -175,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
             print("startDate:"+ start_date.toString());
             print("today:" + DateTime.now().toString());
 
-            if(start_date.isBefore(DateTime.now())){
+            if(end_date.isBefore(DateTime.now())){
               deleteEvent(event);
               refreshEvent();
             }
