@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:projecttest/profilePage.dart';
 import '../Theme/themeConstants.dart';
-import 'eventParticipants.dart';
+
 
 class EventPage extends StatefulWidget {
   const EventPage(
@@ -14,6 +14,7 @@ class EventPage extends StatefulWidget {
       required this.picture,
       required this.appbar,
       required this.theEventName,
+        required this.groupName,
       required this.eventInfo,
       required this.date,
       required this.time})
@@ -22,6 +23,7 @@ class EventPage extends StatefulWidget {
   final String picture;
   final AppBar appbar;
   final String theEventName;
+  final String groupName;
   final String eventInfo;
   final String date;
   final String time;
@@ -46,7 +48,7 @@ class _EventPageState extends State<EventPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           eventImage(height, width),
-          eventName(widget.theEventName),
+          Row(children: [eventName(widget.theEventName),Expanded(child:SizedBox(width: width/2,)), const Icon(Icons.group,size: 24,),Padding(child:Text(widget.groupName,style: const TextStyle(fontSize: 24)), padding: EdgeInsets.only(left:5,right: sidePadding))],),
           dateAndTime(widget.date, widget.time),
           eventInformation(widget.eventInfo, height, width, themeManager),
         ],
@@ -137,41 +139,12 @@ class _EventPageState extends State<EventPage> {
         children: [
           Icon(Icons.calendar_month, size: 24),
           Text(date, style: const TextStyle(fontSize: 24)),
+          SizedBox(width:16,),
           Icon(
             Icons.access_time,
             size: 24,
           ),
           Text(time, style: const TextStyle(fontSize: 24)),
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                padding: const EdgeInsets.all(0),
-                icon: Column(
-                  children: const [
-                    Icon(Icons.group),
-                    Text(
-                      'Deltagare',
-                      style: TextStyle(fontSize: 10),
-                    ),
-                  ],
-                ),
-                iconSize: 30,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          EventParticipants(
-                        eventName: widget.theEventName,
-                      ),
-                      transitionDuration: Duration.zero,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
         ],
       ),
     );
