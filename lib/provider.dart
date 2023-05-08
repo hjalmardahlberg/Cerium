@@ -31,12 +31,12 @@ class GoogleSignInProvider extends ChangeNotifier {
     print(image_url);
     print(u_email);
 
-    var uri = Uri.parse('http://192.121.208.57:8080/user/picture/save&' + u_email.toString() + '&' + image_url.toString());
+    var uri = Uri.parse('http://192.121.208.57:8080/user/picture/save&' + u_email.toString());
     print("THIS IS THE FUCKING URL TO SERVER");
     print(uri.toString());
 
     try {
-      var response = await http.put(uri);
+      var response = await http.put(uri, body: image_url);
       if (response.statusCode != 200) {
         throw Exception('Failed to update profile picture: ${response.statusCode}\n${response.body}');
       }
