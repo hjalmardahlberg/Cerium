@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:projecttest/provider.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
@@ -37,6 +40,7 @@ final client = StompClient(
   config: StompConfig.SockJS(
     url: 'http://192.121.208.57:25565/ws',
     onConnect: onConnectCallback,
+    heartbeatOutgoing: Duration(milliseconds: 2000),
     beforeConnect: () async {
       print('waiting to connect...');
       //await Future.delayed(Duration(milliseconds: 200));
@@ -104,6 +108,9 @@ class _GroupChat extends State<GroupChat> {
   }
 
   Future<void> subscribe() async {
+    final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+    final curr_user = FirebaseAuth.instance.currentUser!;
+
     await Future.delayed(Duration(milliseconds: 200));
     client.subscribe(
       destination: '/topic/group/messages/${widget.groupName}&${widget
@@ -112,10 +119,14 @@ class _GroupChat extends State<GroupChat> {
         Map<String, dynamic>? result = json.decode(frame.body!);
         print("KAJSHDKJASHJDAHS\n\n");
         print("result:"+result?["message"]); //toString());
-        chatList.add(Text(result?["message"])); //.toString());
+
+        if(result?["senderName"] != curr_user.displayName){
+
+        chatList.add(Text(result?["senderName"] + ": " + result?["message"])); //.toString());
         print(result.toString());
         print("\n");
         setState(() {});
+        }
       },
     );
   }
@@ -187,7 +198,7 @@ class _GroupChat extends State<GroupChat> {
     print(response.body);
     messageList.forEach((element) {
         //Message message = element as Message;
-        chatList.add(Text(element['message']));
+        chatList.add(Text(element["senderName"] + ":  " + element['message']));
     });
     setState(() {});
 
