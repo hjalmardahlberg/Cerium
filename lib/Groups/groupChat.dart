@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:projecttest/profile_widget.dart';
 import 'package:provider/provider.dart';
 import '../Theme/themeConstants.dart';
+import 'package:http/http.dart' as http;
+
+import 'Message.dart';
 
 class GroupChat extends StatefulWidget {
   const GroupChat({
@@ -50,6 +53,13 @@ class _GroupChat extends State<GroupChat> {
   final myController = TextEditingController();
   final chatList = List.empty(growable: true);
 
+  @override
+  void initState() {
+    super.initState();
+    client.activate();
+    populateChatList();
+    subscribe();
+  }
 
   @override
   void dispose() {
@@ -100,17 +110,15 @@ class _GroupChat extends State<GroupChat> {
           .groupAdmin}',
       callback: (frame) {
         List<dynamic>? result = json.decode(frame.body!);
-        setState(() {
-          chatList.add(result.toString());
-        });
+        chatList.add(result.toString());
+        setState(() {});
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    client.activate();
-    subscribe();
+
     final themeManager = Provider.of<ThemeManager>(context);
     double baseWidth = 390;
     double fem = MediaQuery.of(context).size.width / baseWidth;
@@ -124,7 +132,7 @@ class _GroupChat extends State<GroupChat> {
       ],
     );
 
-    populateChatList();
+
     return Scaffold(appBar: appBar(context), body: body);
   }
 
@@ -164,8 +172,22 @@ class _GroupChat extends State<GroupChat> {
   }
 
 
-  void populateChatList() {
-    //TODO: Servercall
+
+  Future<void> populateChatList() async {
+    final url = 'http://192.121.208.57:25565/chat/group/messages/${widget.groupName}&${widget.groupAdmin}';
+    final headers = {'Content-Type': 'application/json'};
+    final response = await http.get(Uri.parse(url), headers: headers);
+    final messageList = jsonDecode(response.body);
+
+
+    print(response.body);
+    messageList.forEach((element) {
+        Message message = element as Message;
+        chatList.add(Text(message.toString()));
+    });
+    setState(() {});
+
+
   }
 
   chatInput(
@@ -174,10 +196,10 @@ class _GroupChat extends State<GroupChat> {
       chatList.add(Text(input));
     });
     final message = {
-      'senderName': userName,
+      'senderName': groupAdmin,
       'receiverGroup': groupName,
-      'receiverGroupAdmin': groupAdmin,
-      'timeStamp': DateTime.now().toString(),
+      'receiverGroupAdmin': userName,
+      'date': DateTime.now().toString(),
       'message': input,
     };
     final encodedMSG = jsonEncode(message);
