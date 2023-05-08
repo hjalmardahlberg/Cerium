@@ -40,10 +40,12 @@ Future<void> deleteEvent(EventData event) async {
   final url = 'http://192.121.208.57:8080/event/delete/'+ event.name;
   final headers = {'Content-Type': 'application/json'};
   List<String> groups = event.group.split(',');
+  print(groups.toString());
+
   String g_id = groups[0].split(':')[1].replaceAll(' ', '');
   String owner = groups[2].split(':')[1].replaceAll(' ', '');
   String image = groups[3].split(':')[1].replaceAll(' ', '');
-  String name = groups[5].split(':')[1].replaceAll(' ', '');
+  String name = groups[1].split(':')[1].replaceAll(' ', '');
   String u_id = groups[0].split(':')[1].replaceAll(' ', '');
   String adminusername = groups[4].split(':')[1].replaceAll(' ', '');
   print("gid:" + g_id);
@@ -55,7 +57,7 @@ Future<void> deleteEvent(EventData event) async {
 
   final group = {
     'g_id': g_id,
-    'owner': owner,
+    'admin': owner,
     'image':image,
     'name': name,
     'u_id': u_id,

@@ -177,6 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
             if(start_date.isBefore(DateTime.now())){
               deleteEvent(event);
+              refreshEvent();
             }
             else{
              String time_to_disp = start_date.hour.toString().padLeft(2, '0') + ':' + start_date.minute.toString().padLeft(2, '0') + ' - ' + end_date.hour.toString().padLeft(2, '0') + ':' + end_date.minute.toString().padLeft(2, '0');
@@ -245,22 +246,6 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             }),
       ),
-      TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => EventPage(
-                        picture: 'images/wallsten.jpg',
-                        appbar: homeAppBar(),
-                        theEventName: 'EventName',
-                        eventInfo: 'eventInfo',
-                        date: 'TBD',
-                        time: 'TBD',
-                      )),
-            );
-          },
-          child: const Text('Event page'))
     ]);
   }
 
